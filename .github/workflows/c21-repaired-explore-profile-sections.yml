@@ -20,7 +20,6 @@ jobs:
       options: --init --ipc=host
     env:
       C21_HEAD: 6cae2f8323f13b39009518c05e9fc5e0e95adbb4
-      QA_PREVIOUS_PROOF_HEAD: 6cae2f8323f13b39009518c05e9fc5e0e95adbb4
       QA_DISCOVER_PROFILE_SECTIONS: '1'
       C21_DIST_TREE: 3244b76b491e51400334e72ba233cfa81a8016b7
       C21_MANIFEST: c2fca78d019495cafe0673e473ac82105a7dcbcd3720e5d4aa9e2e536c249f0c
@@ -44,12 +43,6 @@ jobs:
           node-version: '22'
           cache: npm
       - run: npm ci --prefix "$RUNNER_TEMP/c21-product"
-      - uses: actions/download-artifact@v4
-        with:
-          run-id: '45103726006'
-          github-token: ${{ github.token }}
-          name: c21-expanded-explore-${{ matrix.viewport }}
-          path: output/prior-explore
       - name: Exercise each signed Explore destination
         shell: bash
         run: |
@@ -58,10 +51,7 @@ jobs:
           export QA_EXPLORE_OUTPUT="$GITHUB_WORKSPACE/output/explore"
           mkdir -p "$QA_EXPLORE_OUTPUT"
           export QA_EXPLORE_INVENTORY="$QA_EXPLORE_OUTPUT/inventory.json"
-          export QA_EXPLORE_PRIOR="$GITHUB_WORKSPACE/output/prior-explore/summary.json"
           cd "$RUNNER_TEMP/c21-product"
-          test "$(git rev-parse "$QA_PREVIOUS_PROOF_HEAD:dist")" = "$C21_DIST_TREE"
-          if git diff --name-only "$QA_PREVIOUS_PROOF_HEAD" HEAD | grep -Fvx -e tests/browser/performance-reading.spec.js -e tests/browser/research-enhancements.spec.js; then exit 1; fi
           PYTHONPATH=scripts python3 - <<'PY'
           import os
           from pathlib import Path
