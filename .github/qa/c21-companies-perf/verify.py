@@ -6,6 +6,7 @@ import os
 from pathlib import Path
 import subprocess
 import sys
+import tarfile
 import time
 from urllib.error import URLError
 from urllib.request import urlopen
@@ -16,6 +17,7 @@ QA = Path(__file__).resolve().parent
 TEMP = Path(os.environ["RUNNER_TEMP"]) / "companies-perf"
 EVIDENCE = Path(os.environ["RUNNER_TEMP"]) / "companies-perf-evidence"
 EXPECTED = json.loads((QA / "identities.json").read_text())
+BUILD_TREES = ("data", "docs", "release-assets", "schema", "scripts", "tests", "tools", "web")
 
 
 def run(name, args, *, cwd=ROOT, env=None):
@@ -32,6 +34,24 @@ def freeze(label, source, destination):
     (EVIDENCE / f"{label}-manifest.json").write_bytes(manifest)
     if sha256(manifest).hexdigest() != EXPECTED[label]["manifest"]:
         raise RuntimeError(f"{label} artifact differs from the locally frozen manifest")
+
+
+def materialize(label, destination):
+    """Use the exact sparse source inputs that produced the local frozen artifact."""
+    revision = EXPECTED[label]["source"]
+    top = subprocess.check_output(["git", "ls-tree", "-z", revision], cwd=ROOT)
+    files = [entry.partition(b"\t")[2].decode() for entry in top.split(b"\0") if b" blob " in entry]
+    destination.mkdir()
+    with (EVIDENCE / f"{label}-source.log").open("w") as log:
+        log.write(f"{revision}\n" + "\n".join((*files, *BUILD_TREES)) + "\n")
+        log.flush()
+        command = ["git", "archive", "--format=tar", revision, "--", *files, *BUILD_TREES]
+        with subprocess.Popen(command, cwd=ROOT, stdout=subprocess.PIPE, stderr=log) as archive:
+            with tarfile.open(fileobj=archive.stdout, mode="r|") as bundle:
+                bundle.extractall(destination, filter="data")
+            if archive.wait():
+                raise RuntimeError(f"{label} source materialization failed")
+    (destination / "node_modules").symlink_to(ROOT / "node_modules", target_is_directory=True)
 
 
 @contextmanager
@@ -85,7 +105,7 @@ def report_comparison():
                 "transferBytes": sum(item["transferSize"] for item in resources),
                 "workRequests": [item["url"] for item in resources if "/presentation/summary." in item["url"]],
                 "bootData": [{"url": item["url"], "transferBytes": item["transferSize"]}
-                             for item in resources if "/js/" in item["url"] and "-data." in item["url"]
+                             for item in resources if "/js/companies-data." in item["url"]
                              or "/js/data." in item["url"]],
             })
         routes[label] = {"settings": summary["resolvedSettingsSha256"], "limitedRoutePassed": route["passed"],
@@ -98,15 +118,19 @@ def report_comparison():
 def main():
     TEMP.mkdir()
     reference = TEMP / "reference-source"
+    prototype = TEMP / "prototype-source"
     reference_dist, prototype_dist = TEMP / "reference-dist", TEMP / "prototype-dist"
-    source = subprocess.check_output(["git", "rev-parse", "HEAD^"], cwd=ROOT, text=True).strip()
-    if source != EXPECTED["prototype"]["source"]:
-        raise RuntimeError("QA workflow is not a single commit above the frozen source")
-    if run("reference-checkout", ["git", "worktree", "add", "--detach", str(reference), EXPECTED["reference"]["source"]]):
-        raise RuntimeError("Reference source checkout failed")
-    (reference / "node_modules").symlink_to(ROOT / "node_modules", target_is_directory=True)
+    source = EXPECTED["prototype"]["source"]
+    subprocess.run(["git", "merge-base", "--is-ancestor", source, "HEAD"], cwd=ROOT, check=True)
+    changes = subprocess.check_output(["git", "diff", "--name-only", source, "HEAD"], cwd=ROOT, text=True).splitlines()
+    qa_prefix = ".github/qa/c21-companies-perf/"
+    allowed = {".github/workflows/c21-companies-perf-proof.yml", "tests/browser/companies-deferred-work.spec.js"}
+    if any(not path.startswith(qa_prefix) and path not in allowed for path in changes):
+        raise RuntimeError("QA branch changed files outside the proof")
+    materialize("reference", reference)
+    materialize("prototype", prototype)
     freeze("reference", reference, reference_dist)
-    freeze("prototype", ROOT, prototype_dist)
+    freeze("prototype", prototype, prototype_dist)
     if run("projection", ["node", str(QA / "projection.cjs"), str(prototype_dist), str(reference_dist)]):
         raise RuntimeError("Work projection or recovery probe failed")
     # Pin the official settings, runner and policy. Only narrow the route list in this copy.
