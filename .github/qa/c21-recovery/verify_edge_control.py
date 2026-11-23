@@ -7,7 +7,7 @@ import shutil
 import subprocess
 import sys
 from urllib.parse import quote
-from urllib.request import urlopen
+from urllib.request import Request, urlopen
 from release_artifact import validate_artifact
 
 target=os.environ['QA_TARGET']
@@ -23,7 +23,8 @@ assert subprocess.check_output(['git','rev-parse','HEAD:dist'],text=True).strip(
 validate_artifact(Path('dist'),manifest)
 
 def http_bytes(path):
-    with urlopen(origin+path,timeout=45) as response:
+    request=Request(origin+path,headers={'Cache-Control':'no-cache','User-Agent':'ScienceToStartup-ReleaseVerification/1.0 (+https://sciencetostartup.com/method/)'})
+    with urlopen(request,timeout=45) as response:
         assert response.status==200 and response.url==origin+path
         return response.read()
 

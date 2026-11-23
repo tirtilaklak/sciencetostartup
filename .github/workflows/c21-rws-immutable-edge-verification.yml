@@ -88,3 +88,5 @@ jobs:
           path: output/c21-full/
           if-no-files-found: error
           retention-days: 14
+
+# Use the declared ScienceToStartup HTTP verification client.

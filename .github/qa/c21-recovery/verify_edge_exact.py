@@ -57,7 +57,7 @@ signed=Path('dist/manifest.json').read_bytes()
 build=json.loads(signed)['build_id']
 
 def observe(edge):
-    with urlopen(Request(address,headers={'Cache-Control':'no-cache'}),timeout=25) as response:
+    with urlopen(Request(address,headers={'Cache-Control':'no-cache', 'User-Agent':'ScienceToStartup-ReleaseVerification/1.0 (+https://sciencetostartup.com/method/)'}),timeout=25) as response:
         body=response.read()
         final,status=response.url,response.status
     assert status==200 and final==address and body==signed and sha256(body).hexdigest()==digest
