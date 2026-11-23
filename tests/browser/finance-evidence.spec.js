@@ -50,7 +50,7 @@ test('Explore uses publisher copies while retaining the original source records'
   async function expectCitation(row, record) {
     await expect(row.getByRole('link').first()).toHaveAttribute('href', record.url);
     await expect(row.locator('a[href="' + record.url + '"]')).toHaveCount(1);
-    const mirror = row.getByRole('link', { name: 'Recorded mirror', exact: true });
+    const mirror = row.getByRole('link', { name: 'Recorded mirror (opens in a new tab)', exact: true });
     await expect(mirror).toHaveAttribute('href', record.mirror);
     await expect(mirror.locator('..')).toContainText('Checked 12 Oct 2026');
     await expect(row.locator('p.sub').first()).toContainText(`Published ${record.publication} · Checked 22 Nov 2026`);
