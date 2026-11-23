@@ -1,0 +1,160 @@
+name: Verify and materialize the RWS citation update
+on:
+  push:
+    branches: [codex/site-quality-c21-hosted-recovery-20261122]
+    paths: [.github/workflows/c21-rws-mirror-materialize.yml]
+permissions:
+  contents: write
+  actions: read
+jobs:
+  materialize:
+    runs-on: ubuntu-24.04
+    container:
+      image: mcr.microsoft.com/playwright:v1.65.0-noble@sha256:f6fe3cf9a493670b9a20f33597a807262abb25c40c31839ba4ac1dbc51fe7366
+      options: --init --ipc=host
+    timeout-minutes: 12
+    env:
+      BASE_SOURCE: fa24bac625b428bf868b2d5259f2837eef6023b5
+      BASE_MANIFEST: af4eb4073ebd85ec930e080a8745059dce38f5a8ceaeb9def054d4bf9d5724c9
+      MARKET_SOURCE: 3dc00346d6791920535ecca7df608e35a3aee9e6
+      MARKET_MANIFEST: ea4fa51e30eea853e7526bdd62b0117c36c7532da0cb8f471beffd21708a1c45
+      MARKET_BUILD: c5a51a4772cc0d68f33d
+      PROOF_BRANCH: codex/site-quality-rws-source-proof-20261122
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/download-artifact@v4
+        with:
+          github-token: ${{ github.token }}
+          run-id: 45112972232
+          name: c21-rws-mirror-proof-repaired
+          path: output/repaired
+      - name: Apply exactly the already verified output
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+          chown --reference=/proc/self "$HOME"
+          OUT="$GITHUB_WORKSPACE/output/signed-market"
+          PROOF="$GITHUB_WORKSPACE/output/repaired"
+          PRODUCT="$RUNNER_TEMP/market-proof"
+          mkdir -p "$OUT"
+          test "$(git ls-remote origin "refs/heads/$PROOF_BRANCH" | cut -f1)" = "$MARKET_SOURCE"
+          git worktree add --detach "$PRODUCT" "$MARKET_SOURCE"
+          git config --global --add safe.directory "$PRODUCT"
+          cd "$PRODUCT"
+          git config --local user.name 'ScienceToStartup QA'
+          git config --local user.email 'qa@sciencetostartup.com'
+          PYTHONPATH=scripts python3 - "$PROOF" "$RUNNER_TEMP/market-dist" <<'PY'
+          from hashlib import sha256
+          import json, os, shutil, sys
+          from pathlib import Path
+          from release_artifact import validate_artifact
+          proof,new=map(Path,sys.argv[1:])
+          result=json.loads((proof/'build-receipt.json').read_bytes())
+          assert result['source']==os.environ['MARKET_SOURCE']
+          assert result['build']==os.environ['MARKET_BUILD']
+          base=Path('dist')
+          validate_artifact(base,os.environ['BASE_MANIFEST'])
+          assert sha256((proof/'manifest-before.json').read_bytes()).hexdigest()==os.environ['MARKET_MANIFEST']
+          raw=(proof/'payloads/manifest.json').read_bytes()
+          assert sha256(raw).hexdigest()==os.environ['MARKET_MANIFEST']==result['manifest_sha256']
+          expected=json.loads(raw)['sha256']
+          old=json.loads((base/'manifest.json').read_bytes())['sha256']
+          delta={name:sha for name,sha in expected.items() if old.get(name)!=sha}
+          assert delta==result['changed']
+          assert sorted(set(old)-set(expected))==result['removed']
+          assert len(expected)==1282
+          for name,sha in expected.items():
+              source=proof/'payloads'/name if name in delta else base/name
+              assert sha256(source.read_bytes()).hexdigest()==sha,name
+              target=new/name
+              target.parent.mkdir(parents=True,exist_ok=True)
+              shutil.copyfile(source,target)
+          (new/'manifest.json').write_bytes(raw)
+          validate_artifact(new,os.environ['MARKET_MANIFEST'])
+          archives={name:sha for name,sha in old.items() if name.startswith(('research/editions/','publication/','daily/202'))}
+          assert len(archives)==121 and all(expected.get(name)==sha for name,sha in archives.items())
+          PY
+          mv dist "$RUNNER_TEMP/c21-predecessor-dist"
+          mv "$RUNNER_TEMP/market-dist" dist
+          npm ci
+          export QA_BASE_URL=http://127.0.0.1:19011
+          export RWS_RECEIPT="$OUT/rws-parity.json"
+          PYTHONPATH=scripts python3 tests/test_company_updates.py
+          QA_DIST="$PWD/dist" python3 scripts/browser_qa_server.py --port 19011 > "$OUT/origin.log" 2>&1 &
+          origin=$!
+          trap 'kill "$origin" 2>/dev/null || true' EXIT
+          for attempt in $(seq 1 15); do
+            curl --silent --fail "$QA_BASE_URL/manifest.json" --output "$OUT/manifest-before.json" && break
+            sleep 1
+          done
+          cmp "$OUT/manifest-before.json" dist/manifest.json
+          node <<'JS'
+          const { chromium } = require('playwright');
+          const { writeFileSync } = require('node:fs');
+          const url=process.env.QA_BASE_URL;
+          const alternate="https://www.tradingview.com/news/reuters.com%2C2026-10-27%3Anewsml_RSa5108Aa%3A0-reg-rws-holdings-plc-trading-statement/";
+          const original='https://www.lse.co.uk/rns/RWS/trading-statement-bgo38kxyahrrjkn.html?mobile_view=desktop';
+          (async () => {
+            const browser=await chromium.launch();
+            const result=[];
+            try {
+              for (const width of [390,1280]) {
+                for (const native of [true,false]) {
+                  const context=await browser.newContext({viewport:{width,height:844},javaScriptEnabled:!native});
+                  const page=await context.newPage();
+                  try {
+                    await page.goto(url+(native?'/company/rws_trainai/':'/explore/#company/rws_trainai/business'));
+                    await page.locator('details.company-current-facts > summary').press('Enter');
+                    const copy=page.getByRole('link',{name:/RNS 5108A \(via Reuters\)/i});
+                    await copy.waitFor({state:'visible'});
+                    const canonical=page.getByRole('link',{name:/year-end trading statement and notice of results, RNS 5108A/i});
+                    await canonical.waitFor({state:'visible'});
+                    const links=[await copy.getAttribute('href'),await canonical.getAttribute('href')];
+                    const text=await page.locator('body').innerText();
+                    if (links[0]!==alternate||links[1]!==original||!text.includes('expected about £700 million in group revenue')||!text.includes('completed its acquisition of Acogroup')) throw Error('The two exact links did not preserve the verified financial disclosure');
+                    result.push({width,native,links,passed:true});
+                  } finally {await context.close();}
+                }
+              }
+            } finally {
+              await browser.close();
+              writeFileSync(process.env.RWS_RECEIPT,JSON.stringify(result,null,2));
+            }
+            console.log('RWS LINK PARITY',JSON.stringify({cases:result.length,results:result}));
+          })().catch(error=>{console.error(error);process.exitCode=1;});
+          JS
+          node scripts/payload_budgets.mjs --dist dist --output "$OUT/payload-budgets.json"
+          curl --silent --show-error --fail "$QA_BASE_URL/manifest.json" --output "$OUT/manifest-after.json"
+          cmp "$OUT/manifest-after.json" dist/manifest.json
+          git add -A -- dist
+          git diff --cached --check
+          if git diff --cached --name-only | grep -v '^dist/'; then exit 1; fi
+          git commit -m 'Build the verified RWS source update' -- dist
+          HEAD="$(git rev-parse HEAD)"
+          TREE="$(git rev-parse HEAD:dist)"
+          python3 scripts/release_artifact.py prepare --dist dist --output "$OUT/worker-prepared" --source-commit "$HEAD"
+          python3 - "$OUT/materialized.json" "$HEAD" "$TREE" <<'PY'
+          import json, os, sys
+          from pathlib import Path
+          path,head,tree=sys.argv[1:]
+          report={'source':os.environ['MARKET_SOURCE'],'head':head,'dist_tree':tree,
+                  'build':os.environ['MARKET_BUILD'],'manifest_sha256':os.environ['MARKET_MANIFEST']}
+          Path(path).write_text(json.dumps(report,indent=2)+'\n')
+          print(json.dumps(report))
+          PY
+          git push origin "HEAD:refs/heads/$PROOF_BRANCH"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: c21-rws-verified-signed
+          path: output/signed-market/
+          if-no-files-found: error
+          retention-days: 14
