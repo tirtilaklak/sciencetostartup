@@ -59,7 +59,7 @@ html[data-work-load="pending"] [data-work-group] .work-load-status{position:abso
 .work-heading{grid-area:identity;min-width:0}
 .work-heading .work-company{display:inline-block;font-size:.875rem;font-weight:550;line-height:1.4;margin:0 8px 0 0;color:var(--muted)}
 .work-heading h3{font:inherit;font-size:1.1875rem;font-weight:650;line-height:1.3;letter-spacing:-.02em;margin:0;color:var(--ink);overflow-wrap:anywhere}
-.work-heading h3>a{display:inline-block;min-width:44px;min-height:44px;align-content:center;color:var(--ink);text-decoration-color:var(--print-control,#73766b);text-underline-offset:3px}
+.work-heading h3>a{display:inline-block;min-width:44px;min-height:45px;align-content:center;color:var(--ink);text-decoration-color:var(--print-control,#73766b);text-underline-offset:3px}
 .work-heading h3>a:hover{color:var(--green);text-decoration-color:currentColor}
 .work-status{display:inline-block;font-size:.8125rem;line-height:1.4;color:var(--amber,#795418)}
 .work-offer{grid-area:offer;min-width:0}
@@ -97,7 +97,7 @@ html[data-work-load="pending"] [data-work-group] .work-load-status{position:abso
 .work-compare-scroll{overflow-x:auto}
 .work-compare-scroll table{width:100%}
 .work-compare-scroll :is(th,td){padding:8px;text-align:left}
-@media(max-width:760px){
+@media(max-width:759px){
  .work-listing-columns{display:none}
  .work-listing{grid-template-columns:minmax(0,1fr) minmax(0,1fr);grid-template-areas:"identity identity" "offer review" "conditions conditions" "action terms";column-gap:16px}
  .work-listing:has(>.work-terms[open]){grid-template-areas:"identity identity" "offer review" "conditions conditions" "action action" "terms terms"}
@@ -128,7 +128,7 @@ html[data-work-load="pending"] [data-work-group] .work-load-status{position:abso
  font-size:var(--work-option-size);
 }
 .work-page-filter-fields label{font-size:max(12px,.75rem)}
-.work-page-filter-fields select{font-size:var(--work-option-size);padding-inline:8px}
+.static-page .work-page-filter-fields select{font-size:var(--work-option-size);padding-inline:8px}
 .work-page-clear{justify-self:start}
 @supports (grid-template-columns:subgrid) and selector(::details-content){
  .work-page-filters{grid-template-columns:minmax(44px,1fr) max-content;grid-template-rows:auto auto;row-gap:0}
@@ -156,11 +156,12 @@ html[data-work-load="pending"] [data-work-group] .work-load-status{position:abso
 .work-page-advice>summary{display:list-item;min-height:44px;padding:11px 0;font-size:14px;line-height:1.5;color:var(--green);cursor:pointer}
 .work-page-advice[open]{padding-bottom:8px}
 .work-page-advice .note{margin-bottom:0}
-.work-page-disclosures:not(:has(details[open]:not([hidden]))){display:flex;flex-wrap:wrap;gap:0 16px}
+main:not(:has(.work-page-filter-options[open])) .work-page-disclosures:not(:has(details[open]:not([hidden]))){display:flex;flex-wrap:wrap;gap:0 16px}
 @media(orientation:landscape) and (max-height:460px){
  .static-page main:has(.work-page-heading){padding-top:10px}
  .static-page .work-crumbs ol{margin-bottom:8px}
  .static-page main .work-page-heading h1{font-size:2.25rem}
+ .work-listing-columns{display:none}
 }
 @media(min-width:760px) and (max-height:460px) and (orientation:landscape){
  .static-page:has(.work-page-intro) .site-header{min-height:44px;padding-block:4px}

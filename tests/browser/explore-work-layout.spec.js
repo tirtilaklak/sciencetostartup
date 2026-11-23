@@ -89,7 +89,7 @@ test('native Work explains the full count and updates the live count for matchin
   const totals = sections.locator('.work-page-counts');
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/');
-  await page.locator('.primary-link.work-link').click();
+  await page.locator('.hero-actions a[href="/work/"]').click();
   await expect(page).toHaveURL(/\/work\/$/);
   await expect(page.getByRole('searchbox', { name: 'Search listings' })).toBeVisible();
   await expect(count).toHaveAttribute('aria-live', 'polite');
