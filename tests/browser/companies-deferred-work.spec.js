@@ -52,6 +52,13 @@ test('Companies defers Work and recovers the same ordered listings and export', 
   expect(await workIds(page)).toEqual(ids);
   expect(await workCsv(page)).toBe(csv);
   expect(attempts).toBe(2);
+
+  if (process.env.QA_REFERENCE_URL) {
+    await page.goto(new URL('/explore/#work?' + workQuery, process.env.QA_REFERENCE_URL).href);
+    await expect(page.locator('html')).toHaveAttribute('data-view-state', 'ready');
+    expect(await workIds(page)).toEqual(ids);
+    expect(await workCsv(page)).toBe(csv);
+  }
 });
 
 test('Companies Search preserves the query and browse actions when Work data is unavailable', async ({ page }) => {
@@ -89,4 +96,12 @@ test('Market evidence remains available after Companies even before Work loads',
   await page.reload();
   await expect(page.locator('html')).toHaveAttribute('data-view-state', 'ready');
   await expect(page.locator('#overview-work')).toContainText('providers');
+  const market = await page.locator('#business-health').innerText();
+  const workSummary = await page.locator('#overview-work').innerText();
+  if (process.env.QA_REFERENCE_URL) {
+    await page.goto(new URL('/explore/#business-health', process.env.QA_REFERENCE_URL).href);
+    await expect(page.locator('html')).toHaveAttribute('data-view-state', 'ready');
+    expect(await page.locator('#business-health').innerText()).toBe(market);
+    expect(await page.locator('#overview-work').innerText()).toBe(workSummary);
+  }
 });

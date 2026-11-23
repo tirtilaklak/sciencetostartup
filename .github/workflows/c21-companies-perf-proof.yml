@@ -1,0 +1,41 @@
+name: C21 Companies startup prototype proof
+on:
+  push:
+    branches: [codex/site-quality-c21-companies-perf-proof-20261122]
+permissions:
+  contents: read
+jobs:
+  exact-prototype:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - name: Record setup
+        run: |
+          mkdir -p "$RUNNER_TEMP/companies-perf-evidence"
+          date -u > "$RUNNER_TEMP/companies-perf-evidence/setup.log"
+          printf '%s\n' "$GITHUB_SHA" >> "$RUNNER_TEMP/companies-perf-evidence/setup.log"
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 8
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - name: Set up pinned browser and tooling
+        shell: bash
+        run: |
+          npm ci 2>&1 | tee "$RUNNER_TEMP/companies-perf-evidence/npm.log"
+          npx playwright install --with-deps chromium 2>&1 | tee "$RUNNER_TEMP/companies-perf-evidence/browser-install.log"
+      - name: Verify frozen artifacts and compare Companies startup
+        run: python3 .github/qa/c21-companies-perf/verify.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: c21-companies-perf-proof
+          path: ${{ runner.temp }}/companies-perf-evidence/
+          if-no-files-found: error
+          retention-days: 14

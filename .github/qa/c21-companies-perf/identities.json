@@ -1,0 +1,12 @@
+{
+  "reference": {
+    "source": "b1133b04a25cb0d66d39f8836ee9635129816df9",
+    "build": "b773cc149a757d988e22",
+    "manifest": "6edf60f384be1e9d7844d398ef755d9fb839e5130d69b707e92e08ae15241ec1"
+  },
+  "prototype": {
+    "source": "56232938dfe5d32e74953bb1633a042090afe54a",
+    "build": "1789234ab5b7e640e15f",
+    "manifest": "2daef97a0b4476fa2e7d8f20c17d5a7866c88f3b5bd6805724c42a8af63848e9"
+  }
+}
