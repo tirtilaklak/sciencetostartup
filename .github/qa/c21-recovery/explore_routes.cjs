@@ -14,6 +14,14 @@ if (inventory.head !== process.env.C21_HEAD || inventory.manifest !== digest(sig
 const phone = process.env.QA_VIEWPORT === 'phone';
 const viewport = phone ? { width: 390, height: 844 } : { width: 1280, height: 900 };
 const routes = new Map(Object.entries(inventory.routes));
+const prior = process.env.QA_EXPLORE_PRIOR ? JSON.parse(fs.readFileSync(process.env.QA_EXPLORE_PRIOR)) : null;
+if (prior) {
+  if (prior.head !== process.env.QA_PREVIOUS_PROOF_HEAD || prior.manifest !== inventory.manifest ||
+      !prior.passed || prior.before.sha256 !== inventory.manifest || prior.after.sha256 !== inventory.manifest ||
+      prior.viewport.width !== viewport.width || prior.viewport.height !== viewport.height ||
+      !prior.results.every(row => row.passed)) throw Error('Previous route proof does not identify these signed bytes.');
+  for (const row of prior.results) if (!routes.has(row.fragment)) routes.set(row.fragment, row.linkedFrom);
+}
 const aliases = { 'business-health': 'market', venture: 'market', about: 'method',
   labels: 'method', corrections: 'method', coverage: 'method', downloads: 'method' };
 const views = new Set(['market', 'companies', 'work', 'compare', 'method', 'company', ...Object.keys(aliases)]);
@@ -86,7 +94,8 @@ async function reach(page, fragment) {
   const page = await context.newPage();
   const first = await observe(context, 'before');
   const output = process.env.QA_EXPLORE_OUTPUT;
-  const results = [];
+  const results = prior ? [...prior.results] : [];
+  const alreadyTested = new Set(results.map(row => row.fragment));
   let discovery = 0;
   try {
     for (const section of ['market', 'companies', 'work', 'compare', 'method']) {
@@ -105,7 +114,27 @@ async function reach(page, fragment) {
         }
       }
     }
+    if (prior) {
+      await reach(page, 'companies');
+      const companies = await page.evaluate(() => Object.keys(window.SUMMARY_INDEX.companyDetails).sort());
+      for (const id of companies) {
+        const profile = 'company/' + encodeURIComponent(id);
+        await reach(page, profile);
+        if (!routes.has(profile)) routes.set(profile, ['published company profile']);
+        const tabs = await page.locator('#profile-view [data-profile-tab]').evaluateAll(nodes =>
+          nodes.map(node => node.dataset.profileTab));
+        for (const tab of tabs) {
+          if (!primaryPanes.includes(tab)) throw Error('Unknown profile tab: ' + tab);
+          const destination = profile + '/' + tab;
+          if (!routes.has(destination)) {
+            routes.set(destination, ['rendered company tab ' + id + '/' + tab]);
+            discovery += 1;
+          }
+        }
+      }
+    }
     for (const [fragment, linkedFrom] of [...routes.entries()].sort(([a], [b]) => a.localeCompare(b))) {
+      if (alreadyTested.has(fragment)) continue;
       try {
         const result = await reach(page, fragment);
         results.push({ fragment, linkedFrom, passed: true, ...result });
@@ -123,7 +152,7 @@ async function reach(page, fragment) {
     const last = await observe(context, 'after');
     const summary = { passed: results.length === routes.size && results.every(result => result.passed),
       head: inventory.head, manifest: inventory.manifest, viewport, before: first, after: last,
-      authored: Object.keys(inventory.routes).length, extraVisibleRoutes: discovery,
+      authored: Object.keys(inventory.routes).length, extraVisibleRoutes: discovery, priorPassed: alreadyTested.size,
       destinations: routes.size, passedDestinations: results.filter(result => result.passed).length, results };
     fs.writeFileSync(path.join(output, 'summary.json'), JSON.stringify(summary, null, 2) + '\n');
     const failures = results.filter(result => !result.passed).map(({ fragment, error }) => ({ fragment, error }));
