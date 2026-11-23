@@ -81,7 +81,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: c21-company-final-${{ matrix.target }}
+          name: c21-company-rebound-${{ matrix.target }}
           path: output/c21-full/
           if-no-files-found: error
           retention-days: 14
