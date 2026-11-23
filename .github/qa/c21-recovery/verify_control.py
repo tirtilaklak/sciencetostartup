@@ -5,6 +5,7 @@ import os
 from pathlib import Path
 import shutil
 import subprocess
+import sys
 from urllib.parse import quote
 from urllib.request import urlopen
 from release_artifact import validate_artifact
@@ -90,9 +91,10 @@ else:
             assert source_bytes==Path(source_file).read_bytes()
             expected['exact_source_sha256'][source_file]=sha256(source_bytes).hexdigest()
         expected_path.write_text(json.dumps(expected,indent=2)+'\n')
+    command = ([sys.executable,str(scope/'source-index.py'),'--repo',str(Path.cwd())]
+               if target=='companies' else ['bash',str(scope/'run.sh')])
     with (out/'control.log').open('x') as log:
-        code=subprocess.run(['bash',str(scope/'run.sh')],stdout=log,stderr=subprocess.STDOUT,
-                            timeout=1150).returncode
+        code=subprocess.run(command,stdout=log,stderr=subprocess.STDOUT,timeout=1150).returncode
     if code:
         print('\n'.join((out/'control.log').read_text().splitlines()[-28:]))
     reports=Path('output/c20-controls')
