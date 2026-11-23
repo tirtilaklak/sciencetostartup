@@ -84,6 +84,33 @@ test('Back restores the opener from a new entry at the same Compare URL', async 
   await expect(work).toBeInViewport();
 });
 
+test('Rapid Back restores the Compare opener before the fragment change is delivered', async ({ page, browserName }) => {
+  test.skip(browserName !== 'chromium', 'Control Chromium’s same-document Navigation API commit order');
+  await page.addInitScript(() => {
+    window.navigation.addEventListener('currententrychange', event => {
+      if (event.navigationType !== 'push' || location.hash !== '#company/mercor/work') return;
+      queueMicrotask(() => {
+        window.compareEarlyBack = true;
+        history.back();
+      });
+    });
+  });
+  const compare = '/explore/#compare/mercor/a-team/sama';
+  await page.goto(compare);
+  const work = compareCell(page, 'Paid work', 'mercor').getByRole('link', { name: 'Pay & requirements' });
+  await expect(work).toBeVisible();
+  const firstEntry = await page.evaluate(() => window.navigation.currentEntry.key);
+  await page.goto(compare, { waitUntil: 'commit' });
+  const openerEntry = await page.evaluate(() => window.navigation.currentEntry.key);
+  expect(openerEntry).not.toBe(firstEntry);
+  await work.press('Enter');
+  await expect.poll(() => page.evaluate(() => window.compareEarlyBack)).toBe(true);
+  await expect(page).toHaveURL(compare);
+  await expect(work).toBeFocused();
+  await expect(work).toBeInViewport();
+  expect(await page.evaluate(() => window.navigation.currentEntry.key)).toBe(openerEntry);
+});
+
 test('fresh Back from native financing evidence restores More, the Compare pair and keyboard focus', async ({ page }) => {
   await page.addInitScript(() => {
     addEventListener('unload', () => {});
