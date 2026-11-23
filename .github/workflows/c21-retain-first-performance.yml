@@ -1,0 +1,49 @@
+name: Preserve the original mobile performance miss
+on:
+  push:
+    branches: [codex/site-quality-c21-hosted-recovery-20261122]
+    paths: [.github/workflows/c21-retain-first-performance.yml]
+permissions:
+  contents: read
+  actions: read
+jobs:
+  retain:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          github-token: ${{ github.token }}
+          run-id: 45113777911
+          artifact-ids: 14790723436
+          path: output
+      - name: Verify the original failed metric and all report digests
+        run: |
+          python3 - <<'PY'
+          from hashlib import sha256
+          import json
+          from pathlib import Path
+          selected=[]
+          for path in Path('output').rglob('summary.json'):
+              summary=json.loads(path.read_bytes())
+              if summary.get('kind')=='mobile-performance-budget-report':
+                  selected.append((path,summary))
+          assert len(selected)==1
+          path,report=selected[0]
+          assert report['manifestSha256']=='ea4fa51e30eea853e7526bdd62b0117c36c7532da0cb8f471beffd21708a1c45'
+          assert len(report['routes'])==24 and not report['passed']
+          bad=[row for row in report['routes'] if not row['passed']]
+          assert len(bad)==1 and bad[0]['route']=='/explore/#companies'
+          assert 2565<bad[0]['medians']['largest-contentful-paint']<2566
+          for route in report['routes']:
+              for case in route['runReports']:
+                  assert sha256((path.parent/case['report']).read_bytes()).hexdigest()==case['reportSha256']
+          print(json.dumps({'first_artifact':14790723436,'unchanged_reports':72,
+                            'failed_route':bad[0]['route'],'median':bad[0]['medians']['largest-contentful-paint']}))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: pr38-first-mobile-budget-miss
+          path: output
+          if-no-files-found: error
+          retention-days: 14
