@@ -815,13 +815,14 @@ def _reader_shortcuts(outline=(), passages=(), *, chapter_count=0):
             + (_link('#section-contents', 'Section contents') if outline else '') + jumps + '</nav>')
 
 
-def _findings(context):
+def _findings(context, *, edition):
     findings, withheld = executive_findings(context)
     body = ''
     for finding in findings:
+        title = finding['id'] if edition else finding['id'].replace('-', ' ').capitalize()
         body += (f'<article class="r-finding" id="{sp.escape(finding_anchor(finding))}">'
                  '<p class="r-kicker">Analytical judgment</p><h3>'
-                 + _link('#' + finding_anchor(finding), finding['id']) + '</h3>'
+                 + _link('#' + finding_anchor(finding), title) + '</h3>'
                  + '<p>' + sp.escape(field_text(finding['text'])) + '</p><dl class="r-finding-fields">')
         for key, label in JUDGMENT_FIELDS:
             value = field_text(finding.get(key))
@@ -929,7 +930,7 @@ def _report(context, edition=False, base=REPORT_PATH):
     body = ('<section class="r-chapter" id="' + sp.escape(section['id']) + '" tabindex="-1"><h2>'
             + sp.escape(section['title']) + '</h2>'
             + _chapter_content(context, section, ())
-            + _findings(context) + '</section>'
+            + _findings(context, edition=edition) + '</section>'
             + _reader_navigation(context, section['id'], base) + _reader_citation(context, edition))
     return (header + ('' if edition else operating_status_notice(context))
             + '<div class="r-report-layout r-book-reader">'
@@ -1307,6 +1308,7 @@ def _edition_downloads(context, metadata, ledger_path, reuse_path):
 def _data(context, *, ledger_path='/research/data/', metadata=None, reuse_path='', download_sizes=None):
     graph, gate, report = context["graph"], context["gate"], context["report"]
     archive = report.get('archive', {})
+    doi = None if metadata and metadata.get('doi') else publication_metadata(context).get('doi')
     assertions, stubs, sources = _ledger_records(context)
     retired = _retired_assertions(context, assertions, stubs)
     rows = [("Privacy-filtered research JSON", "/publication/clean-dataset.json"), ("CSV", "/publication/clean-dataset.csv"),
@@ -1332,6 +1334,10 @@ def _data(context, *, ledger_path='/research/data/', metadata=None, reuse_path='
         elif url == '/publication/report.pdf' and _has_pre_registration_report(archive):
             link = (_link(url, f'Read the archived report PDF ({report["release_id"]})')
                     + '. The cover was prepared before DOI registration.')
+        elif url == '/publication/executive-brief.html' and ledger_path == '/research/data/' and _has_pre_registration_report(archive):
+            link = _link(url, 'Read the archived executive brief') + '. Prepared before DOI registration.'
+            if doi:
+                link += ' ' + _link('#citation', 'Cite the registered edition') + '.'
         else:
             link = _link(url, label)
         links.append(f'<li>{link}</li>')
@@ -1347,7 +1353,6 @@ def _data(context, *, ledger_path='/research/data/', metadata=None, reuse_path='
     if metadata and metadata.get('doi'):
         download_citation = _edition_downloads(context, metadata, ledger_path, reuse_path)
     else:
-        doi = publication_metadata(context).get('doi')
         version_label = 'Evidence data version' if ledger_path == '/research/data/' else 'Research release'
         download_citation = (
             '<section class="r-section" aria-labelledby="downloads"><h2 id="downloads">Download the research</h2>'

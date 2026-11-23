@@ -56,7 +56,8 @@ class NativeSearchTests(unittest.TestCase):
         self.assertEqual(len(cards), len(data['companies']))
         self.assertIn('Outlier', cards['scale_ai']['data-search'])
         self.assertTrue(any('contributor brand' in value for value in json.loads(cards['scale_ai']['data-search-aliases'])))
-        self.assertIn('href="/?search=#browse-guide"', directory)
+        self.assertIn('href="/#browse-guide" aria-label="Browse the guide"', directory)
+        self.assertIn('data-full-guide-search href="/?search=#browse-guide"', directory)
         html = sp.render_work(research, work['routes'], {row['id']: row['name'] for row in data['companies']}, '2026-11-18')
         projected = work_native_selection(work, research.companies)
         projected_ids = [row['id'] for row in projected]

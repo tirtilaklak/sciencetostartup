@@ -60,10 +60,6 @@
   text-decoration: none;
 }
 .site-header nav a:hover { color: var(--ink); text-decoration: underline; }
-.site-header #home-search-open:not([data-search-ready]) { width: auto; padding-inline: 10px; }
-.site-header #home-search-open:not([data-search-ready]) .site-search-label {
-  position: static; width: auto; height: auto; overflow: visible; clip-path: none;
-}
 .home-menu { display: none; }
 
 .hero {
@@ -212,7 +208,7 @@
   .landing-page .research { grid-template-columns: minmax(0, 1fr); padding-inline: 16px; }
 }
 @media (max-width: 359px) {
-  .site-header { padding-block: 4px; }
+  .site-header { padding-block: 4px; column-gap: 4px; }
   .site-header .site-search-open { margin-left: auto; }
   .hero-actions { gap: 4px; }
   .hero-actions :is(.primary-link, .research-link) { padding-inline: 8px; }

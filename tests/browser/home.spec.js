@@ -175,6 +175,7 @@ test('the Home header can browse when the search runtime is blocked', async ({ p
 });
 
 test('the Home header becomes Search when its pending runtime binds', async ({ page }) => {
+  await page.setViewportSize({ width: 320, height: 720 });
   let resume;
   const pending = new Promise(resolve => { resume = resolve; });
   await page.route('**/home-runtime.js', async route => {
@@ -184,14 +185,27 @@ test('the Home header becomes Search when its pending runtime binds', async ({ p
   try {
     await page.goto('/', { waitUntil: 'commit' });
     const opener = page.locator('#home-search-open');
+    const layout = async () => ({
+      controls: await page.locator('#home-search-open, .home-menu summary').evaluateAll(nodes =>
+        nodes.map(node => {
+          const { x, y, width, height } = node.getBoundingClientRect();
+          return [x, y + scrollY, width, height];
+        })),
+      heroTop: await page.locator('#hero-title').evaluate(node => node.getBoundingClientRect().top + scrollY),
+    });
     await expect(opener).toHaveAccessibleName('Browse the guide');
+    await expect(opener).toHaveCSS('padding-left', '4px');
+    await expect(page.locator('.site-header')).toHaveCSS('column-gap', '4px');
     await expect(opener.locator('kbd')).toBeHidden();
+    const before = await layout();
     await opener.click();
     await expect(page).toHaveURL(/#browse-guide$/);
     await expect(page.locator('#home-search')).toBeHidden();
     resume();
     await page.waitForLoadState('domcontentloaded');
     await expect(opener).toHaveAccessibleName('Search the guide');
+    expect(await layout()).toEqual(before);
+    await expect(opener).toHaveAttribute('href', '/?search=#browse-guide');
     await expect(opener).toHaveAttribute('aria-keyshortcuts', 'Control+K Meta+K');
     await expect(opener.locator('kbd')).not.toHaveAttribute('hidden', '');
     await opener.click();

@@ -1,5 +1,19 @@
 const { test, expect, firefox } = require('@playwright/test');
 
+test('Company correction email has a full touch target on narrow screens', async ({ page }) => {
+  for (const width of [320, 390]) {
+    await page.setViewportSize({ width, height: 720 });
+    await page.goto('/company/org.dataforce/');
+    await page.getByText('Company and review scope', { exact: true }).press('Enter');
+    const correction = page.locator('.r-record-correction');
+    await correction.getByText('Request a correction', { exact: true }).press('Enter');
+    await page.keyboard.press('Tab');
+    const email = correction.getByRole('link', { name: 'Continue to private email', exact: true });
+    await expect(email).toBeFocused();
+    expect((await email.boundingBox()).height).toBeGreaterThanOrEqual(44);
+  }
+});
+
 test('Method correction actions remain separated on narrow screens', async ({ page }) => {
   for (const width of [320, 390]) {
     await page.setViewportSize({ width, height: 720 });

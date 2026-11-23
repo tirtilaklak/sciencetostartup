@@ -1024,12 +1024,16 @@ def cta(href, label):
     return f'<a class="cta" href="{escape(href)}">{escape(label)}{RIGHT_ARROW}</a>'
 
 
-def site_header(current=None, state="page"):
+def site_header(current=None, state="page", *, browse_fallback=False):
     links = "".join(f'<a href="{ORIGIN}{path}"' + (f' aria-current="{state}"' if key == current else "") + f">{label}</a>" for key, label, path in NAV)
     nav = f'<nav class="site-nav" aria-label="Main">{links}</nav>'
+    search_label = "Browse" if browse_fallback else "Search"
+    search_href = "/#browse-guide" if browse_fallback else "/?search=#browse-guide"
+    browse_marker = " data-guide-browse" if browse_fallback else ""
+    icon_hidden = " hidden" if browse_fallback else ""
     return ('<a class="skip" href="#main">Skip to content</a>\n'
             f'<header class="site-header"><a class="wordmark" href="{ORIGIN}/"><span>{SITE_NAME}<small>The AI data field guide</small></span></a>'
-            f'{nav}<a class="site-search-open" href="/?search=#browse-guide" aria-label="Search the guide"><svg class="ui-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true" focusable="false"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 4 4"/></svg><span class="site-search-label">Search</span></a>'
+            f'{nav}<a class="site-search-open"{browse_marker} href="{search_href}" aria-label="{search_label} the guide"><svg class="ui-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true" focusable="false"{icon_hidden}><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 4 4"/></svg><span class="site-search-label">{search_label}</span></a>'
             f'<details class="site-menu"><summary>Menu</summary>{nav}</details></header>\n')
 
 
@@ -1103,9 +1107,12 @@ def document(research, title, description, canonical, body, structured=None, cur
     if structured: head.append(f'<script type="application/ld+json">{json_ld(structured)}</script>\n')
     details_script = '<script src="/native-details.js" defer></script>\n' if re.search(r'class="[^"]*\b(?:company-dossier|method-page)\b', body) else ""
     search_exclusions = ("/research/editions/", "/research/data/assertions/", "/research/data/sources/")
+    path = urlsplit(canonical).path
     search_script = ('<script src="/guide-search-shell.js" defer></script>\n'
-                     if canonical and not urlsplit(canonical).path.startswith(search_exclusions) else "")
-    return "".join(head) + "</head>\n<body class=\"static-page\">\n" + site_header(current, state) + '<main id="main">\n' + body + "</main>\n" + site_footer(research, note) + details_script + search_script + '</body>\n</html>\n'
+                     if canonical and not path.startswith(search_exclusions) else "")
+    # Keep the archived Daily header markup in dated issues.
+    browse_fallback = bool(search_script) and (path == "/daily/" or not path.startswith("/daily/"))
+    return "".join(head) + "</head>\n<body class=\"static-page\">\n" + site_header(current, state, browse_fallback=browse_fallback) + '<main id="main">\n' + body + "</main>\n" + site_footer(research, note) + details_script + search_script + '</body>\n</html>\n'
 
 # ---------------------------------------------------------------------------
 # Company pages

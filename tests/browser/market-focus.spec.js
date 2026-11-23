@@ -82,6 +82,27 @@ test('Market restores Handshake focus to each successive evidence opener', async
   });
 });
 
+test('Market evidence closes and focuses the profile after following its company link', async ({ page }) => {
+  await page.goto('/explore/#business-health');
+  const value = page.locator('#bh-ledger').getByRole('button', { name: /^Appen .*Inspect evidence/ });
+  const dialog = page.locator('#bh-evidence-dialog');
+  const traction = page.locator('#profile-view [data-profile-pane="traction"]');
+
+  async function followProfile() {
+    await openEvidence(value, dialog);
+    await dialog.getByRole('link', { name: 'Full company profile' }).press('Enter');
+    await expect(page).toHaveURL(/#company\/appen\/traction$/);
+    await expect(page.locator('html')).toHaveAttribute('data-view-state', 'ready');
+    await expect(dialog).toHaveJSProperty('open', false);
+    await expect(traction).toBeFocused();
+  }
+
+  await followProfile();
+  await page.goBack();
+  await expect(page).toHaveURL(/#business-health$/);
+  await followProfile();
+});
+
 test('Market restores RWS focus after an alternate observation and nested claim', async ({ page }) => {
   const dialog = await openMarket(page);
 
@@ -128,6 +149,45 @@ test('Market restores RWS focus after an alternate observation and nested claim'
 
   await page.locator('.bh-method > summary').press('Enter');
   await expect(page.locator('#bh-method-content')).toContainText(`Grade A covers ${gradeA}.`);
+});
+
+test('Market claim stays closed when evidence arrives after Escape', async ({ page }) => {
+  await page.addInitScript(() => {
+    const digest = SubtleCrypto.prototype.digest;
+    SubtleCrypto.prototype.digest = async function (algorithm, data) {
+      const result = await digest.call(this, algorithm, data);
+      if (!new TextDecoder().decode(data).includes('"companyId":"rws_trainai"')) return result;
+
+      // Finish a real evidence request between native dismissal and delivery of the close event.
+      const dialog = document.getElementById('evidence-dialog');
+      await new Promise(resolve => {
+        const observer = new MutationObserver(() => {
+          if (dialog.open) return;
+          observer.disconnect();
+          resolve();
+        });
+        observer.observe(dialog, { attributeFilter: ['open'] });
+        dialog.addEventListener('close', () => { window.rwsClaimClosed = true; }, { once: true });
+        window.rwsClaimReadyToFinish = true;
+      });
+      return result;
+    };
+  });
+
+  const dialog = await openMarket(page);
+  const bar = await chartControl(page, rwsSegmentId);
+  await openEvidence(bar, dialog);
+  const claim = dialog.locator('button[data-claim="rws_trainai.claim.growth_metrics-1"]');
+  const sources = page.locator('#evidence-dialog');
+  await openEvidence(claim, sources);
+  await expect(sources).toHaveAttribute('aria-busy', 'true');
+  await page.waitForFunction(() => window.rwsClaimReadyToFinish);
+
+  await page.keyboard.press('Escape');
+  await page.waitForFunction(() => window.rwsClaimClosed);
+  await expect(sources).toHaveJSProperty('open', false);
+  await expect(dialog).toBeVisible();
+  await expect(claim).toBeFocused();
 });
 
 test('Market marks the current observation by its exact ID', async ({ page }) => {

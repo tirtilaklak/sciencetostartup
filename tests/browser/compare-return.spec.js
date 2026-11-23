@@ -4,6 +4,31 @@ function compareCell(page, row, company) {
   return page.locator(`[data-comparison-row="${row}"] [data-comparison-company="${company}"]`);
 }
 
+test('Compare can remove a company whose evidence request keeps failing', async ({ page }) => {
+  let requests = 0;
+  await page.route('**/presentation/company-mercor.*.json', route => {
+    requests++;
+    return route.abort('failed');
+  });
+  await page.goto('/explore/#compare/mercor/a-team/sama');
+
+  const root = page.locator('html');
+  const view = page.locator('#compare-view');
+  const retry = view.getByRole('button', { name: 'Try again' });
+  await expect(root).toHaveAttribute('data-view-state', 'failed');
+  await expect(view.getByRole('heading', { name: 'Evidence for Mercor could not load.' })).toBeVisible();
+  await expect(view.getByRole('link', { name: 'Read the Mercor profile' })).toHaveAttribute('href', '/company/mercor/');
+  const beforeRetry = requests;
+  await retry.press('Enter');
+  await expect.poll(() => requests).toBeGreaterThan(beforeRetry);
+  await expect(retry).toBeFocused();
+
+  await view.getByRole('button', { name: 'Remove Mercor' }).press('Enter');
+  await expect(page).toHaveURL('/explore/#compare/a-team/sama');
+  await expect(root).toHaveAttribute('data-view-state', 'ready');
+  await expect(view.locator('.comparison-table thead .card-head a')).toHaveText(['A.Team', 'Sama']);
+});
+
 test('Compare shows the selected figures on the first phone screen with one selection editor', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/explore/#compare/mercor/snorkel_ai/labelbox');

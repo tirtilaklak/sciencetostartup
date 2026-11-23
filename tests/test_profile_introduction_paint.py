@@ -8,14 +8,17 @@ ROOT = Path(__file__).resolve().parents[1]
 HARNESS = r"""
 const fs=require('node:fs'),path=require('node:path'),vm=require('node:vm'),assert=require('node:assert/strict');
 const source=fs.readFileSync(path.join(process.argv[1],'web/data-runtime.js'),'utf8');
+const app=fs.readFileSync(path.join(process.argv[1],'web/app.js'),'utf8');
 const start=source.indexOf('function pendingView('),end=source.indexOf("\ndocument.addEventListener('click'",start);
+const dialogs=app.indexOf('function closeRouteDialogs()'),route=app.indexOf('function route(event)',dialogs);
 assert(start>=0&&end>start,'Actual profile paint/route owner functions were not found');
-const actual=source.slice(start,end);
+assert(dialogs>=0&&route>dialogs,'Shared dialog lifecycle was not found');
+const actual=app.slice(dialogs,route)+source.slice(start,end);
 const flush=async()=>{for(let i=0;i<10;i++)await Promise.resolve();};
 function environment({visibility='visible',animation=true,transport=null}={}){
  const timers=new Map(),frames=new Map(),calls=[],installed=[],rendered=[],failures=[];let next=0;
  const node=id=>({id,hidden:true,open:false,attributes:new Map(),innerHTML:'',setAttribute(k,v){this.attributes.set(k,v);},removeAttribute(k){this.attributes.delete(k);},querySelector(){return null;}});
- const nodes=new Map(['profile-view','companies-view','work-view','app-failure','compare-content','company-dialog','evidence-dialog'].map(id=>[id,node(id)]));
+ const nodes=new Map(['profile-view','companies-view','work-view','app-failure','compare-content','company-dialog','evidence-dialog','bh-evidence-dialog'].map(id=>[id,node(id)]));
  const root={dataset:{},removeAttribute(){}};
  const document={visibilityState:visibility,documentElement:root,querySelectorAll(selector){return selector==='main>.view'?[nodes.get('profile-view'),nodes.get('companies-view'),nodes.get('work-view')]:[];}};
  const window={},location={hash:'#company/mercor/work'};

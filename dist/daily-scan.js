@@ -26,13 +26,14 @@
   const navigationState = typeof navigationAPI?.currentEntry?.getState === 'function' &&
     typeof navigationAPI.updateCurrentEntry === 'function' && typeof navigationAPI.addEventListener === 'function';
   const timing = globalThis.performance?.getEntriesByType?.('navigation')?.[0];
-  const hashTarget = () => rowById.get(location.hash.slice(1));
+  function hashTarget() {
+    try { return rowById.get(decodeURIComponent(location.hash.slice(1))); }
+    catch (_) { return undefined; }
+  }
   let markedFragment = null;
   function syncFragmentHighlight() {
     // A recreated WebKit document can have a valid fragment without a native :target.
-    let row;
-    try { row = rowById.get(decodeURIComponent(location.hash.slice(1))); }
-    catch (_) { /* Malformed fragment. */ }
+    const row = hashTarget();
     const visibleTarget = row && !row.hidden ? row : null;
     if (visibleTarget === markedFragment) return;
     markedFragment?.removeAttribute('data-fragment-target');
@@ -221,6 +222,8 @@
     if (updateURL) {
       restoration++;
       const url = new URL(location.href);
+      // A newly filtered URL should reproduce these results when shared or reloaded.
+      if (hashTarget()?.hidden) url.hash = '';
       for (const [key, value] of [['q', search.value], ['topic', topic.value], ['type', kind.value]]) {
         if (value) url.searchParams.set(key, value); else url.searchParams.delete(key);
       }
@@ -322,6 +325,7 @@
     restoreReading(true, true);
   });
   filter(false);
+  root.setAttribute('data-daily-enhanced', '');
   showFilters(Boolean(search.value || topic.value || kind.value));
   if (dateForm) dateForm.hidden = false;
   filterDisclosure.hidden = false;

@@ -209,6 +209,7 @@
 
   const openerLabel = opener.querySelector('.site-search-label');
   if (openerLabel) openerLabel.textContent = 'Search';
+  if (opener.dataset.guideBrowse !== undefined) opener.href = '/?search=#browse-guide';
   opener.querySelector('.ui-icon')?.removeAttribute('hidden');
   opener.querySelector('kbd')?.removeAttribute('hidden');
   opener.setAttribute('aria-label', 'Search the guide');
