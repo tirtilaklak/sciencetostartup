@@ -216,12 +216,13 @@ function openEvidence(selector,pointerScroll){
   return;
  }
  const {signal,measure,cohort,company,observation}=bhState;
- evidenceOrigin={selector,pointerScroll,selection:{signal,measure,cohort,company,observation}};
+ evidenceOrigin={selector,pointerScroll,hash:location.hash,selection:{signal,measure,cohort,company,observation}};
  dialog.showModal();
 }
 function restoreEvidenceFocus(){
  const origin=evidenceOrigin;
  if(!origin)return;
+ if(origin.hash!==location.hash){evidenceOrigin=null;return;}
  let trigger=document.querySelector(origin.selector);
  // An alternate measure or scope can remove an invoking chart bar.
  if(!trigger){

@@ -1066,12 +1066,24 @@ function renderMissingCompanyProfile(parts){
  document.title='Profile not found · ScienceToStartup';
  $('profile-view').innerHTML=`<div class="page-heading"><h1>Profile not found</h1><p>No company in this historical Explore set uses ${query?'“'+esc(query)+'”':'that address'}.</p>${recovery}<p><a href="${attr(searchUrl)}">Search the company directory</a></p></div>`;
 }
+function closeRouteDialogs(){
+ let closed=false;
+ for(const id of ['company-dialog','evidence-dialog','bh-evidence-dialog']){
+  const dialog=$(id);
+  if(!dialog?.open)continue;
+  dialog.close();
+  closed=true;
+ }
+ return closed;
+}
 function route(event){
  const wasTraversal=routeTraversal;
  ensureHistoryEntryKey();
  exploreEntryKey=historyKey();
  const returnOrigin=exploreReturnOrigin({traversedFragment:wasTraversal&&event?.type==='hashchange',initial:!event&&!previousRoute});
- if(typeof cancelWorkRouteWrite==='function')cancelWorkRouteWrite();document.documentElement?.removeAttribute?.('data-route');document.documentElement?.style?.removeProperty?.('scroll-behavior');const key=historyKey(),kept=previousRoute===''||routeTraversal?(window.navigation?window.navigation.currentEntry?.getState?.()?.scrollY:history.state?.scrollY):null,saved=Number.isFinite(kept)?kept:null,restore=routeTraversal&&entryScroll.has(key)?entryScroll.get(key):saved;routeRestoredScroll=restore;routeTraversal=false;const closingDialog=event?.closedDialog||event?.type==='hashchange'&&['company-dialog','evidence-dialog'].some(id=>$(id).open);if(event?.type==='hashchange')for(const id of ['company-dialog','evidence-dialog'])if($(id).open)$(id).close();const parts=routeParts(),aliases=window.RESEARCH_ALIASES;parts[0]=String(parts[0]||'').toLowerCase();if(parts[0]==='company'&&parts[1]){const lower=String(parts[1]).toLowerCase();if(lower!==parts[1]&&(isCompanyId(lower)||(aliases&&Object.hasOwn(aliases,lower))))parts[1]=lower;}if(parts[0]==='company'&&aliases&&Object.hasOwn(aliases,parts[1])&&isCompanyId(aliases[parts[1]]))parts[1]=aliases[parts[1]];if(parts[0]==='company'&&isCompanyId(parts[1])){const hash='#'+parts.map(encodeURIComponent).join('/');if(location.hash.split('?')[0]!==hash)history.replaceState(history.state,'',hash+(location.hash.match(/\?.*$/)?.[0]||''));}const anchorId=Object.hasOwn(VIEW_ANCHORS,parts[0])?parts[0]:'',view=anchorId?VIEW_ANCHORS[anchorId]:['market','companies','work','compare','method','company'].includes(parts[0])?parts[0]:'market';
+ if(typeof cancelWorkRouteWrite==='function')cancelWorkRouteWrite();document.documentElement?.removeAttribute?.('data-route');document.documentElement?.style?.removeProperty?.('scroll-behavior');const key=historyKey(),kept=previousRoute===''||routeTraversal?(window.navigation?window.navigation.currentEntry?.getState?.()?.scrollY:history.state?.scrollY):null,saved=Number.isFinite(kept)?kept:null,restore=routeTraversal&&entryScroll.has(key)?entryScroll.get(key):saved;routeRestoredScroll=restore;routeTraversal=false;
+ const closingDialog=(event?.type==='hashchange'&&closeRouteDialogs())||event?.closedDialog;
+ const parts=routeParts(),aliases=window.RESEARCH_ALIASES;parts[0]=String(parts[0]||'').toLowerCase();if(parts[0]==='company'&&parts[1]){const lower=String(parts[1]).toLowerCase();if(lower!==parts[1]&&(isCompanyId(lower)||(aliases&&Object.hasOwn(aliases,lower))))parts[1]=lower;}if(parts[0]==='company'&&aliases&&Object.hasOwn(aliases,parts[1])&&isCompanyId(aliases[parts[1]]))parts[1]=aliases[parts[1]];if(parts[0]==='company'&&isCompanyId(parts[1])){const hash='#'+parts.map(encodeURIComponent).join('/');if(location.hash.split('?')[0]!==hash)history.replaceState(history.state,'',hash+(location.hash.match(/\?.*$/)?.[0]||''));}const anchorId=Object.hasOwn(VIEW_ANCHORS,parts[0])?parts[0]:'',view=anchorId?VIEW_ANCHORS[anchorId]:['market','companies','work','compare','method','company'].includes(parts[0])?parts[0]:'market';
  const shortlist=view==='companies'?shortlistReturnState(wasTraversal):null;
  const fallback=history.state?.companySearchFallback;
  const restoreFallback=view==='companies'&&!event&&!previousRoute&&fallback?.page===location.href&&window.performance?.getEntriesByType?.('navigation')[0]?.type==='back_forward';

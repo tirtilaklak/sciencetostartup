@@ -442,7 +442,9 @@ test('imported executive judgments retain complete content and approved evidence
     const id = 'finding-' + finding.id;
     const article = page.locator(selector(id));
     await expect(article).toHaveCount(1);
-    await expect(article.getByRole('heading', { level: 3 }).getByRole('link')).toHaveAttribute('href', '#' + id);
+    const heading = finding.id.toLowerCase().replaceAll('-', ' ').replace(/^./, letter => letter.toUpperCase());
+    await expect(article.getByRole('heading', { level: 3, name: heading, exact: true }).getByRole('link'))
+      .toHaveAttribute('href', '#' + id);
     await expect(article).toContainText(normalize(text(finding.text)));
     for (const [key, label] of Object.entries(judgmentFields)) {
       if (!text(finding[key])) continue;

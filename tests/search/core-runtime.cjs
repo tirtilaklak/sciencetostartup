@@ -56,6 +56,8 @@ function harness(url = 'https://fixture.test/', { nativeDialog = true } = {}) {
   const opener = node('home-search-open');
   const parts = {'.site-search-label':node('search-label'),'.ui-icon':node('search-icon'),kbd:node('search-shortcut')};
   opener.querySelector = selector => parts[selector] || null;
+  opener.dataset.guideBrowse = '';
+  opener.href = '#browse-guide';
   opener.setAttribute('aria-label','Browse the guide');
   parts['.site-search-label'].textContent = 'Browse';
   parts['.ui-icon'].hidden = parts.kbd.hidden = true;
@@ -71,11 +73,13 @@ function harness(url = 'https://fixture.test/', { nativeDialog = true } = {}) {
 const unsupported = harness(undefined,{nativeDialog:false});
 unsupported.click();
 assert.equal(unsupported.node('home-search-open')['aria-label'],'Browse the guide');
+assert.equal(unsupported.node('home-search-open').href,'#browse-guide');
 assert.equal(unsupported.node('search-label').textContent,'Browse');
 assert.equal(unsupported.node('search-shortcut').hidden,true);
 assert.equal(unsupported.scripts.length,0);
 const stalled = harness();
 assert.equal(stalled.node('home-search-open')['aria-label'],'Search the guide');
+assert.equal(stalled.node('home-search-open').href,'/?search=#browse-guide');
 assert.equal(stalled.node('home-search-open').dataset.searchReady,'');
 assert.equal(stalled.node('search-label').textContent,'Search');
 assert.equal(stalled.node('search-icon').hidden,undefined);

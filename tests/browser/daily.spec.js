@@ -461,6 +461,8 @@ test('Daily story highlight follows the visible fragment as filters and history 
   const markedRows = page.locator('.scan-item[data-fragment-target]');
   const search = page.getByRole('searchbox', { name: 'Search', exact: true });
   const address = `/daily/${latest.date}/`;
+  const query = 'daily-no-such-selection-987654321';
+  const filteredAddress = address + '?q=' + query;
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.goto(address);
 
@@ -479,13 +481,25 @@ test('Daily story highlight follows the visible fragment as filters and history 
   await expectHighlight(first.id);
   await rows.nth(0).locator('summary').press('Enter');
   await openFilters(page);
-  await search.fill('daily-no-such-selection-987654321');
+  const entries = await page.evaluate(() => history.length);
+  await search.fill(query);
+  await expect(page).toHaveURL(filteredAddress);
+  await expect(search).toBeFocused();
+  expect(await page.evaluate(() => history.length)).toBe(entries);
   await expect(rows.nth(0)).toBeHidden();
   await expectHighlight();
   await search.clear();
+  await expect(page).toHaveURL(address);
   await expect(rows.nth(0)).toBeVisible();
-  await expectHighlight(first.id);
+  await expectHighlight();
   await expect(rows.nth(0).locator('details')).not.toHaveAttribute('open', '');
+
+  await search.fill(query);
+  await page.reload();
+  await expect(page).toHaveURL(filteredAddress);
+  await expect(search).toHaveValue(query);
+  await assertSelections(page, []);
+  await search.clear();
 
   await rows.nth(1).locator('summary').press('Enter');
   await rows.nth(1).locator('.scan-permalink').press('Enter');

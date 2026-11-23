@@ -1,6 +1,28 @@
 const {test,expect}=require('@playwright/test');
 const {routes}=require('../../data/work-routes.json');
 
+test.describe('without JavaScript', () => {
+  test.use({ javaScriptEnabled: false });
+  for (const path of ['/work/', '/research/', '/daily/']) {
+    test(`the header on ${path} leads to Browse`, async ({ page }) => {
+      await page.goto(path);
+      const browse = page.locator('header').getByRole('link', { name: 'Browse the guide' });
+      const label = browse.locator('.site-search-label');
+      await expect(browse).toHaveAttribute('href', '/#browse-guide');
+      await expect(browse).not.toHaveAttribute('aria-haspopup', 'dialog');
+      await expect(label).toHaveText('Browse');
+      expect((await label.boundingBox()).width).toBeGreaterThan(20);
+      const size = await browse.boundingBox();
+      expect(size.width).toBeGreaterThanOrEqual(44);
+      expect(size.height).toBeGreaterThanOrEqual(44);
+      await browse.press('Enter');
+      await expect(page).toHaveURL('/#browse-guide');
+      await expect(page.getByRole('navigation', { name: 'Browse the guide' }).getByRole('link'))
+        .toHaveText(['Companies', 'Paid work', 'Research']);
+    });
+  }
+});
+
 test('global search keeps the native reader page, filters and opener when dismissed', async ({ page }) => {
   const requests = [];
   page.on('request', request => requests.push(request.url()));

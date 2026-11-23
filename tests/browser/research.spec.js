@@ -259,7 +259,18 @@ test.describe('research without JavaScript', () => {
       expect(receipt.concept_doi).not.toBe(doi);
       expect(receipt.record_url).toBe('https://zenodo.org/records/' + receipt.record_id);
       expect(metadata).toMatchObject({ status: 'published', doi, url: receipt.record_url });
-      if (status.release_id === 'research-2026-11-12.1') expect(doi).toBe('10.5281/zenodo.24249277');
+      if (status.release_id === 'research-2026-11-12.1') {
+        expect(doi).toBe('10.5281/zenodo.24249277');
+        const download = page.locator('.r-downloads li').filter({
+          has: page.getByRole('link', { name: 'Read the archived executive brief' }),
+        });
+        await expect(download.getByRole('link', { name: 'Read the archived executive brief' }))
+          .toHaveAttribute('href', '/publication/executive-brief.html');
+        await expect(download).toContainText('Prepared before DOI registration.');
+        await download.getByRole('link', { name: 'Cite the registered edition' }).click();
+        await expect(page.locator('#citation:target').getByRole('link', { name: 'Registered version DOI ' + doi }))
+          .toHaveAttribute('href', 'https://doi.org/' + doi);
+      }
     } else {
       expect(metadata.doi).toBeUndefined();
     }

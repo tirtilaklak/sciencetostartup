@@ -35,7 +35,8 @@
 .scan-item{padding:26px 0 20px;border-bottom:1px solid var(--border);scroll-margin-top:24px}
 .scan-item:first-child{padding-top:14px}
 .scan-item-body{min-width:0}
-.scan-item:target,.scan-item[data-fragment-target]{background:#eaf0e5;box-shadow:16px 0 #eaf0e5,-16px 0 #eaf0e5}
+/* A browser can keep :target on the old story after history.replaceState. */
+.daily-scan:not([data-daily-enhanced]) .scan-item:target,.scan-item[data-fragment-target]{background:#eaf0e5;box-shadow:16px 0 #eaf0e5,-16px 0 #eaf0e5}
 .scan-meta{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center;font-size:11px;color:var(--muted);line-height:1.5}
 .scan-kind{color:var(--green);font-weight:600}
 .scan-meta>span:last-child{margin-left:auto}
@@ -100,7 +101,7 @@
   .daily-scan dl>div{display:block}
   .daily-scan dt{margin-bottom:4px}
   .scan-context{grid-template-columns:1fr;gap:24px}
-  .scan-item:target,.scan-item[data-fragment-target]{box-shadow:8px 0 #eaf0e5,-8px 0 #eaf0e5}
+  .daily-scan:not([data-daily-enhanced]) .scan-item:target,.scan-item[data-fragment-target]{box-shadow:8px 0 #eaf0e5,-8px 0 #eaf0e5}
 }
 @media(max-width:360px){
   .scan-controls>div:not(.scan-search-control){flex-basis:100%}

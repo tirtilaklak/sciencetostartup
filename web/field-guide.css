@@ -38,6 +38,20 @@ h1,h2,h3,h4{font-family:var(--fg-sans);color:var(--ink)}
 .site-search-open .ui-icon{flex:none;width:18px;height:18px}
 .site-search-open kbd,.site-search-enter{padding:1px 6px;border:1px solid var(--border);border-radius:3px;background:var(--bg);color:var(--muted);font:12px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace}
 .site-search-open kbd{margin-left:auto}
+.site-header > .site-search-open[data-guide-browse]:not([data-search-ready]) { width: auto; }
+.site-header > .site-search-open[data-guide-browse]:not([data-search-ready]) > .site-search-label {
+  position: static; width: auto; height: auto; overflow: visible; clip-path: none;
+}
+@media (max-width: 900px) {
+  .site-header > .site-search-open[data-guide-browse] {
+    display: inline-grid; place-items: center; width: auto; min-width: 44px; padding: 0 4px;
+  }
+  .site-search-open[data-guide-browse] > :is(.ui-icon, .site-search-label) { grid-area: 1 / 1; }
+  /* Reserve the Browse label's space when the compact control becomes Search. */
+  .site-search-open[data-guide-browse][data-search-ready]::before {
+    content: "Browse"; visibility: hidden; grid-area: 1 / 1;
+  }
+}
 
 /* One native search dialog is shared by the light homepage and the guide. */
 .site-search{position:fixed;inset:0;width:min(640px,calc(100% - 32px));max-width:none;max-height:calc(100vh - 96px);max-height:calc(100dvh - 96px);margin:48px auto auto;padding:0;border:1px solid #aebba8;border-radius:8px;background:var(--bg);color:var(--ink);overflow:hidden}

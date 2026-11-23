@@ -7,7 +7,7 @@ test.use({ launchOptions: { firefoxUserPrefs: {
 
 const destinations = ['Daily scan', 'Research', 'Companies', 'Paid work', 'About'];
 
-function navigation(page) {
+function navigation(page, searchLabel = 'Search the guide') {
   const header = page.locator('body > header.site-header');
   const nav = header.getByRole('navigation', { name: 'Main', exact: true });
   return {
@@ -16,7 +16,7 @@ function navigation(page) {
     links: destinations.map(name => nav.getByRole('link', { name, exact: true })),
     skip: page.getByRole('link', { name: 'Skip to content' }),
     wordmark: header.getByRole('link', { name: /ScienceToStartup/ }),
-    search: header.getByRole('link', { name: 'Search the guide' }),
+    search: header.getByRole('link', { name: searchLabel }),
     menu: header.getByText('Menu', { exact: true }),
   };
 }
@@ -73,7 +73,7 @@ async function checkInlineNavigation(page) {
     await test.step(`${width}px inline navigation`, async () => {
       await page.setViewportSize({ width, height: 844 });
       await page.goto('/work/');
-      const { skip, wordmark, search, menu, nav, links } = navigation(page);
+      const { skip, wordmark, search, menu, nav, links } = navigation(page, 'Browse the guide');
       await expect(menu).toBeHidden();
       await expect(nav.getByRole('link')).toHaveText(destinations);
       await tabTo(page, skip, wordmark);
@@ -152,11 +152,11 @@ test.describe('native navigation with enlarged Firefox text and no scripts', () 
       ]) {
         await test.step(path, async () => {
           await page.goto(path);
-          const { header, skip, wordmark, search, menu, nav, links } = navigation(page);
+          const { header, skip, wordmark, search, menu, nav, links } = navigation(page, 'Browse the guide');
           const closedHeight = (await header.boundingBox()).height;
           if (width === 320) expect(closedHeight).toBeLessThanOrEqual(110);
           await expect(nav).toHaveCount(0);
-          await expect(search).toHaveAttribute('href', '/?search=#browse-guide');
+          await expect(search).toHaveAttribute('href', '/#browse-guide');
 
           await tabTo(page, skip, wordmark, search, menu);
           for (const control of [wordmark, search, menu]) await expectHitArea(control);

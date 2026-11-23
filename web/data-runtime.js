@@ -134,10 +134,16 @@ function installResearchContext(payload){
  if(payload.companyId)window.COMPANY_CONTEXTS_READY.add(payload.companyId);
  if(typeof refreshResearchIndexes==='function')refreshResearchIndexes();
 }
-async function companyContext(id,signal){
- const descriptor=Object.hasOwn(presentationIdentity.companyDetails,id)&&presentationIdentity.companyDetails[id];if(!descriptor)throw new Error('Company record is missing');
+async function companyContext(id,signal,onEvidenceError){
+ const descriptor=Object.hasOwn(presentationIdentity.companyDetails,id)&&presentationIdentity.companyDetails[id];
+ if(!descriptor){
+  const error=new Error('Company record is missing');
+  onEvidenceError?.(error,id);
+  throw error;
+ }
  if(detailCache.has(id))return detailCache.get(id);
- const [payload]=await Promise.all([fetchPresentation(descriptor,id,signal),ensureHealthModule()]);detailCache.set(id,payload);return payload;
+ const evidence=fetchPresentation(descriptor,id,signal).catch(error=>{onEvidenceError?.(error,id);throw error;});
+ const [payload]=await Promise.all([evidence,ensureHealthModule()]);detailCache.set(id,payload);return payload;
 }
 function pendingView(view){
  document.documentElement.removeAttribute('data-route');
@@ -185,16 +191,23 @@ function failedProfile(id,section,error){
  else target.innerHTML=`<div class="profile-v2" data-profile-company="${attr(id)}">${profileIntroductionHTML(id)}${notice}</div>`;
  presentationState('failed',evidenceFailure(error));
 }
-function pendingComparison(selection,error){
+function pendingComparison(selection,error,failedCompany){
  pendingView('compare');
  renderComparisonScope('compare');
  compareTitle(selection.ids);
  syncComparisonPreset();syncCompareAdd();
  const names=listText(selection.ids.map(id=>companies[id].name)),target=$('compare-content');
  const notice=compareNoticeHTML(compareRouteNotice(selection));
- const nativeLinks=selection.ids.map(id=>`<li><a href="/company/${encodeURIComponent(id)}/">Read the ${esc(companies[id].name)} profile</a></li>`).join('');
- const status=error?`Evidence for ${names} could not load.`:`Loading evidence for ${names}…`;
- if(error)target.removeAttribute('aria-busy');else target.setAttribute('aria-busy','true');
+ const nativeLinks=selection.ids.map(id=>{
+  const name=esc(companies[id].name);
+  const remove=error?` <button type="button" class="quiet" data-remove="${attr(id)}">Remove ${name}</button>`:'';
+  return `<li><a href="/company/${encodeURIComponent(id)}/">Read the ${name} profile</a>${remove}</li>`;
+ }).join('');
+ const status=error?`Evidence for ${failedCompany?companies[failedCompany].name:names} could not load.`:`Loading evidence for ${names}…`;
+ if(error){
+  target.removeAttribute('aria-busy');
+  syncCompareTools(selection.ids);
+ }else target.setAttribute('aria-busy','true');
  $('compare-status').textContent=status;
  target.innerHTML=notice+`<section class="availability-notice"><h2>${esc(status)}</h2>${error?'<p><button type="button" data-retry-compare>Try again</button></p>':''}<ul>${nativeLinks}</ul></section>`;
  if(error)presentationState('failed',evidenceFailure(error));
@@ -221,6 +234,7 @@ route=function(event){
  const view=parts[0],company=view==='company'?profileRouteCompany(parts[1]):'';
  const archive=view==='method'||VIEW_ANCHORS[view]==='method';
  const comparison=view==='compare'?compareRouteSelection(hash):null;
+ const companyEvidenceErrors=new Map();
  const correction=view==='corrections'?exploreCorrectionTarget(hash):null;
  const correctionCompany=correction&&!exploreCorrectionClaim(correction)?correction.company:'';
  const overview=view===''||view==='market'||VIEW_ANCHORS[view]==='market'||!['companies','work','compare','method','company',...Object.keys(VIEW_ANCHORS)].includes(view);
@@ -233,8 +247,7 @@ route=function(event){
   for(const id of [...(cacheKey?[cacheKey]:[]),...ids])installResearchContext(detailCache.get(id));
   const result=synchronousRoute.call(this,event);presentationState('ready');afterRouteRetry(event,generation);window.APP_ROUTE_READY=Promise.resolve(result);return result;
  }
- const closedDialog=event?.type==='hashchange'&&['company-dialog','evidence-dialog'].some(id=>$(id).open);
- if(event?.type==='hashchange')for(const id of ['company-dialog','evidence-dialog'])if($(id).open)$(id).close();
+ const closedDialog=event?.type==='hashchange'&&closeRouteDialogs();
  const controller=detailController=new AbortController();presentationState('loading');
  if(company)loadingProfile(company,parts[2]);
  if(comparison){
@@ -254,7 +267,7 @@ route=function(event){
    section=Promise.all([fetchPresentation(descriptor,null,controller.signal),ensureHealthModule()]).then(([payload])=>payload);
   }
   const [sectionContext,...payloads]=await Promise.all([section,...ids.map(id=>{
-   const pending=companyContext(id,controller.signal);
+   const pending=companyContext(id,controller.signal,comparison?(error,id)=>companyEvidenceErrors.set(error,id):undefined);
    return correctionCompany?pending.catch(()=>null):pending;
   })]);
   if(generation!==navigationGeneration||location.hash!==hash)return;
@@ -270,7 +283,7 @@ route=function(event){
   if(error.name==='AbortError'||generation!==navigationGeneration||location.hash!==hash)return;
   restoreSearchRouteControls();
   if(company)failedProfile(company,parts[2],error);
-  else if(comparison)pendingComparison(comparison,error);
+  else if(comparison)pendingComparison(comparison,error,companyEvidenceErrors.get(error));
   else if(needsSearch){pendingWorkSearchRoute(true);presentationState('failed','search-request');}
   else{
    const active=document.activeElement;
@@ -298,7 +311,7 @@ showEvidence=function(id,...args){
  const generation=++evidenceGeneration,navigation=navigationGeneration;
  if(!Object.hasOwn(presentationIdentity.companyDetails,company))return synchronousEvidence.call(this,id,...args);
  const dialog=$('evidence-dialog');
- const current=()=>generation===evidenceGeneration&&location.hash===hash&&navigation===navigationGeneration;
+ const current=()=>dialog.open&&generation===evidenceGeneration&&location.hash===hash&&navigation===navigationGeneration;
  const fallback=nativeProfileFallback(company,'claim');
  const present=(text,pending=false,retry=false)=>{
   if(!dialog.open){evidenceReturnFocus=document.activeElement;evidenceReturnHash='';evidenceRecordHash='';}
