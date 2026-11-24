@@ -166,6 +166,46 @@ async function returnWithEarlyBookmarkFocus(page, whileHeld = async () => {}) {
   return departure;
 }
 
+test.describe('Work application and source return', () => {
+  test.use({ viewport: { width: 320, height: 720 } });
+
+  for (const fromTerms of [false, true]) {
+    const label = fromTerms ? 'source in Terms & sources' : 'primary application link';
+    test(`cold Back restores the exact ${label} on a bookmarked Work entry`, async ({ page }) => {
+      await observeHistory(page, true);
+      const bookmark = '/work/?q=World+Models&pay=hourly#' + roleId;
+      const destination = 'https://experts.afterquery.com/apply/world-models-ml-experts';
+      await page.route(destination, route => route.fulfill({
+        contentType: 'text/html', body: '<!doctype html><title>Application source</title><p>Application source fixture</p>',
+      }));
+      await page.goto(bookmark);
+      const { card, application, terms } = controls(page);
+      await expect(card).toBeFocused();
+      const summary = terms.locator('summary');
+      if (fromTerms) await summary.press('Enter');
+      const source = terms.locator(`a[href="${destination}"]`);
+      const opener = fromTerms ? source : application;
+      await expect(opener).toHaveAttribute('href', destination);
+      await opener.scrollIntoViewIfNeeded();
+      await opener.focus();
+      const top = await opener.evaluate(link => link.getBoundingClientRect().top);
+      await opener.press('Enter');
+      await expect(page).toHaveURL(destination);
+
+      await page.goBack({ waitUntil: 'commit' });
+      await expect(page).toHaveURL(bookmark);
+      await expect.poll(() => page.evaluate(() => window.workReturnPersisted)).toBe(false);
+      await expect(opener).toBeFocused();
+      await expect(terms).toHaveJSProperty('open', fromTerms);
+      await expect(opener).toBeInViewport({ ratio: 1 });
+      await expect.poll(() => opener.evaluate((link, previous) => Math.abs(link.getBoundingClientRect().top - previous), top)).toBeLessThan(3);
+      if (fromTerms) await page.keyboard.press('Shift+Tab');
+      else await page.keyboard.press('Tab');
+      await expect(summary).toBeFocused();
+    });
+  }
+});
+
 test.describe('Work company-profile handoff', () => {
   test.use({ viewport: { width: 1024, height: 600 } });
   test.skip(({ isMobile }) => isMobile, 'Use the audited desktop keyboard layout');

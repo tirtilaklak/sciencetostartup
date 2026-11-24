@@ -305,7 +305,10 @@ context.INITIALIZE_RUNTIME=()=>{
         summary, _ = build_presentation(self.data, self.destination, ROOT, sidecars, {})
         self.assertNotIn("researchSearchEntries", summary)
         search = json.loads((self.destination / summary["fullSearch"]["href"].lstrip('/')).read_text())
-        self.assertEqual(search["researchSearchEntries"], entries)
+        self.assertEqual([row for row in search["researchSearchEntries"] if row["kind"] != "market"], entries)
+        market = next(row for row in search["researchSearchEntries"] if row["kind"] == "market")
+        self.assertEqual(market["url"], "/explore/#business-health")
+        self.assertIn("Business health", market["aliases"])
         home = json.loads((self.destination / summary["homeSearch"]["href"].lstrip('/')).read_text())
         self.assertEqual(next(row for row in home["entries"] if row["href"] == entries[0]["url"])["name"], entries[0]["title"])
 

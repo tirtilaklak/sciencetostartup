@@ -135,9 +135,12 @@ test('native Work explains the full count and updates the live count for matchin
   await expect(count).toHaveText('0 matching records');
   await expect(sections).toBeHidden();
   await expect(page.locator('[data-work-empty]')).toContainText('No records match.');
+  await expect(page.getByRole('link', { name: 'Compare results' })).toBeHidden();
+  await expect(page.getByRole('button', { name: 'Download CSV' })).toBeHidden();
   await page.getByRole('button', { name: 'Clear search and filters' }).click();
   await expect(count).toHaveText(fullCount);
   await expect(totals).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Download CSV' })).toBeVisible();
   await page.getByRole('link', { name: 'Compare results' }).click();
   await expect(page.locator('[data-work-comparison]')).toBeVisible();
   await expect(sections).toBeHidden();
@@ -163,6 +166,22 @@ test('native Work explains the full count and updates the live count for matchin
   } finally {
     await noScript.close();
   }
+});
+
+test('a Work comparison with zero results still offers a return to listings', async ({ page }) => {
+  await page.goto('/work/?q=unfindable-work-record-fixture&view=compare');
+  const back = page.getByRole('link', { name: 'Back to listings' });
+  await expect(back).toBeVisible();
+  await expect(page.locator('[data-work-comparison]')).toBeHidden();
+  await expect(page.getByRole('button', { name: 'Download CSV' })).toBeHidden();
+  await back.press('Enter');
+  await expect(page).toHaveURL('/work/?q=unfindable-work-record-fixture');
+  const clear = page.getByRole('button', { name: 'Clear search and filters' });
+  await expect(clear).toBeVisible();
+  await clear.press('Enter');
+  await expect(page.getByRole('searchbox', { name: 'Search listings' })).toBeFocused();
+  await expect(page.getByRole('link', { name: 'Compare results' })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Download CSV' })).toBeVisible();
 });
 
 test('native Work restores the open section disclosure on cold Back from Compare', async ({ page }) => {

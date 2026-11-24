@@ -1984,6 +1984,7 @@ def render_index(research, companies, editorial_by_id, labels, work_count, modif
 
     current_entries = current_entries or []
     current_by_id = {row["entity_id"]: row for row in current_entries}
+    sourced_companies = {source.get("company_id") for source in getattr(research, "sources", {}).values() if is_web_url(source.get("url"))}
     historical_count = len(companies)
     companies = sorted([*companies, *[{"id": row["entity_id"], "name": row["name"]} for row in current_entries]], key=lambda c: (locale_key(clean(c["name"])), c["id"]))
     editorial_by_id = {**editorial_by_id, **{row["entity_id"]: {"primary_offering": row["group"], "summary": row["wikipedia"]["description"]} for row in current_entries}}
@@ -2024,6 +2025,9 @@ def render_index(research, companies, editorial_by_id, labels, work_count, modif
                 compare_link = ''
             else:
                 evidence = business_observation_html(research, business_health, cid, inline=True) + current_facts_html((profile_by_id or {}).get(cid))
+                if not evidence and cid in sourced_companies:
+                    evidence = (f'<a class="directory-source-link" href="{ORIGIN}/company/{escape(cid)}/#sources" '
+                                f'aria-label="Profile sources for {escape(name)}">Profile sources</a>')
                 content = f'<p class="directory-company-summary">{escape(summary)}</p>'
                 if evidence:
                     content += f'<div class="directory-company-evidence">{evidence}</div>'

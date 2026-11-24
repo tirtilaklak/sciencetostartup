@@ -57,6 +57,15 @@ window.WORK_NATIVE_SELECTION=[{"id":"mercor.work.expert-network","company_id":"m
     return explicitWork(text) ? text.trim().replace(leadingWork, '').replace(trailingWork, '').trim() : text;
   }
   const workUrl = value => '/work/' + (String(value ?? '').trim() ? '?' + new URLSearchParams({ q: value }) : '');
+  const hourlyWork = Object.freeze({
+    name: 'See roles with published hourly pay',
+    summary: 'Includes past listings',
+    href: '/work/?pay=hourly'
+  });
+  const hourlyWorkShortcut = value => {
+    const key = normalize(value);
+    return key === 'hourly' || key === 'hourly pay' ? hourlyWork : null;
+  };
   function compile(row) {
     const aliases = values(row.aliases).map(raw => ({ raw, key: normalize(aliasName(raw)) }));
     const name = normalize(row.name);
@@ -84,7 +93,7 @@ window.WORK_NATIVE_SELECTION=[{"id":"mercor.work.expert-network","company_id":"m
     if (!key || entry.name.includes(key)) return '';
     return entry.aliases.find(alias => alias.key === key || alias.key.startsWith(key))?.raw || '';
   }
-  globalThis.S2SSearch = Object.freeze({ normalize, identifier, identifiers, isWorkQuery, workTerms, workUrl, compile, rank, compare, matchedAlias });
+  globalThis.S2SSearch = Object.freeze({ normalize, identifier, identifiers, isWorkQuery, workTerms, workUrl, hourlyWorkShortcut, compile, rank, compare, matchedAlias });
 })();
 
 /* Selection, order and data export shared by native Work and Explore. */
@@ -568,6 +577,7 @@ const S2SWork = (() => {
     const fields = Object.fromEntries(S2SWork.keys.map(key => [key, form.elements.namedItem(key)]));
     const cards = new Map([...list.querySelectorAll('[data-work-route]')].map(card => [card.dataset.workRoute, card]));
     const profileLinkSelector = '.work-heading a[href^="/company/"]';
+    const sourceLinkSelector = '.work-listing-action a.ext[href], .work-terms a.ext[href]';
     const text = (card, selector) => card.querySelector(selector)?.textContent.trim() || '';
     // An older page can still request the current unversioned enhancer. Its own
     // cards supply search terms and groups so a newer release cannot change their facts.
@@ -589,7 +599,7 @@ const S2SWork = (() => {
     const initialOpen = new Map([...groupElements.values()].filter(group => group.tagName === 'DETAILS').map(group => [group, group.open]));
     const compareArrivalKey = 's2s.workCompareArrival';
     let compareDeparture;
-    let profileClick, profileDeparture;
+    let cardClick, cardDeparture;
     let returnBookmark;
     let selection = [];
     let active = false;
@@ -731,9 +741,10 @@ const S2SWork = (() => {
       }
       active = filtering;
       if (legacyNavigation) legacyNavigation.hidden = filtering;
+      const hasResults = selection.length !== 0;
       list.hidden = showCompare;
-      if (comparison) comparison.hidden = !showCompare;
-      empty.hidden = selection.length !== 0;
+      if (comparison) comparison.hidden = !showCompare || !hasResults;
+      empty.hidden = hasResults;
       if (showCompare) comparisonRows(selection);
       const matchKeys = S2SWork.keys.filter(key => key !== 'sort' && criteria[key]);
       const record = selection.length === 1 ? 'record' : 'records';
@@ -742,7 +753,7 @@ const S2SWork = (() => {
         : matchKeys.length ? `${selection.length} matching ${record}` : initialCount;
       if (count.textContent !== countLabel) count.textContent = countLabel;
       if (sectionDisclosure) {
-        sectionDisclosure.hidden = showCompare || !selection.length;
+        sectionDisclosure.hidden = showCompare || !hasResults;
         if (sectionTotals) {
           const named = groups.named.length, programs = groups.programs.length;
           const companies = new Set([...groups.named, ...groups.programs].map(route => route.company_id)).size;
@@ -758,11 +769,14 @@ const S2SWork = (() => {
         }
       }
       if (compareLink) {
+        compareLink.hidden = !showCompare && !hasResults;
         if (showCompare) url.searchParams.delete('view');
         else url.searchParams.set('view', 'compare');
         compareLink.href = url.pathname + url.search + url.hash;
         compareLink.textContent = showCompare ? 'Back to listings' : 'Compare results';
       }
+      if (exportButton) exportButton.hidden = !hasResults;
+      if (exportStatus) exportStatus.hidden = !hasResults;
       const search = S2SWork.writeCriteria(new URLSearchParams(), criteria).toString();
       if (exploreLink) exploreLink.href = '/explore/#work' + (search ? '?' + search : '');
     }
@@ -813,9 +827,10 @@ const S2SWork = (() => {
     function savedHandoff() {
       const { workReturnFocus, workCompareFocus } = history.state || {};
       if (workReturnFocus) {
-        const { kind, page, href, top, role, termsOpen } = workReturnFocus;
-        const card = kind === 'profile' ? cards.get(role) : null;
-        const link = kind === 'profile' ? card?.querySelector(profileLinkSelector) : handoffLinks[kind];
+        const { kind, page, href, top, role, termsOpen, sourceIndex } = workReturnFocus;
+        const card = cards.get(role);
+        const link = kind === 'source' ? card?.querySelectorAll(sourceLinkSelector)[sourceIndex]
+          : kind === 'profile' ? card?.querySelector(profileLinkSelector) : handoffLinks[kind];
         if (link && page === location.href && href === link.href) return { link, top, card, termsOpen };
       } else if (workCompareFocus && compareLink) return { link: compareLink };
       return null;
@@ -823,8 +838,9 @@ const S2SWork = (() => {
 
     function restoreHandoff({ link, top, card, termsOpen }) {
       // A warm history traversal keeps this document and its browser-managed focus.
-      // On a verified cold return, the browser may focus the opener's bookmark first.
+      // On a cold return, the browser may focus the opener's bookmark first.
       const bookmark = card && card === targetFromHash() ? card : null;
+      const source = link.matches(sourceLinkSelector);
       const bookmarkHandoff = bookmark && { target: bookmark, recover: null };
       returnBookmark = bookmarkHandoff;
       const input = readerInput;
@@ -851,12 +867,13 @@ const S2SWork = (() => {
         }
       }
 
-      function settleBookmarkPosition(event) {
+      function settleReturnPosition(event) {
         if (event?.persisted) return clearBookmark();
         // WebKit can apply the native fragment focus and scroll after the
-        // opener has already received focus. Leave other focus moves alone.
+        // opener receives focus. Firefox can clear a source link's focus at pageshow.
         setTimeout(() => requestAnimationFrame(() => requestAnimationFrame(() => {
           recoverBookmarkFocus();
+          if (source && document.activeElement === document.body && canRestore()) link.focus({ preventScroll: true });
           if (document.activeElement === link && canRestore()) restorePosition();
           clearBookmark();
         })), 0);
@@ -872,9 +889,9 @@ const S2SWork = (() => {
         if (bookmarkHandoff) bookmarkHandoff.recover = () => queueMicrotask(recoverBookmarkFocus);
         link.focus({ preventScroll: true });
         restorePosition();
-        if (bookmark) {
-          if (document.readyState === 'complete') settleBookmarkPosition();
-          else addEventListener('pageshow', settleBookmarkPosition, { once: true });
+        if (bookmark || source) {
+          if (document.readyState === 'complete') settleReturnPosition();
+          else addEventListener('pageshow', settleReturnPosition, { once: true });
         }
       }));
     }
@@ -892,6 +909,12 @@ const S2SWork = (() => {
 
     function followsHandoff() {
       const saved = history.state?.workReturnFocus;
+      if (saved?.kind === 'source') {
+        // Cross-origin history entries are opaque. Restore the last source link
+        // saved on this Work entry when a cross-origin traversal recreates it.
+        const activation = window.navigation?.activation;
+        return !window.navigation || (activation?.navigationType === 'traverse' && !activation.from);
+      }
       if (!window.navigation) return window.S2SNativeHandoff?.returnedFrom(saved?.entry);
       const { from, entry } = window.navigation.activation || {};
       if (saved?.kind === 'profile') {
@@ -907,17 +930,18 @@ const S2SWork = (() => {
         !event.shiftKey && !event.altKey && !link.hasAttribute('download') && (!link.target || link.target.toLowerCase() === '_self');
     }
 
-    function recordProfileDeparture() {
-      const click = profileClick;
-      const departure = profileDeparture;
-      profileClick = profileDeparture = null;
+    function recordCardDeparture() {
+      const click = cardClick;
+      const departure = cardDeparture;
+      cardClick = cardDeparture = null;
       const leaving = departure && ['push', 'replace'].includes(departure.navigationType);
       const activated = click && !click.event.defaultPrevented && (window.navigation
         ? leaving && departure.navigationType === 'push' && departure.sourceElement === click.link && departure.destination.url === click.saved.href
-        : click.saved.entry);
-      // Wait for an actual departure before changing the source entry. Retain
-      // it on browser traversals so a repeated Back can restore it again.
-      if (!activated && (!leaving || history.state?.workReturnFocus?.kind !== 'profile')) return;
+        : click.saved.kind === 'source' || click.saved.entry);
+      if (activated && click.saved.kind === 'source') return;
+      // Record a profile visit once its navigation commits. Retain the opener
+      // on browser traversals so a repeated Back can restore it again.
+      if (!activated && (!leaving || !history.state?.workReturnFocus?.role)) return;
       try { remember({ workReturnFocus: activated ? click.saved : null, workCompareFocus: false }); } catch {}
     }
 
@@ -963,7 +987,7 @@ const S2SWork = (() => {
     for (const [kind, link] of Object.entries(handoffLinks)) {
       link?.addEventListener('click', event => {
         if (!sameTabActivation(event, link)) return;
-        if (link === compareLink && comparison?.hidden) {
+        if (link === compareLink && !list.hidden) {
           compareDeparture = event;
           if (sectionDetails) remember({ workSectionDisclosureOpen: sectionDetails.open });
         }
@@ -973,21 +997,30 @@ const S2SWork = (() => {
     }
     if (comparison && window.top === window) {
       list.addEventListener('click', event => {
-        const link = event.target.closest?.(profileLinkSelector);
+        const link = event.target.closest?.(`${profileLinkSelector}, ${sourceLinkSelector}`);
         if (!link || !sameTabActivation(event, link)) return;
         const card = link.closest('[data-work-route]');
         if (!card) return;
-        const entry = window.S2SNativeHandoff?.begin(link.href, event);
-        profileClick = { link, event, saved: {
-          kind: 'profile', page: location.href, href: link.href, role: card.dataset.workRoute,
+        const profile = link.matches(profileLinkSelector);
+        if (!profile && link.origin === location.origin) return;
+        const kind = profile ? 'profile' : 'source';
+        const entry = profile ? window.S2SNativeHandoff?.begin(link.href, event) : undefined;
+        const sourceIndex = profile ? undefined : [...card.querySelectorAll(sourceLinkSelector)].indexOf(link);
+        const saved = {
+          kind, page: location.href, href: link.href, role: card.dataset.workRoute, sourceIndex,
           top: link.getBoundingClientRect().top, termsOpen: Boolean(card.querySelector('details.work-terms')?.open), entry,
-        } };
+        };
+        cardClick = { link, event, saved };
+        // WebKit can leave the origin before pagehide can update history.
+        if (!profile) {
+          try { remember({ workReturnFocus: saved, workCompareFocus: false }); } catch {}
+        }
       });
       window.navigation?.addEventListener('navigate', event => {
-        if (!event.destination.sameDocument) profileDeparture = event;
+        if (!event.destination.sameDocument) cardDeparture = event;
       });
       window.addEventListener('pageshow', event => { if (event.persisted) bindProfileArrival(); });
-      window.addEventListener('pagehide', recordProfileDeparture);
+      window.addEventListener('pagehide', recordCardDeparture);
       window.addEventListener('pagehide', () => {
         const departure = compareDeparture;
         compareDeparture = null;
@@ -1039,8 +1072,6 @@ const S2SWork = (() => {
     render();
     restoreSectionDisclosure();
     form.hidden = false;
-    if (compareLink) compareLink.hidden = false;
-    if (exportButton) exportButton.hidden = false;
     const retried = loader?.retried;
     const compareArrival = takeCompareArrival() && !loader?.interacted;
     bindProfileArrival();

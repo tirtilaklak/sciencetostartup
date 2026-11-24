@@ -86,7 +86,9 @@ function syncWorkRoute(traversal=false){
   const key=historyKey(),criteria=workCriteriaForRoute(location.hash,traversal);
   applyWorkCriteria(criteria);if(key)workEntryCriteria.set(key,criteria);
   const hash=workHashFor(criteria);if(location.hash!==hash||history.state?.workDraft)history.replaceState({...history.state,workDraft:null},'',hash);
-  renderWork();
+  // Returning from a company keeps the open disclosures and the link inside them.
+  const returningToListing=traversal&&workReturnOrigin?.entryKey===key&&workReturnFocus?.isConnected&&workRenderedHash===hash;
+  if(!returningToListing)renderWork();
 }
 window.addEventListener('pageshow',event=>{
   if(event.persisted&&routeParts()[0]==='work'&&history.state?.workDraft?.hash===location.hash)route({type:'work-resume'});

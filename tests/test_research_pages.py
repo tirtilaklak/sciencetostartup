@@ -161,8 +161,8 @@ class ResearchPageTests(unittest.TestCase):
     def test_current_reader_labels_only_available_archived_formats(self):
         html, pdf = 'publication/report.html', 'publication/report.pdf'
         self.context['publication_assets'] = [html, pdf]
-        self.assertIn('Read offline: <a href="/publication/report.html">Complete HTML report</a> · '
-                      '<a href="/publication/report.pdf">Full report PDF</a>', rp._reader_downloads(self.context))
+        self.assertIn('Read offline: <a href="/publication/report.html" data-disclosure-return>Complete HTML report</a> · '
+                      '<a href="/publication/report.pdf" data-disclosure-return>Full report PDF</a>', rp._reader_downloads(self.context))
 
         self.context['report'].update(updated_on='2026-11-15', archive={
             'status': 'published', 'artifact_sha256': rp.EDITION_MIRROR_ARCHIVE_SHA256})

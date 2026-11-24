@@ -415,7 +415,8 @@ def _render(context, title, description, path, body, page_type="WebPage", parent
              '<link rel="alternate" type="application/atom+xml" title="Research corrections" href="/research/corrections/atom.xml">\n')
     if company_page:
         extra += '<link rel="stylesheet" href="/company-profile.css">\n'
-    if page_type == 'Chapter' or path in {'/research/', '/research/papers/', REPORT_PATH}:
+    if (page_type == 'Chapter' or path in {'/research/', '/research/papers/', REPORT_PATH}
+            or 'data-disclosure-return' in body):
         extra += '<script src="/native-details.js" defer></script>\n'
     if page_type == 'Chapter' and path.endswith('/chapters/technical-landscape/'):
         # A history restoration needs the complete layout used when the reader
@@ -881,7 +882,7 @@ def _reader_downloads(context, *, edition=False):
             labels = ('Archived HTML report', 'Archived report PDF')
             prefix = ''
             note = f' · {_date(report["updated_on"])} snapshot. Prepared before DOI registration.'
-        links = ' · '.join(_link('/' + path, label)
+        links = ' · '.join(_link('/' + path, label, disclosure_return=not edition)
                            for path, label in zip(('publication/report.html', 'publication/report.pdf'), labels)
                            if path in available)
     return '<p class="r-reader-downloads">' + prefix + links + note + '</p>' if links else ''
@@ -1242,7 +1243,8 @@ def _ledger_pages(context, ledger_path='/research/data/'):
                     '<section class="r-section" aria-labelledby="records"><h2 id="records">' + label + ' records</h2>')
             for stable_id in selected:
                 permalink = ledger_path + _evidence_url(kind, stable_id).removeprefix('/research/data/')
-                correction = _record_correction(context, stable_id, permalink)
+                correction = _record_correction(context, stable_id, permalink,
+                                                disclosure_return=ledger_path == '/research/data/')
                 if kind == 'source':
                     body += _source(sources[stable_id], correction, rechecks.get(stable_id))
                 elif stable_id in assertions:
@@ -1744,7 +1746,7 @@ def _issue_endpoint(identity):
         'issues', identity.get('repository', {}).get('url', '') + '/issues/new/choose').removesuffix('/choose')
 
 
-def _record_correction(context, stable_id, path, title=''):
+def _record_correction(context, stable_id, path, title='', *, disclosure_return=False):
     edition = context['report']['release_id']
     permalink = sp.ORIGIN + path
     subject = f'ScienceToStartup correction · {stable_id}'
@@ -1762,7 +1764,7 @@ def _record_correction(context, stable_id, path, title=''):
     issue = _issue_endpoint(context['identity']) + '?' + urlencode(
         {'template': 'correction.yml', 'target': ' · '.join(target)}, quote_via=quote)
     return ('<details class="r-record-correction"><summary>Request a correction</summary>'
-            '<p>' + _link(contact, 'Continue to private email') + '</p>'
+            '<p>' + _link(contact, 'Continue to private email', disclosure_return=disclosure_return) + '</p>'
             '<noscript><p>Copy the draft below before continuing to email.</p></noscript>'
             '<details class="r-correction-draft"><summary>Copy the email draft</summary>'
             f'<label>Subject<input type="text" value="{sp.escape(subject)}" readonly></label>'

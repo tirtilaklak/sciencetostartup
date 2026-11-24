@@ -270,6 +270,45 @@ test('a fresh-document Back reopens Sources and data at the exact activated nati
   await expect(page.locator('#sources').locator('..')).toHaveJSProperty('open', false);
 });
 
+for (const { company, hash, selector, destination, heading } of [
+  {
+    company: 'mercor', hash: '#sources', selector: '[data-native-source="mercor.source.m1"] a',
+    destination: 'https://www.mercor.com/blog/1/', heading: 'Introducing Mercor: Redefining Hiring With AI',
+  },
+  {
+    company: 'afterquery', hash: '', selector: 'a[href="/company/afterquery/work-sources/"]',
+    destination: '/company/afterquery/work-sources/', heading: 'AfterQuery paid work sources',
+  },
+]) {
+  test(`cold Back restores the ${company} source link and its open panel`, async ({ page }) => {
+    const profile = `/company/${company}/`;
+    await page.addInitScript(path => {
+      if (location.pathname === path) addEventListener('unload', () => {});
+      addEventListener('pageshow', event => { window.nativePagePersisted = event.persisted; });
+    }, profile);
+    if (destination.startsWith('https://')) {
+      await page.route(destination, route => route.fulfill({ contentType: 'text/html', body: `<h1>${heading}</h1>` }));
+    }
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto(profile + hash);
+    const summary = page.locator('#sources');
+    if (!hash) await summary.press('Enter');
+    const opener = summary.locator('..').locator(selector);
+    await expect(opener).toHaveAttribute('href', destination);
+    await opener.scrollIntoViewIfNeeded();
+    await opener.press('Enter');
+    await expect(page).toHaveURL(destination);
+    await expect(page.getByRole('heading', { name: heading, exact: true })).toBeInViewport();
+
+    await page.goBack();
+    await expect(page).toHaveURL(profile + hash);
+    await expect.poll(() => page.evaluate(() => window.nativePagePersisted)).toBe(false);
+    await expect(summary.locator('..')).toHaveJSProperty('open', true);
+    await expect(opener).toBeFocused();
+    await expect(opener).toBeInViewport({ ratio: 1 });
+  });
+}
+
 test('a cached Back preserves the browser’s native ledger restoration', async ({ baseURL, browserName, isMobile, viewport }) => {
   test.skip(browserName !== 'chromium', 'Exercise an explicitly enabled Chromium back-forward cache');
   const browser = await chromium.launch({ channel: 'chromium', ignoreDefaultArgs: ['--disable-back-forward-cache'] });

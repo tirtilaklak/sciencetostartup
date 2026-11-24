@@ -66,6 +66,84 @@ test('global search shortcut restores the actual focused control and finds the p
   }
 });
 
+test('Explore guide search opens companies by a recorded alias or a spaced name', async ({ page, isMobile }) => {
+  await page.goto('/explore/#market');
+  const opener = page.locator('#site-search-open');
+  await expect(opener).toHaveAttribute('aria-haspopup', 'dialog');
+  await opener.click();
+  const dialog = page.getByRole('dialog', { name: 'Search the guide' });
+  const input = dialog.getByRole('combobox');
+  const first = dialog.getByRole('option').first();
+
+  await input.fill('micro 1');
+  await expect(first.locator('.site-search-name')).toHaveText('micro1');
+  await input.fill('Data Force');
+  await expect(first).toHaveAttribute('href', '/company/org.dataforce/');
+  await input.fill('DataForce by TransPerfect');
+  await expect(first).toHaveAttribute('href', '/company/org.dataforce/');
+  await expect(first).toContainText('Also known as DataForce by TransPerfect');
+  if (isMobile) await first.tap();
+  else {
+    await input.press('ArrowDown');
+    await input.press('Enter');
+  }
+  await expect(page).toHaveURL('/company/org.dataforce/');
+  await page.goBack();
+  await expect(input).toHaveValue('DataForce by TransPerfect');
+  await expect(first).toHaveAttribute('aria-selected', 'true');
+});
+
+test('native and Explore guide search open the Revenue & growth section for business health', async ({ page, isMobile }) => {
+  for (const path of ['/research/', '/explore/#market']) {
+    await page.goto(path);
+    const opener = page.locator('header .site-search-open');
+    await expect(opener).toHaveAttribute('aria-haspopup', 'dialog');
+    await opener.click();
+    const dialog = page.getByRole('dialog', { name: 'Search the guide' });
+    const input = dialog.getByRole('combobox');
+    const first = dialog.getByRole('option').first();
+    if (path.startsWith('/explore/')) {
+      await input.fill('market');
+      await expect(first).toHaveAccessibleName(/^Market overview\b/);
+    }
+    await input.fill('business health');
+    await expect(first).toHaveAccessibleName(/^Revenue & growth\b/);
+    if (isMobile) await first.tap();
+    else {
+      await input.press('ArrowDown');
+      await input.press('Enter');
+    }
+    await expect(page).toHaveURL('/explore/#business-health');
+    await expect(dialog).toBeHidden();
+    await expect(page.locator('#business-health-heading')).toBeInViewport();
+  }
+});
+
+test('Explore guide search opens published hourly pay and restores the selected action on Back', async ({ page, isMobile }) => {
+  await page.goto('/explore/#market');
+  const opener = page.locator('#site-search-open');
+  await expect(opener).toHaveAttribute('aria-haspopup', 'dialog');
+  await opener.click();
+  const dialog = page.getByRole('dialog', { name: 'Search the guide' });
+  const input = dialog.getByRole('combobox');
+  const first = dialog.getByRole('option').first();
+  for (const query of ['hourly', '  Hourly   Pay  ']) {
+    await input.fill(query);
+    await expect(first).toHaveAccessibleName(/^See roles with published hourly pay\b/);
+    await expect(first).toHaveAttribute('href', '/work/?pay=hourly');
+  }
+  if (isMobile) await first.tap();
+  else {
+    await input.press('ArrowDown');
+    await input.press('Enter');
+  }
+  await expect(page).toHaveURL('/work/?pay=hourly');
+  await expect(page.locator('[data-work-filters] select[name=pay]')).toHaveValue('hourly');
+  await page.goBack();
+  await expect(input).toHaveValue('  Hourly   Pay  ');
+  await expect(first).toHaveAttribute('aria-selected', 'true');
+});
+
 test('a result on the current day closes Search and focuses its headline', async ({ page, isMobile }) => {
   const day = '/daily/2026-11-18/';
   const fragment = '#regularized-score-centering';

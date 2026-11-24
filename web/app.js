@@ -867,6 +867,12 @@ function applyDirectoryCriteria(criteria){
  $('financial-only').checked=state.financial;
  $('work-only').checked=state.work;
 }
+function restoreDirectoryReading(criteria,slug=''){
+ if(!criteria||groupSlug(criteria.category)!==slug.toLowerCase())return;
+ if(Object.entries(criteria).every(([key,value])=>state[key]===value))return;
+ applyDirectoryCriteria(criteria);
+ directoryShown=false;
+}
 function restoreDirectoryShortlist({selected,notice,...criteria}){
  applyDirectoryCriteria(criteria);
  state.selected=selected.filter(isCompanyId);
@@ -909,6 +915,7 @@ const keepEntryScroll=()=>{
   // Keep the saved reading position while the table is replaced by a loading or failure notice.
   if(comparison&&!table&&entry?.compareReading?.selection===compareHash()&&Number.isFinite(entry.scrollY))return entry.scrollY;
   const reading={scrollY};
+  if(routeParts()[0]==='companies'&&!$('companies-view').hidden)reading.directoryCriteria=directoryCriteria();
   // The scroll position only refers to the same rows when the Compare layout is restored with it.
   if(table)reading.compareReading={selection:compareHash(),pair:state.mobileCompare,expanded:comparisonExpanded};
   if(window.navigation)window.navigation.updateCurrentEntry({state:{...entry,...reading}});else history.replaceState({...entry,...reading},'');
@@ -1143,6 +1150,7 @@ function route(event){
  else{document.title=VIEW_TITLES[view];if(view==='companies'){
   renderComparisonScope(view);
   if(shortlist)restoreDirectoryShortlist(shortlist);
+  else if(wasTraversal)restoreDirectoryReading(entry?.directoryCriteria,parts[1]);
   if(restoreFallback){
    applyDirectoryCriteria(fallback.criteria);
    directoryFallbackFocus=returnedFromDirectoryFallback(fallback);

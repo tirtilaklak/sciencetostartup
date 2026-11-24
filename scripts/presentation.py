@@ -533,8 +533,8 @@ def work_search_titles(routes):
 
 
 def company_search_aliases(company_id, aliases=()):
-    # Both labels resolve to the same reviewed TransPerfect subsidiary profile.
-    recorded_names = ("DataForce by TransPerfect", "TransPerfect / DataForce") if company_id == "org.dataforce" else ()
+    # These labels resolve to the same reviewed TransPerfect subsidiary profile.
+    recorded_names = ("DataForce", "DataForce by TransPerfect", "TransPerfect / DataForce") if company_id == "org.dataforce" else ()
     return list(dict.fromkeys([*aliases, *recorded_names]))
 
 
@@ -753,20 +753,27 @@ def build_presentation(data, destination, root, sidecars, release, daily_context
         products = next((e.get("products", []) for e in sidecars["PROFILE_CONTENT"]["entries"] if e["company_id"] == company["id"]), [])
         search_rows.append({"id": company["id"], "name": company["name"], "summary": entry.get("summary", company.get("description", "")), "group": entry.get("primary_offering", ""), "products": [value for p in products for value in [p["name"], p.get("description", ""), *p.get("aliases", [])] if value], "aliases": company_search_aliases(company["id"], company.get("aliases", [])), "href": "/company/" + company["id"] + "/"})
     from daily_scan import daily_search_entries, daily_search_scope
-    public_search_entries = [*sidecars.get("RESEARCH_SEARCH", []), *daily_search_entries(daily_context)]
+    market_search_entry = {
+        "id": "market-revenue", "title": "Revenue & growth", "kind": "market", "url": "/explore/#business-health",
+        "summary": "Company revenue, annualized pace and growth, with figures linked to their sources.",
+        "aliases": ["Market", "Revenue", "AI data market", "Market overview", "Company revenue",
+                    "Revenue and growth", "Business health"],
+    }
+    public_search_entries = []
     work_titles = work_search_titles(sidecars["WORK_ROUTES"]["routes"])
     summary["dailySearchScope"] = daily_search_scope(daily_context)
-    for entry in public_search_entries:
+    for entry in [*sidecars.get("RESEARCH_SEARCH", []), *daily_search_entries(daily_context), market_search_entry]:
+        if entry["kind"] == "company":
+            company_id = entry["url"].strip("/").removeprefix("company/")
+            entry = dict(entry, aliases=company_search_aliases(company_id, entry.get("aliases", [])))
+        public_search_entries.append(entry)
         keywords = entry.get("keywords", [])
         if isinstance(keywords, str):
             keywords = keywords.split()
-        row = {"id": entry["url"], "name": entry["title"], "summary": entry["summary"], "group": entry["kind"], "products": keywords, "href": entry["url"]}
-        if entry.get("identifiers"):
-            row["identifiers"] = entry["identifiers"]
-        if entry.get("recordKind"):
-            row["recordKind"] = entry["recordKind"]
-        if entry["kind"] == "company":
-            row["aliases"] = company_search_aliases(entry["url"].strip("/").removeprefix("company/"), entry.get("aliases", []))
+        row = {"id": entry.get("id", entry["url"]), "name": entry["title"], "summary": entry["summary"], "group": entry["kind"], "products": keywords, "href": entry["url"]}
+        for key in ("identifiers", "recordKind", "aliases"):
+            if entry.get(key):
+                row[key] = entry[key]
         search_rows.append(row)
     search_rows.extend([
         {"id": "company-directory", "name": "Companies",
@@ -782,11 +789,6 @@ def build_presentation(data, destination, root, sidecars, release, daily_context
          "aliases": ["Compare", "Company comparison", "Company comparisons", "Shortlist",
                      "Company shortlist", "Compare AI data companies"],
          "href": "/explore/#compare"},
-        {"id": "market-revenue", "name": "Revenue & growth",
-         "summary": "Company revenue, annualized pace and growth, with figures linked to their sources.",
-         "group": "market", "products": [], "aliases": ["Market", "Revenue", "AI data market", "Market overview",
-                                                       "Company revenue", "Revenue and growth"],
-         "href": "/explore/#business-health"},
     ])
     summary["homeSearch"] = write_asset(destination, "search", dict(identity, entries=search_rows, workTitles=work_titles))
     company_map = {company["id"]: company for company in data["companies"]}

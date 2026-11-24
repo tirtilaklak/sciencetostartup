@@ -55,6 +55,15 @@
     return explicitWork(text) ? text.trim().replace(leadingWork, '').replace(trailingWork, '').trim() : text;
   }
   const workUrl = value => '/work/' + (String(value ?? '').trim() ? '?' + new URLSearchParams({ q: value }) : '');
+  const hourlyWork = Object.freeze({
+    name: 'See roles with published hourly pay',
+    summary: 'Includes past listings',
+    href: '/work/?pay=hourly'
+  });
+  const hourlyWorkShortcut = value => {
+    const key = normalize(value);
+    return key === 'hourly' || key === 'hourly pay' ? hourlyWork : null;
+  };
   function compile(row) {
     const aliases = values(row.aliases).map(raw => ({ raw, key: normalize(aliasName(raw)) }));
     const name = normalize(row.name);
@@ -82,5 +91,5 @@
     if (!key || entry.name.includes(key)) return '';
     return entry.aliases.find(alias => alias.key === key || alias.key.startsWith(key))?.raw || '';
   }
-  globalThis.S2SSearch = Object.freeze({ normalize, identifier, identifiers, isWorkQuery, workTerms, workUrl, compile, rank, compare, matchedAlias });
+  globalThis.S2SSearch = Object.freeze({ normalize, identifier, identifiers, isWorkQuery, workTerms, workUrl, hourlyWorkShortcut, compile, rank, compare, matchedAlias });
 })();
