@@ -236,11 +236,17 @@ test('without JavaScript the homepage offers its menu and native browse links', 
   await browse.press('Enter');
   await expect(page).toHaveURL(/#browse-guide$/);
   const routes = page.getByRole('navigation', { name: 'Browse the guide' }).getByRole('link');
-  for (const [index, name] of ['Companies', 'Paid work', 'Research'].entries()) {
-    await expect(routes.nth(index)).toHaveAccessibleName(name);
+  const destinations = [
+    ['Companies', '/companies/'],
+    ['Paid work', '/work/'],
+    ['Research', '/research/'],
+  ];
+  await expect(routes).toHaveCount(destinations.length);
+  for (const [index, [name, href]] of destinations.entries()) {
+    const link = routes.nth(index);
+    await expect(link).toHaveAccessibleName(name);
+    await expect(link).toHaveAttribute('href', href);
   }
-  expect(await routes.evaluateAll(links => links.map(link => link.getAttribute('href'))))
-    .toEqual(['/companies/', '/work/', '/research/']);
   await context.close();
 });
 
