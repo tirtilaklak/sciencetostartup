@@ -78,12 +78,19 @@ async function openExploreWorkListing(page) {
 
 test('Back to Explore Work keeps the open listing, terms and company link', async ({ page }) => {
   const { disclosures, opener } = await openExploreWorkListing(page);
-  await opener.scrollIntoViewIfNeeded();
-  await opener.focus();
-  const position = await opener.evaluate(link => link.getBoundingClientRect().top);
-  await opener.press('Enter');
+  await opener.evaluate(link => {
+    link.focus({ preventScroll: true });
+    link.scrollIntoView({ block: 'center', behavior: 'instant' });
+    // Measure the departure itself, after any pending focus scroll.
+    const recordPosition = () => { window.workDepartureTop = link.getBoundingClientRect().top; };
+    if (window.navigation) window.navigation.addEventListener('navigate', recordPosition, { once: true });
+    else link.addEventListener('click', recordPosition, { once: true });
+  });
+  await page.keyboard.press('Enter');
   await expect(page).toHaveURL(/#company\/afterquery\/work$/);
   await expect(page.locator('#profile-pane-work')).toBeVisible();
+  const position = await page.evaluate(() => window.workDepartureTop);
+  expect(Number.isFinite(position)).toBe(true);
 
   await page.goBack();
   await expect(page).toHaveURL(/#work$/);
