@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0.0",
-  "reviewed_on": "2026-11-18",
+  "reviewed_on": "2026-11-24",
   "entries": [
     {
       "entity_id": "org.innodata",
@@ -64,7 +64,51 @@
           "locator": "Generative AI services: Data Annotation, Model Safety/Evaluation and AI Benchmarks.",
           "content_kind": "raw_http_body"
         }
-      ]
+      ],
+      "current_facts": {
+        "reviewed_on": "2026-11-21",
+        "rows": [
+          {
+            "label": "Reporting period",
+            "value": "Q3 2026 · 1 Jul–30 Sep",
+            "source_indexes": [
+              0
+            ]
+          },
+          {
+            "label": "Consolidated revenue",
+            "value": "US$95.6 million · +53% year over year",
+            "source_indexes": [
+              0
+            ]
+          },
+          {
+            "label": "Consolidated net income",
+            "value": "US$10.3 million",
+            "source_indexes": [
+              0
+            ]
+          },
+          {
+            "label": "Evidence basis",
+            "value": "Company earnings release · unaudited",
+            "source_indexes": [
+              0
+            ]
+          }
+        ],
+        "sources": [
+          {
+            "url": "https://www.sec.gov/Archives/edgar/data/903651/000110465926123324/tm2628333d1_ex99-1.htm",
+            "title": "Innodata Reports Record Third Quarter 2026 Results",
+            "published_on": "2026-11-05",
+            "observed_on": "2026-11-21",
+            "response_sha256": "3a6282f5975d1fd0382fadab6ea86e8975beade1d1346a551d0abf90820e0940",
+            "locator": "Opening results and unaudited condensed consolidated statements, text.txt L17–34 and L193–213; rounded headline values selected.",
+            "content_kind": "raw_http_body"
+          }
+        ]
+      }
     },
     {
       "entity_id": "org.dataforce",
@@ -595,7 +639,51 @@
           "locator": "Heading A new standard for contingent workforce solutions; paragraph begins Lifted is a new, wholly owned Upwork Inc. subsidiary.",
           "content_kind": "web_tool_text_excerpt"
         }
-      ]
+      ],
+      "current_facts": {
+        "reviewed_on": "2026-11-21",
+        "rows": [
+          {
+            "label": "Reporting period",
+            "value": "Q3 2026 · 1 Jul–30 Sep",
+            "source_indexes": [
+              0
+            ]
+          },
+          {
+            "label": "Consolidated revenue",
+            "value": "US$185.6 million",
+            "source_indexes": [
+              0
+            ]
+          },
+          {
+            "label": "GAAP net income",
+            "value": "US$31.8 million",
+            "source_indexes": [
+              0
+            ]
+          },
+          {
+            "label": "Evidence basis",
+            "value": "Company earnings release · unaudited",
+            "source_indexes": [
+              0
+            ]
+          }
+        ],
+        "sources": [
+          {
+            "url": "https://www.sec.gov/Archives/edgar/data/1627475/000162747526000053/upwork3q26-pressrelease_3q.htm",
+            "title": "Document",
+            "published_on": "2026-11-02",
+            "observed_on": "2026-11-21",
+            "response_sha256": "6672e8e7c6ffceac43611641c13751fb16b3316d7ca4a207960844ee2e7dbd57",
+            "locator": "Headline and financial highlights text.txt L7–43; condensed consolidated statements marked unaudited L342–374.",
+            "content_kind": "raw_http_body"
+          }
+        ]
+      }
     },
     {
       "entity_id": "org.concentrix",
@@ -678,6 +766,57 @@
         "website": "https://www.concentrix.com/",
         "source_indexes": [
           1
+        ]
+      },
+      "current_facts": {
+        "reviewed_on": "2026-11-22",
+        "rows": [
+          {
+            "label": "Reporting period",
+            "value": "Fiscal Q3 2026 · 1 Jun–31 Aug",
+            "source_indexes": [
+              0
+            ]
+          },
+          {
+            "label": "Consolidated revenue",
+            "value": "US$2,453.7 million · −1.2% year over year",
+            "source_indexes": [
+              0
+            ]
+          },
+          {
+            "label": "GAAP net loss",
+            "value": "US$988.1 million",
+            "source_indexes": [
+              0
+            ]
+          },
+          {
+            "label": "Non-cash goodwill impairment",
+            "value": "US$1,050.0 million · included in GAAP loss",
+            "source_indexes": [
+              0
+            ]
+          },
+          {
+            "label": "Evidence basis",
+            "value": "Company earnings release · unaudited",
+            "source_indexes": [
+              0
+            ]
+          }
+        ],
+        "sources": [
+          {
+            "url": "https://www.sec.gov/Archives/edgar/data/1803599/000180359926000147/exhibit991q32026.htm",
+            "title": "Concentrix Reports Third Quarter 2026 Results",
+            "published_on": "2026-09-29",
+            "observed_on": "2026-11-22",
+            "response_sha256": "ee83ee5f27997a99bd51ad32fd3bc0f75ebdd4e1fb8fd35323b8c8d82e611916",
+            "locator": "Opening quarter results table, text.txt L13–107; fiscal-quarter highlights L111–127; unaudited consolidated statements L309–478. Headline quarter values rounded as issuer reports; goodwill charge is non-cash.",
+            "content_kind": "raw_http_body"
+          }
         ]
       }
     },
@@ -775,6 +914,50 @@
           1,
           2
         ]
+      },
+      "current_facts": {
+        "reviewed_on": "2026-11-21",
+        "rows": [
+          {
+            "label": "Reporting period",
+            "value": "Q3 2026 · 1 Jul–30 Sep",
+            "source_indexes": [
+              0
+            ]
+          },
+          {
+            "label": "Consolidated revenue",
+            "value": "€2,532 million",
+            "source_indexes": [
+              0
+            ]
+          },
+          {
+            "label": "Revenue growth",
+            "value": "+1.0% reported · −1.2% like for like, year over year",
+            "source_indexes": [
+              0
+            ]
+          },
+          {
+            "label": "Evidence basis",
+            "value": "Company revenue release · 5 Nov 2026",
+            "source_indexes": [
+              0
+            ]
+          }
+        ],
+        "sources": [
+          {
+            "url": "https://www.tp.com/media/kcdch3fb/tp-press-release-q3-2026-revenue-eng.pdf",
+            "title": "TP Q3 2026 revenue",
+            "published_on": "2026-11-05",
+            "observed_on": "2026-11-21",
+            "response_sha256": "ee6cff6f559aabc4a588bca77ce6ba14828682e59260e06320a25e5e0464874b",
+            "locator": "PDF p1 consolidated revenue total Q3-26/Q3-25 and growth columns; text.txt L8–30 and L42–47. Complete relevant page rendered and visually inspected as sources/tp-q3/page-1.png.",
+            "content_kind": "raw_http_body"
+          }
+        ]
       }
     },
     {
@@ -839,6 +1022,50 @@
         "description": "Cognizant Technology Solutions Corporation is an American multinational information technology consulting and outsourcing company, headquartered in Teaneck, New Jersey.",
         "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
         "change_note": "Sentence wording unchanged; links, formatting and citation markers omitted."
+      },
+      "current_facts": {
+        "reviewed_on": "2026-11-19",
+        "rows": [
+          {
+            "label": "Acquired company",
+            "value": "Wizeline",
+            "source_indexes": [
+              0
+            ]
+          },
+          {
+            "label": "Completion reported",
+            "value": "6 Nov 2026",
+            "source_indexes": [
+              0
+            ]
+          },
+          {
+            "label": "Legal closing date",
+            "value": "Not separately disclosed in the announcement",
+            "source_indexes": [
+              0
+            ]
+          },
+          {
+            "label": "Transaction terms",
+            "value": "Financial terms undisclosed",
+            "source_indexes": [
+              0
+            ]
+          }
+        ],
+        "sources": [
+          {
+            "url": "https://news.cognizant.com/2026-11-06-Cognizant-Completes-Acquisition-of-Wizeline",
+            "title": "Cognizant Completes Acquisition of Wizeline - Nov 6, 2026",
+            "published_on": "2026-11-06",
+            "observed_on": "2026-11-19",
+            "response_sha256": "59a32d87f8249221b8c97d1d39af03cfcd5983de20fbc9275653c480492cd2e0",
+            "locator": "Article title; 6 Nov dateline; has acquired sentence; financial terms undisclosed. Retained text.txt lines 97–108.",
+            "content_kind": "raw_http_body"
+          }
+        ]
       }
     },
     {
@@ -904,6 +1131,50 @@
         "description": "Wipro Limited is an Indian multinational corporation that provides information technology, consulting and business process services.",
         "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
         "change_note": "Sentence wording unchanged; links, formatting and citation markers omitted."
+      },
+      "current_facts": {
+        "reviewed_on": "2026-11-22",
+        "rows": [
+          {
+            "label": "Reporting period",
+            "value": "Q2 FY2026–27 · 1 Jul–30 Sep 2026",
+            "source_indexes": [
+              0
+            ]
+          },
+          {
+            "label": "Consolidated gross revenue",
+            "value": "INR 247.5 billion · +9.1% year over year",
+            "source_indexes": [
+              0
+            ]
+          },
+          {
+            "label": "Consolidated net income",
+            "value": "INR 32.0 billion",
+            "source_indexes": [
+              0
+            ]
+          },
+          {
+            "label": "Evidence basis",
+            "value": "Company IFRS results announcement · 15 Oct 2026",
+            "source_indexes": [
+              0
+            ]
+          }
+        ],
+        "sources": [
+          {
+            "url": "https://www.wipro.com/newsroom/press-releases/2026/wipro-announces-results-for-the-quarter-ended-september-30-2026/",
+            "title": "Wipro announces results for the Quarter ended September 30, 2026",
+            "published_on": "2026-10-15",
+            "observed_on": "2026-11-22",
+            "response_sha256": "bc437a84883bac541233145b4718ff38dacb5c82424340e8d3fd1b7f92deeda5",
+            "locator": "Financial highlights for quarter ended30Sep2026, text.txt L217–244; net income and gross revenue rounded as issuer headline values. Group INR results; distinct from IT Services segment USD revenue.",
+            "content_kind": "raw_http_body"
+          }
+        ]
       }
     },
     {
@@ -1160,6 +1431,50 @@
         "description": "Tech Mahindra is an Indian multinational information technology services and consulting company.",
         "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
         "change_note": "Sentence wording unchanged; links, formatting and citation markers omitted."
+      },
+      "current_facts": {
+        "reviewed_on": "2026-11-21",
+        "rows": [
+          {
+            "label": "Reporting period",
+            "value": "Q2 FY2026–27 · 1 Jul–30 Sep 2026",
+            "source_indexes": [
+              0
+            ]
+          },
+          {
+            "label": "Consolidated revenue",
+            "value": "US$1,693 million",
+            "source_indexes": [
+              0
+            ]
+          },
+          {
+            "label": "Revenue growth",
+            "value": "+6.8% year over year · reported US dollars",
+            "source_indexes": [
+              0
+            ]
+          },
+          {
+            "label": "Evidence basis",
+            "value": "Company consolidated results announcement",
+            "source_indexes": [
+              0
+            ]
+          }
+        ],
+        "sources": [
+          {
+            "url": "https://www.techmahindra.com/insights/press-releases/techmahindra-q2-fy27-results/",
+            "title": "Tech Mahindra Q2 FY27 Results: EBIT Up 40.5% YoY",
+            "published_on": "2026-10-15",
+            "observed_on": "2026-11-21",
+            "response_sha256": "f49ad61fc40baccca4254547c68ab4e563aff30e1e96f166a81c33289ef7b4aa",
+            "locator": "Financial highlights for the quarter (USD), text.txt L217–225. Source calls results audited and consolidated.",
+            "content_kind": "raw_http_body"
+          }
+        ]
       }
     },
     {
@@ -1267,6 +1582,983 @@
         "description": "HCL Technologies Limited (HCLTech) is an Indian multinational technology company headquartered in Noida, Uttar Pradesh.",
         "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
         "change_note": "Sentence wording unchanged; links, formatting and citation markers omitted."
+      }
+    },
+    {
+      "entity_id": "org.capgemini",
+      "name": "Capgemini",
+      "group": "Managed AI & data services",
+      "website": "https://www.capgemini.com/",
+      "offerings": [
+        {
+          "label": "Data Labeling Services: managed data annotation",
+          "source_indexes": [
+            0,
+            1
+          ]
+        },
+        {
+          "label": "Manual and ML-assisted labeling; synthetic data generation",
+          "source_indexes": [
+            0,
+            1
+          ]
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://www.capgemini.com/solutions/data-labeling-services/",
+          "title": "Data labeling services - Capgemini",
+          "published_on": null,
+          "observed_on": "2026-11-19",
+          "response_sha256": "e36613813e8957eea4e6f947848661d40fa3ecb5200b1652377f6f76ac3dbd1f",
+          "locator": "capgemini-labeling/text.txt:L337-L353: current Data Labeling Services landing and linked brochure; L359-L360: labeling/annotation/validation director role.",
+          "content_kind": "raw_http_body"
+        },
+        {
+          "url": "https://www.capgemini.com/wp-content/uploads/2022/07/Data-Labeling-Services-factsheet.pdf",
+          "title": "Data Labeling Services factsheet | Capgemini",
+          "published_on": null,
+          "observed_on": "2026-11-19",
+          "response_sha256": "a4b22467dc1192f40425978e173ff78bba7177916f83cb6622a29a75565675fc",
+          "locator": "Linked 2022 Data Labeling Services factsheet, PDF page 3: manual labeling, ML-assisted labeling and synthetic data generation; page 2: managed labeling/annotating operations. Copyright 2022 retained; current landing still links this brochure.",
+          "content_kind": "raw_http_body"
+        },
+        {
+          "url": "https://www.capgemini.com/terms-of-use/",
+          "title": "Terms Of Use | Capgemini",
+          "published_on": null,
+          "observed_on": "2026-11-19",
+          "response_sha256": "b667f8eacf0c8b9d5642b3fcce7b45a846860482e81b0f84da40d378aa4a1562",
+          "locator": "capgemini-terms/text.txt:L345: www.capgemini.com sites operated by subsidiaries of Capgemini SE; L398-L400: coordinating Capgemini Service SAS identity/address.",
+          "content_kind": "raw_http_body"
+        },
+        {
+          "url": "https://investors.capgemini.com/file/12740?download=1",
+          "title": "Publication of the 2025 Universal Registration Document | Capgemini SE",
+          "published_on": "2026-03-23",
+          "observed_on": "2026-11-19",
+          "response_sha256": "bdc6de2e9b4a11d994b62749d3b621ad3e5542a1351210e99c7792cfedf26148",
+          "locator": "PDF page 1, issuer legal header: Capgemini, European Company, Paris France registered office, 330703844 RCS Paris; body identifies Capgemini SE filing. No financial figure selected.",
+          "content_kind": "raw_http_body"
+        },
+        {
+          "url": "https://www.capgemini.com/news/press-releases/capgemini-upgrades-its-2026-outlook/",
+          "title": "Capgemini upgrades its 2026 outlook - Capgemini",
+          "published_on": "2026-07-30",
+          "observed_on": "2026-11-19",
+          "response_sha256": "ebe3a39d4602d3a896d8398e0356c79830788781e96c53db1fdbe8e293784daa",
+          "locator": "capgemini-current-business/text.txt:L574-L575: global technology/engineering organization; L581-L584: consulting and application services. Scope is company identity and service type; no financial or staffing quantity selected.",
+          "content_kind": "raw_http_body"
+        }
+      ],
+      "current_identity": {
+        "scope": "current_only",
+        "name": "Capgemini",
+        "aliases": [
+          "Capgemini SE"
+        ],
+        "website": "https://www.capgemini.com/",
+        "source_indexes": [
+          0,
+          2,
+          3,
+          4
+        ]
+      },
+      "wikipedia": {
+        "title": "Capgemini",
+        "article_url": "https://en.wikipedia.org/wiki/Capgemini",
+        "revision_url": "https://en.wikipedia.org/w/index.php?title=Capgemini&oldid=1384063475",
+        "history_url": "https://en.wikipedia.org/w/index.php?title=Capgemini&action=history",
+        "page_id": 972237,
+        "revision_id": 1384063475,
+        "revision_timestamp": "2026-11-06T10:22:13Z",
+        "response_sha256": "73183d65a9537b765343ff4a551d57ca9bcab427fb76e3bee20d020a77504a75",
+        "content_kind": "mediawiki_revision_wikitext",
+        "observed_on": "2026-11-19",
+        "description": "Capgemini SE is a French multinational information technology (IT) services and consulting company.",
+        "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+        "change_note": "Sentence wording unchanged; links, formatting and citation markers omitted."
+      }
+    },
+    {
+      "entity_id": "org.ntt_data",
+      "name": "NTT DATA",
+      "group": "Managed AI & data services",
+      "website": "https://www.nttdata.com/",
+      "offerings": [
+        {
+          "label": "AI support services: data annotation for AI and machine learning",
+          "source_indexes": [
+            0
+          ]
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://www.nttdata.com/global/en/services/business-process-services/business-support-processes",
+          "title": "Business Support Processes | NTT DATA Group",
+          "published_on": null,
+          "observed_on": "2026-11-19",
+          "response_sha256": "40048df6d764867a550462cd92631576d89722c2c6350e02a1f2d4aa1ae03294",
+          "locator": "nttdata-annotation/text.txt:L167-L168: AI support services explicitly offers high-quality data annotation for AI applications and machine-learning models; official NTT DATA Group site.",
+          "content_kind": "raw_http_body"
+        },
+        {
+          "url": "https://www.nttdata.com/global/en/about-us/profile",
+          "title": "NTT DATA Group Corporate Profile | NTT DATA Group",
+          "published_on": null,
+          "observed_on": "2026-11-19",
+          "response_sha256": "e0abe6d5a466526148c2e9a7ebfd50228242ebd8bf2b8d2e5bc5ae53e9aecb5b",
+          "locator": "nttdata-profile/text.txt:L86: global IT/business services, consulting and Tokyo headquarters; L88-L92: NTT DATA Group Corporation and Japan headquarters. No financial or headcount quantity selected.",
+          "content_kind": "raw_http_body"
+        },
+        {
+          "url": "https://www.nttdata.com/global/ja/about-us/profile",
+          "title": "プロフィール | NTTデータグループ - NTT DATA GROUP",
+          "published_on": null,
+          "observed_on": "2026-11-19",
+          "response_sha256": "9c4b6175a9064713a1f8c1653cea5a62f6c8bfc13554f5768536c9d664d7be3a",
+          "locator": "nttdata-profile-japanese/text.txt:L38-L45: global IT services/consulting, Japanese legal name 株式会社NTTデータグループ, English legal name and Tokyo headquarters.",
+          "content_kind": "raw_http_body"
+        }
+      ],
+      "current_identity": {
+        "scope": "current_only",
+        "name": "NTT DATA",
+        "aliases": [
+          "NTT DATA Group Corporation",
+          "株式会社NTTデータグループ"
+        ],
+        "website": "https://www.nttdata.com/",
+        "source_indexes": [
+          0,
+          1,
+          2
+        ]
+      },
+      "wikipedia": {
+        "title": "NTT Data",
+        "article_url": "https://en.wikipedia.org/wiki/NTT_Data",
+        "revision_url": "https://en.wikipedia.org/w/index.php?title=NTT_Data&oldid=1374345605",
+        "history_url": "https://en.wikipedia.org/w/index.php?title=NTT_Data&action=history",
+        "page_id": 21800331,
+        "revision_id": 1374345605,
+        "revision_timestamp": "2026-09-11T12:48:48Z",
+        "response_sha256": "1b586b542590f7588529393f54772452e7f0c3132b185a23f5c82a4dc630aced",
+        "content_kind": "mediawiki_revision_wikitext",
+        "observed_on": "2026-11-19",
+        "description": "NTT DATA Group Corporation (株式会社NTTデータグループ, Kabushiki-kaisha NTT Dēta Gurūpu) is a Japanese multinational information technology (IT) service and consulting company headquartered in Tokyo, Japan.",
+        "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+        "change_note": "Sentence wording unchanged; links, formatting and citation markers omitted."
+      }
+    },
+    {
+      "entity_id": "org.tata_consultancy_services",
+      "name": "Tata Consultancy Services",
+      "group": "Managed AI & data services",
+      "website": "https://www.tcs.com/",
+      "offerings": [
+        {
+          "label": "Data Annotation Studio: autonomous vehicle training-data curation",
+          "source_indexes": [
+            0
+          ]
+        },
+        {
+          "label": "Smart validation: simulation-led AV scenario and test-case generation",
+          "source_indexes": [
+            0
+          ]
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://www.tcs.com/what-we-do/industries/manufacturing/solution/mobility-suite-autonomous-vehicles-future",
+          "title": "TCS Mobility Suite: Easing the Development of Autonomous Vehicles",
+          "published_on": null,
+          "observed_on": "2026-11-19",
+          "response_sha256": "32b71e2be14aa1eae8edd88064489ed9ee3d10046ec8d4869237daad3bc1ab96",
+          "locator": "Official web-tool text L813-L874; retained excerpt. Direct raw HTTP returned 403; hash identifies web-tool text, not raw response bytes.",
+          "content_kind": "web_tool_text_excerpt"
+        },
+        {
+          "url": "https://www.tcs.com/who-we-are",
+          "title": "Who We Are | Tata Consultancy Services",
+          "published_on": null,
+          "observed_on": "2026-11-19",
+          "response_sha256": "11bb0711e619a690dfcf6e86eba35b0557f19cf2e8c7f86cc21b8a6c00507435",
+          "locator": "Official web-tool text L767-L775; retained excerpt. Direct raw HTTP returned 403; hash identifies web-tool text, not raw response bytes.",
+          "content_kind": "web_tool_text_excerpt"
+        },
+        {
+          "url": "https://www.tcs.com/content/dam/tcs/investor-relations/financial-statements/2025-26/q4/IND%20AS/Consolidated%20and%20Standalone.pdf",
+          "title": "Tata Consultancy Services Limited FY2026 audited consolidated results: identity header",
+          "published_on": null,
+          "observed_on": "2026-11-19",
+          "response_sha256": "5a6deb034d962c29026d5717176e6b1b4909da67179b119143ba11648e8463e7",
+          "locator": "Official web-tool text L64-L67; retained excerpt. Direct raw HTTP returned 403; hash identifies web-tool text, not raw response bytes.",
+          "content_kind": "web_tool_text_excerpt"
+        },
+        {
+          "url": "https://www.tcs.com/what-we-do/services/consulting",
+          "title": "TCS Consulting Services to Achieve Success in the Digital Era",
+          "published_on": null,
+          "observed_on": "2026-11-19",
+          "response_sha256": "c07f796440805de3d61419a50d72c8ab3519a43be0620388d45bed29e3eb37ec",
+          "locator": "Official web-tool text L773-L828; retained excerpt. Direct raw HTTP returned 403; hash identifies web-tool text, not raw response bytes.",
+          "content_kind": "web_tool_text_excerpt"
+        }
+      ],
+      "current_identity": {
+        "scope": "current_only",
+        "name": "Tata Consultancy Services",
+        "aliases": [
+          "Tata Consultancy Services Limited",
+          "TCS"
+        ],
+        "website": "https://www.tcs.com/",
+        "source_indexes": [
+          0,
+          1,
+          2,
+          3
+        ]
+      },
+      "wikipedia": {
+        "title": "Tata Consultancy Services",
+        "article_url": "https://en.wikipedia.org/wiki/Tata_Consultancy_Services",
+        "revision_url": "https://en.wikipedia.org/w/index.php?title=Tata_Consultancy_Services&oldid=1382675801",
+        "history_url": "https://en.wikipedia.org/w/index.php?title=Tata_Consultancy_Services&action=history",
+        "page_id": 284006,
+        "revision_id": 1382675801,
+        "revision_timestamp": "2026-10-29T19:13:33Z",
+        "response_sha256": "e6ba4d407ed6ed52213931055910aa95b59796886feb27f6ab954ac15ee54f3f",
+        "content_kind": "mediawiki_revision_wikitext",
+        "observed_on": "2026-11-19",
+        "description": "Tata Consultancy Services Limited (TCS) is an Indian multinational technology company specialising in information technology services and consulting.",
+        "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+        "change_note": "Sentence wording unchanged; links, formatting and citation markers omitted."
+      }
+    },
+    {
+      "entity_id": "org.wns",
+      "name": "WNS",
+      "group": "Managed AI & data services",
+      "website": "https://www.wns.com/",
+      "offerings": [
+        {
+          "label": "Text, audio, image and video data annotation",
+          "source_indexes": [
+            0
+          ]
+        },
+        {
+          "label": "LiDAR and geospatial data annotation",
+          "source_indexes": [
+            0
+          ]
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://www.wns.com/industries/hi-tech-and-professional-services/product-data-operations",
+          "title": "Product Data Operations for Digital Commerce",
+          "published_on": null,
+          "observed_on": "2026-11-21",
+          "response_sha256": "209ed049f7461c37156e114355b7486ca9020ba4bfab478df9011069a723e911",
+          "locator": "wns-product-data-operations/text.txt:L304-L309: AI/ML training-data annotation service; L373-L389: text, audio, image, video, LiDAR and geospatial annotation.",
+          "content_kind": "raw_http_body"
+        },
+        {
+          "url": "https://www.wns.com/terms-of-use",
+          "title": "WNS Terms of Use",
+          "published_on": null,
+          "observed_on": "2026-11-21",
+          "response_sha256": "57d6d80d339b7f62e7f978b8e0eef0e2c841943947c1daa2a6af39f62f1baa3f",
+          "locator": "wns-terms/text.txt:L303-L308: WNS Global Services website/service identity; L464: WNS (Holdings) Ltd. copyright identity.",
+          "content_kind": "raw_http_body"
+        },
+        {
+          "url": "https://www.wns.com/about-us",
+          "title": "About Our Company | WNS",
+          "published_on": null,
+          "observed_on": "2026-11-21",
+          "response_sha256": "d2b233e2dd9fb3720b62cf41a1caf25e9af77aa12a056906e5894a53d850d6e2",
+          "locator": "wns-about/text.txt:L302-L306: WNS, part of Capgemini, operations/transformation business; active WNS official site.",
+          "content_kind": "raw_http_body"
+        },
+        {
+          "url": "https://www.capgemini.com/news/press-releases/capgemini-completes-the-acquisition-of-wns-and-creates-a-global-leader-in-agentic-ai-powered-intelligent-operations/",
+          "title": "Capgemini completes the acquisition of WNS and creates a global leader in Agentic AI-powered Intelligent Operations - Capgemini",
+          "published_on": "2025-10-17",
+          "observed_on": "2026-11-21",
+          "response_sha256": "be35ebde4ed0bbcc8bfbaf5fb9bc7d7996705a46394520b885c4edaa3a2dc5be",
+          "locator": "wns-acquisition-completed/text.txt:L344-L354: completed acquisition of WNS; Oct17 2025 source date retained. Current WNS site separately confirms part of Capgemini.",
+          "content_kind": "raw_http_body"
+        },
+        {
+          "url": "https://www.gov.je/gazette/pages/wns%28holdings%29limited.aspx",
+          "title": "WNS (Holdings) Limited notice to creditors of an application for continuance overseas",
+          "published_on": "2026-08-03",
+          "observed_on": "2026-11-21",
+          "response_sha256": "096a435642688aac62c260b5eb45ab31514a28330fdc4a5200750ed6112534f5",
+          "locator": "wns-continuance-notice/text.txt:L20-L35: issuer WNS (Holdings) Limited; published Aug3 2026; intended application for continuation in France, not proof of completed jurisdiction change.",
+          "content_kind": "raw_http_body"
+        }
+      ],
+      "current_identity": {
+        "scope": "current_only",
+        "name": "WNS",
+        "aliases": [
+          "WNS Global Services",
+          "WNS (Holdings) Limited"
+        ],
+        "website": "https://www.wns.com/",
+        "source_indexes": [
+          0,
+          1,
+          2,
+          4
+        ]
+      },
+      "wikipedia": {
+        "title": "WNS Global Services",
+        "article_url": "https://en.wikipedia.org/wiki/WNS_Global_Services",
+        "revision_url": "https://en.wikipedia.org/w/index.php?title=WNS_Global_Services&oldid=1386405745",
+        "history_url": "https://en.wikipedia.org/w/index.php?title=WNS_Global_Services&action=history",
+        "page_id": 15621301,
+        "revision_id": 1386405745,
+        "revision_timestamp": "2026-11-18T10:05:27Z",
+        "response_sha256": "508db05ae4be5109185de5bed63d46798c2e014ced8f78b649421f17296a97c8",
+        "content_kind": "mediawiki_revision_wikitext",
+        "observed_on": "2026-11-21",
+        "description": "WNS (Holdings) Limited is a global business process management (BPM) company and a subsidiary of Capgemini.",
+        "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+        "change_note": "Sentence wording unchanged; links, formatting and citation markers omitted."
+      }
+    },
+    {
+      "entity_id": "org.iqvia",
+      "name": "IQVIA",
+      "group": "AI software & analytics",
+      "website": "https://www.iqvia.com/",
+      "offerings": [
+        {
+          "label": "HART: clinical text annotation and gold-standard training data",
+          "source_indexes": [
+            0
+          ]
+        },
+        {
+          "label": "HART: train/test exports for model evaluation",
+          "source_indexes": [
+            0
+          ]
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://www.iqvia.com/solutions/real-world-evidence/iqvia-nlp-platform/iqvia-human-assisted-review-tool",
+          "title": "IQVIA Human Assisted Review Tool (HART)​ | IQVIA",
+          "published_on": null,
+          "observed_on": "2026-11-21",
+          "response_sha256": "e57c9493762dba221f38bb56294d0088ba23f1f242e8e23bade33efc79eabbe3",
+          "locator": "iqvia-hart/text.txt:L733-L736: web-based HART gold-standard/training-data tool; L755-L772: pre-annotation, review, dynamic annotation and train/test split; L783-L786: model training/evaluation.",
+          "content_kind": "raw_http_body"
+        },
+        {
+          "url": "https://www.iqvia.com/newsroom/2026/09/iqvia-to-announce-third-quarter-2026-results-on-october-27-2026",
+          "title": "IQVIA to Announce Third-Quarter 2026 Results on October 27, 2026 | IQVIA",
+          "published_on": "2026-09-29",
+          "observed_on": "2026-11-21",
+          "response_sha256": "9c14ac15f2c1505691ee28869fa9dcc582147d3b8556add488b1b42e784db5b1",
+          "locator": "iqvia-official-identity/text.txt:L733-L741: Sep29 2026 release identifies IQVIA Holdings Inc. as IQVIA; L752-L759 clinical-research/healthcare-intelligence business and iqvia.com. No staff or financial quantity selected.",
+          "content_kind": "raw_http_body"
+        },
+        {
+          "url": "https://www.iqvia.com/about-us/privacy/online-privacy-policy",
+          "title": "Online Privacy Policy | IQVIA",
+          "published_on": null,
+          "observed_on": "2026-11-21",
+          "response_sha256": "b461a2451e7379cd7fb347e399f59830f1263146a8299d72c37cfb9e4c6b24b5",
+          "locator": "iqvia-privacy/text.txt:L782: effective Jan23 2026 (not asserted publication date); L945: IQVIA Inc. maintains website. IQVIA Inc. is not treated as an alias of the holding company.",
+          "content_kind": "raw_http_body"
+        },
+        {
+          "url": "https://s201.q4cdn.com/580005511/files/content_files/IQV-2026-09-30-10Q-Filed-with-Exhibits.pdf",
+          "title": "IQVIA Holdings Inc. Q3 2026 Form 10-Q: company identity and principal executive office",
+          "published_on": "2026-10-27",
+          "observed_on": "2026-11-21",
+          "response_sha256": "c6baa5c3ca4566a91342d227081abddf66bd707d62cc8c2f56f4ef1f126954e1",
+          "locator": "Official issuer-hosted Q3 2026 Form10-Q PDF p1, text.txt:L20-L31: IQVIA Holdings Inc.; Delaware incorporation; principal executive office at 2400 Ellis Rd., Durham, North Carolina. Scope excludes financial results.",
+          "content_kind": "raw_http_body"
+        },
+        {
+          "title": "IQVIA Holdings Inc. - Resources - Investor FAQs",
+          "published_on": null,
+          "observed_on": "2026-11-21",
+          "response_sha256": "3f564ca454407a1687fa6ad56b1f04681e93478f202e205dfb7710aaa8d9fda5",
+          "content_kind": "web_tool_text_excerpt",
+          "url": "https://ir.iqvia.com/resources/investor-faqs/default.aspx",
+          "locator": "Saved official web-tool excerpt, web open turn220view0 L55-L61: explicit headquarters at 2400 Ellis Road, Durham, North Carolina, USA. SHA identifies the saved text excerpt only."
+        }
+      ],
+      "current_identity": {
+        "scope": "current_only",
+        "name": "IQVIA",
+        "aliases": [
+          "IQVIA Holdings Inc."
+        ],
+        "website": "https://www.iqvia.com/",
+        "source_indexes": [
+          0,
+          1,
+          3,
+          4
+        ]
+      },
+      "wikipedia": {
+        "title": "IQVIA",
+        "article_url": "https://en.wikipedia.org/wiki/IQVIA",
+        "revision_url": "https://en.wikipedia.org/w/index.php?title=IQVIA&oldid=1385554782",
+        "history_url": "https://en.wikipedia.org/w/index.php?title=IQVIA&action=history",
+        "page_id": 6324689,
+        "revision_id": 1385554782,
+        "revision_timestamp": "2026-11-13T22:45:17Z",
+        "response_sha256": "5fe14d34cb01e41b1e991324d6a48fef0e2a181ed12b96be43fd36b33ca40206",
+        "content_kind": "mediawiki_revision_wikitext",
+        "observed_on": "2026-11-21",
+        "description": "IQVIA Holdings, Inc. is an American health information technology and clinical research company headquartered in Durham, North Carolina.",
+        "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+        "change_note": "Sentence wording unchanged; links, formatting and citation markers omitted."
+      }
+    },
+    {
+      "entity_id": "org.sopra_steria",
+      "name": "Sopra Steria",
+      "group": "Managed AI & data services",
+      "website": "https://www.soprasteria.com/",
+      "offerings": [
+        {
+          "label": "Synthetic image generation for computer-vision training",
+          "source_indexes": [
+            0,
+            2
+          ]
+        },
+        {
+          "label": "Training-data quality measurement and domain adaptation",
+          "source_indexes": [
+            2
+          ]
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://www.soprasteria.com/about-us/strategic-alliances/about-usstrategic-alliancessopra-steria-transformation-services-for-aws",
+          "title": "Sopra Steria Transformation Services for AWS - Sopra Steria",
+          "published_on": null,
+          "observed_on": "2026-11-21",
+          "response_sha256": "61569b21f46768835b6c7ac04da7790f04845f70d25a542fa1650b3e83f07ff4",
+          "locator": "soprasteria-aws/text.txt:L151-L156: current Model Training Augmented Generation solution; synthetic images for CV edge cases. Raw HTML directly links prodview-yiydhzoethq6k; 2024 award and unrelated Apr19 2023 news card do not date this current page.",
+          "content_kind": "raw_http_body"
+        },
+        {
+          "title": "AWS Marketplace: Sopra Steria Model Training Augmented Generation",
+          "published_on": null,
+          "observed_on": "2026-11-21",
+          "response_sha256": "977111f11098ab3f62761b9218c8c86106911fc3e7de961464610c1d28a1e2df",
+          "content_kind": "web_tool_text_excerpt",
+          "url": "https://aws.amazon.com/marketplace/pp/prodview-yiydhzoethq6k",
+          "locator": "Current official landing-linked AWS listing; retained web-tool title/seller/delivery-method excerpt. Raw HTTP 200 was JavaScript-only; excerpt hash is not raw body hash."
+        },
+        {
+          "url": "https://aws.amazon.com/marketplace/pp/prodview-qfia5nzstw2bc",
+          "title": "Sopra Steria Model Training Augmented Generation | AWS Marketplace",
+          "published_on": null,
+          "observed_on": "2026-11-21",
+          "response_sha256": "6940d79b88e3b030fbd2ad0fe5df9aa29932ef1e33c44853c3a5172648cda8d2",
+          "locator": "soprasteria-model-training/text.txt:L25-L57: separately discovered, directly readable seller-authored listing for same named professional service; synthetic train images, reference-quality measurement and domain adaptation. This is not the exact linked listing ID.",
+          "content_kind": "raw_http_body"
+        },
+        {
+          "url": "https://www.soprasteria.com/footer/terms-of-use",
+          "title": "Terms of use - Sopra Steria",
+          "published_on": null,
+          "observed_on": "2026-11-21",
+          "response_sha256": "3842ee0353b242812ba9f2713f242174e216f1092e0ec42288440b3b983e4751",
+          "locator": "soprasteria-terms/text.txt:L106-L115: Sopra Steria Group site publisher, Annecy registration326820065 and explicit Paris headquarters; L132-L139 group companies remain independent legal entities.",
+          "content_kind": "raw_http_body"
+        },
+        {
+          "url": "https://www.soprasteria.com/docs/librariesprovider2/sopra-steria-corporate/finance/cp-fi/26022026_sop_fy2025_fr.pdf",
+          "title": "Sopra Steria FY2025 results: legal identity header, 26 February 2026",
+          "published_on": "2026-02-26",
+          "observed_on": "2026-11-21",
+          "response_sha256": "e5a49eb67b8d60d577f28accf64923e292736163e30e55c54e637ee1e6dad03a",
+          "locator": "Official French FY2025-results PDF p1, text.txt:L23-L25: Sopra Steria Group SA legal name. Published Feb26 2026; no financial value selected.",
+          "content_kind": "raw_http_body"
+        },
+        {
+          "url": "https://www.soprasteria.com/about-us/our-offices",
+          "title": "Our offices and locations - Sopra Steria",
+          "published_on": null,
+          "observed_on": "2026-11-21",
+          "response_sha256": "5422a6f8283c94d331172e0b144878b1b241b25bb7c10f6e2af4bfefd7fd3807",
+          "locator": "soprasteria-offices/text.txt:L412-L415 Berlin, L591-L594 Brussels and L1390-L1401 Luxembourg offices; current official footprint supports several Western European countries. No office or employee totals selected.",
+          "content_kind": "raw_http_body"
+        }
+      ],
+      "current_identity": {
+        "scope": "current_only",
+        "name": "Sopra Steria",
+        "aliases": [
+          "Sopra Steria Group SA",
+          "Sopra Steria Group"
+        ],
+        "website": "https://www.soprasteria.com/",
+        "source_indexes": [
+          0,
+          3,
+          4,
+          5
+        ]
+      },
+      "wikipedia": {
+        "title": "Sopra Steria",
+        "article_url": "https://en.wikipedia.org/wiki/Sopra_Steria",
+        "revision_url": "https://en.wikipedia.org/w/index.php?title=Sopra_Steria&oldid=1386183947",
+        "history_url": "https://en.wikipedia.org/w/index.php?title=Sopra_Steria&action=history",
+        "page_id": 4649465,
+        "revision_id": 1386183947,
+        "revision_timestamp": "2026-11-17T04:17:49Z",
+        "response_sha256": "c2866d70f54d2f749a1e54b3f773d26cc8c24e8088756dd4feda7359c191284d",
+        "content_kind": "mediawiki_revision_wikitext",
+        "observed_on": "2026-11-21",
+        "description": "The company is headquartered in Paris and has operations in several countries in Western Europe.",
+        "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+        "change_note": "Sentence wording unchanged; links, formatting and citation markers omitted."
+      }
+    },
+    {
+      "entity_id": "org.lilt",
+      "name": "LILT",
+      "group": "Managed AI & data services",
+      "website": "https://lilt.com/",
+      "offerings": [
+        {
+          "label": "Multilingual supervised fine-tuning data",
+          "source_indexes": [
+            0
+          ]
+        },
+        {
+          "label": "Preference ranking and model evaluation data",
+          "source_indexes": [
+            0,
+            1,
+            2
+          ]
+        }
+      ],
+      "sources": [
+        {
+          "content_kind": "raw_http_body",
+          "observed_on": "2026-11-22",
+          "url": "https://lilt.com/products/train",
+          "published_on": null,
+          "response_sha256": "593bc6457ee73cd764cf1e7b83d347a94174decca731d623578a6458e2d8ba6e",
+          "title": "High‑Quality Training Data for AI | LILT",
+          "locator": "sources/lilt-train/text.txt:L97-L133: current Train offering; SFT programs, expert-authored/reviewed data, structured preference ranking and text/audio/multimodal datasets. No quality, compliance or outcome claim selected."
+        },
+        {
+          "content_kind": "raw_http_body",
+          "observed_on": "2026-11-22",
+          "url": "https://lilt.com/products/rlhf",
+          "published_on": null,
+          "response_sha256": "f81c8b7c6ddcc9ec3dd2ff7aa5c614953e95435ae7a30cbe8bd38b023a2e9a5f",
+          "title": "RLHF Across Languages & Cultures | LILT",
+          "locator": "sources/lilt-rlhf/text.txt:L100-L119: current preference ranking/pairwise comparisons and rubric-driven evaluation offering. No measurable reliability or calibration outcome asserted."
+        },
+        {
+          "content_kind": "raw_http_body",
+          "observed_on": "2026-11-22",
+          "url": "https://lilt.com/contact/ai-data-services",
+          "published_on": null,
+          "response_sha256": "6133ecc5e8358266753bf0393565da531c74d85222ba9a906e1577170969252c",
+          "title": "Book Demo | LILT | AI Data Services",
+          "locator": "sources/lilt-evaluation-datasets/text.txt:L97-L103: current training/evaluation dataset service contact page. No language count, contamination-free assertion or performance recovery selected."
+        },
+        {
+          "content_kind": "raw_http_body",
+          "observed_on": "2026-11-22",
+          "url": "https://lilt.com/legal/privacy",
+          "published_on": null,
+          "response_sha256": "46f227aa6ba37192c0a86d8b1f1337de8388498410e6b1a1bdee66cc7f7d6e6f",
+          "title": "Privacy Policy & Data Protection | LILT",
+          "locator": "sources/lilt-privacy/text.txt:L99-L118: policy last-updated July15,2025; LILT, Inc. website and services identity. Current site is evidence of self-identification, not a privacy audit."
+        },
+        {
+          "content_kind": "raw_http_body",
+          "observed_on": "2026-11-22",
+          "url": "https://lilt.com/lilt-platform-terms-and-conditions",
+          "published_on": null,
+          "response_sha256": "d95e0f98db790812c5d61351f63427117c8e8c7c8624dba74c55a05410d3ad0c",
+          "title": "Platform Terms and Conditions | LILT",
+          "locator": "sources/lilt-platform-terms/text.txt:L97-L104: LILT, Inc. platform and related-services identity. These terms describe translation platform, not proof of worker contracts or dataset rights."
+        },
+        {
+          "content_kind": "raw_http_body",
+          "observed_on": "2026-11-22",
+          "url": "https://lilt.com/company",
+          "published_on": null,
+          "response_sha256": "1f0edb6534be0956c2246f25df354af6c1f6a64fecb782846485b1213bdc68c0",
+          "title": "About LILT & Agentic AI Translation | LILT",
+          "locator": "Company page: Spence Green and John DeNero co-founder blocks; incorporation in March 2015. SHA-256 covers the captured Brotli-encoded response. Verified decoded HTML SHA-256 7d08033ba81551456f828eeb0d02235f12a146c532ef8a284542332d7c8c9b31; decoded-text.txt lines 101–109."
+        }
+      ],
+      "current_identity": {
+        "scope": "current_only",
+        "name": "LILT",
+        "aliases": [
+          "LILT, Inc."
+        ],
+        "website": "https://lilt.com/",
+        "source_indexes": [
+          3,
+          4,
+          5
+        ]
+      },
+      "wikipedia": {
+        "title": "Lilt (company)",
+        "article_url": "https://en.wikipedia.org/wiki/Lilt_%28company%29",
+        "revision_url": "https://en.wikipedia.org/w/index.php?title=Lilt_%28company%29&oldid=1385566753",
+        "history_url": "https://en.wikipedia.org/w/index.php?title=Lilt_%28company%29&action=history",
+        "page_id": 73189509,
+        "revision_id": 1385566753,
+        "revision_timestamp": "2026-11-13T23:57:25Z",
+        "response_sha256": "3919882a859a68ff5508c7041e03f1cd2da1cfe255049af74a3bedf75975a13c",
+        "content_kind": "mediawiki_revision_wikitext",
+        "observed_on": "2026-11-22",
+        "description": "LILT was founded in 2015 by Spence Green and John DeNero.",
+        "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+        "change_note": "Sentence wording unchanged; links, formatting and citation markers omitted."
+      }
+    },
+    {
+      "entity_id": "org.l_and_t_technology_services",
+      "name": "L&T Technology Services",
+      "group": "AI software & analytics",
+      "website": "https://www.ltts.com/",
+      "offerings": [
+        {
+          "label": "AnnotAI: multi-sensor data annotation software",
+          "source_indexes": [
+            0,
+            1
+          ]
+        }
+      ],
+      "sources": [
+        {
+          "content_kind": "raw_http_body",
+          "observed_on": "2026-11-22",
+          "url": "https://www.ltts.com/solutions/AnnotAi",
+          "published_on": null,
+          "response_sha256": "3a2440251d14f2e5176a0ec9a8f3c481c703ea159b9c455f189371569b18f817",
+          "title": "AnnotAI | L&T Technology Services",
+          "locator": "sources/ltts-annotai/text.txt:L185-L214: AnnotAI automatic annotation tool; multi-sensor data labeling and computer-vision training for autonomous vehicles/robotics. No 95% accuracy, compliance certification or safety guarantee selected."
+        },
+        {
+          "content_kind": "raw_http_body",
+          "observed_on": "2026-11-22",
+          "url": "https://www.ltts.com/solutions",
+          "published_on": null,
+          "response_sha256": "9e882e464f5106293ba64fd377fb4eb8ac79ff1a16dcaab9980b0b7e7ff8952b",
+          "title": "Solutions | L&T Technology Services",
+          "locator": "sources/ltts-solutions/text.txt: current named AnnotAI entry linked from official solutions catalogue; training-oriented multi-sensor annotation tool. No generic unrelated solutions attributed as training data."
+        },
+        {
+          "content_kind": "raw_http_body",
+          "observed_on": "2026-11-22",
+          "url": "https://www.ltts.com/privacy-policy",
+          "published_on": null,
+          "response_sha256": "554602d1bd2252c6c69719b63c0b31c76c94e2126ed1ebf2c9a141312713087e",
+          "title": "Website Privacy Policy | L&T Technology Services",
+          "locator": "sources/ltts-privacy/text.txt:L185-L188: L&T Technology Services Limited website/operator identity and ltts.com domain. July1,2024 policy update is not treated as current publication date."
+        },
+        {
+          "content_kind": "raw_http_body",
+          "observed_on": "2026-11-22",
+          "url": "https://www.ltts.com/press-release/Q2FY27-results",
+          "published_on": "2026-10-19",
+          "response_sha256": "a18bf195075f8b0a7314e01782793f30229dbfb0400408479ed1555b524a21f1",
+          "title": "L&T Technology Services Reports 12.1% YoY Revenue Growth and 66.8% Net Profit Growth in Q2FY27 - Press Release",
+          "locator": "sources/ltts-q2fy27-identity/text.txt:L185-L186: October19,2026 issuer name and BSE/NSE tickers; L223: listed subsidiary of Larsen & Toubro. Scope excludes all financial/headcount/customer quantities."
+        }
+      ],
+      "current_identity": {
+        "scope": "current_only",
+        "name": "L&T Technology Services",
+        "aliases": [
+          "LTTS",
+          "L&T Technology Services Limited"
+        ],
+        "website": "https://www.ltts.com/",
+        "source_indexes": [
+          2,
+          3
+        ]
+      },
+      "wikipedia": {
+        "title": "L&T Technology Services",
+        "article_url": "https://en.wikipedia.org/wiki/L%26T_Technology_Services",
+        "revision_url": "https://en.wikipedia.org/w/index.php?title=L%26T_Technology_Services&oldid=1370363947",
+        "history_url": "https://en.wikipedia.org/w/index.php?title=L%26T_Technology_Services&action=history",
+        "page_id": 55354182,
+        "revision_id": 1370363947,
+        "revision_timestamp": "2026-08-20T18:19:03Z",
+        "response_sha256": "dd8fcab6d982fc901223870ca5ed3c19c729a588668ccc06a8609ab1eaecade2",
+        "content_kind": "mediawiki_revision_wikitext",
+        "observed_on": "2026-11-22",
+        "description": "LTTS is a subsidiary of the conglomerate Larsen & Toubro (L&T), and listed on both NSE and BSE.",
+        "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+        "change_note": "Sentence wording unchanged; links, formatting and citation markers omitted."
+      }
+    },
+    {
+      "entity_id": "org.genpact",
+      "name": "Genpact",
+      "group": "Managed AI & data services",
+      "website": "https://www.genpact.com/",
+      "wikipedia": {
+        "title": "Genpact",
+        "article_url": "https://en.wikipedia.org/wiki/Genpact",
+        "revision_url": "https://en.wikipedia.org/w/index.php?title=Genpact&oldid=1371968355",
+        "history_url": "https://en.wikipedia.org/w/index.php?title=Genpact&action=history",
+        "page_id": 4311837,
+        "revision_id": 1371968355,
+        "revision_timestamp": "2026-08-29T16:52:36Z",
+        "response_sha256": "7bbc371e35e0138cb892e808a3393836f7e7afc5cd83876e96cbcb42f9ac1624",
+        "content_kind": "mediawiki_revision_wikitext",
+        "observed_on": "2026-11-23",
+        "description": "Genpact was founded in 1997 as a unit of General Electric.",
+        "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+        "change_note": "Sentence wording unchanged; links, formatting and citation markers omitted."
+      },
+      "offerings": [
+        {
+          "label": "AI safety data annotation and labeling",
+          "source_indexes": [
+            0
+          ]
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://www.genpact.com/insight/everest-group-names-genpact-a-leader-in-trust-and-safety",
+          "title": "Genpact | Trust and Safety Leader | Everest Group | Genpact",
+          "published_on": "2025-08-20",
+          "observed_on": "2026-11-23",
+          "response_sha256": "9797327aa98a0346997d864c85789b6eb6b3f4c729084ab88a41c4db245f09bf",
+          "locator": "20 August 2025 provider description: data annotation and labelling for AI safety. Red teaming is attributed to partners.",
+          "content_kind": "raw_http_body"
+        },
+        {
+          "url": "https://www.genpact.com/services/trust-and-safety",
+          "title": "Trust and Safety Services | Genpact",
+          "published_on": null,
+          "observed_on": "2026-11-23",
+          "response_sha256": "1cae42bd98d481a10daa6f9fffa06654242818e37b37d4d35aa9c44e27983a83",
+          "locator": "Trust and Safety services; current link to the 20 August 2025 provider description.",
+          "content_kind": "raw_http_body"
+        },
+        {
+          "url": "https://www.genpact.com/about-us",
+          "title": "About Us | Genpact",
+          "published_on": null,
+          "observed_on": "2026-11-23",
+          "response_sha256": "9e42e3fd6b290b81430685dc4615a9103f731cb636674870afce76855686a311",
+          "locator": "Our history: 1997-2005, beginning within General Electric.",
+          "content_kind": "raw_http_body"
+        },
+        {
+          "url": "https://www.genpact.com/about-us/facts-and-stats",
+          "title": "Facts and Stats | About Us | Genpact",
+          "published_on": null,
+          "observed_on": "2026-11-23",
+          "response_sha256": "56822d46ffae53b5421f0fd83da8411e44be07d763f1dbc95405bd8d6f2c13bf",
+          "locator": "Milestones: 1997, began as part of GE.",
+          "content_kind": "raw_http_body"
+        }
+      ],
+      "current_identity": {
+        "scope": "current_only",
+        "name": "Genpact",
+        "aliases": [],
+        "website": "https://www.genpact.com/",
+        "source_indexes": [
+          2,
+          3
+        ]
+      }
+    },
+    {
+      "entity_id": "org.dataart",
+      "name": "DataArt",
+      "group": "Expert data & evaluation",
+      "website": "https://www.dataart.com/",
+      "wikipedia": {
+        "title": "DataArt",
+        "article_url": "https://en.wikipedia.org/wiki/DataArt",
+        "revision_url": "https://en.wikipedia.org/w/index.php?title=DataArt&oldid=1385546793",
+        "history_url": "https://en.wikipedia.org/w/index.php?title=DataArt&action=history",
+        "page_id": 10051916,
+        "revision_id": 1385546793,
+        "revision_timestamp": "2026-11-13T21:46:50Z",
+        "response_sha256": "9459ead88c345694aed84d7e6825a99ffac7fa3d4692b448a2f9d9c4a4fe993f",
+        "content_kind": "mediawiki_revision_wikitext",
+        "observed_on": "2026-11-23",
+        "description": "DataArt is a New York City-based IT consultancy company.",
+        "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+        "change_note": "Sentence wording unchanged; links, formatting and citation markers omitted."
+      },
+      "offerings": [
+        {
+          "label": "LLM safety testing with adversarial prompts",
+          "source_indexes": [
+            0
+          ]
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://www.dataart.com/services/security/llm-penetration-testing-services",
+          "title": "DataArt AI Security | Expert LLM Penetration Testing Services",
+          "published_on": null,
+          "observed_on": "2026-11-23",
+          "response_sha256": "ecc29384a9d7c8c280334c067f15011efd7132cfb057bc6e28618ff9fecdb469",
+          "locator": "LLM Penetration Testing; in-house experts assess model responses to crafted prompts, including harmful or unintended outputs. Conventional application testing is separate.",
+          "content_kind": "raw_http_body"
+        },
+        {
+          "url": "https://www.dataart.com/company/about-us",
+          "title": "About DataArt | Data and AI Transformation Partner",
+          "published_on": null,
+          "observed_on": "2026-11-23",
+          "response_sha256": "59b09154b9310b61623c9cf40cdf2a787ee45ede011aac6897c9f35850b353bb",
+          "locator": "About DataArt; software engineering, data and AI services.",
+          "content_kind": "raw_http_body"
+        },
+        {
+          "url": "https://www.dataart.com/legal-information",
+          "title": "Legal Information | DataArt Companies",
+          "published_on": null,
+          "observed_on": "2026-11-23",
+          "response_sha256": "ed67737711191ea47b19fb7b485468acc699bb59c5018031e034643357042ad5",
+          "locator": "United States legal entities and New York City office address.",
+          "content_kind": "raw_http_body"
+        },
+        {
+          "url": "https://www.dataart.com/dataart-privacy-policy",
+          "title": "DataArt Privacy and Cookie Policy",
+          "published_on": null,
+          "observed_on": "2026-11-23",
+          "response_sha256": "c9883be1263d83d8d454965ab2881f3da9919e98bcddba2ff80eebf041eb07df",
+          "locator": "Privacy Policy, 11 June 2026: DataArt headquarters in New York; worldwide operations.",
+          "content_kind": "raw_http_body"
+        }
+      ],
+      "current_identity": {
+        "scope": "current_only",
+        "name": "DataArt",
+        "aliases": [],
+        "website": "https://www.dataart.com/",
+        "source_indexes": [
+          1,
+          2
+        ]
+      }
+    },
+    {
+      "entity_id": "org.softserve",
+      "name": "SoftServe",
+      "website": "https://www.softserveinc.com/",
+      "group": "Frontier data & RL environments",
+      "wikipedia": {
+        "title": "SoftServe",
+        "article_url": "https://en.wikipedia.org/wiki/SoftServe",
+        "revision_url": "https://en.wikipedia.org/w/index.php?title=SoftServe&oldid=1380575423",
+        "history_url": "https://en.wikipedia.org/w/index.php?title=SoftServe&action=history",
+        "page_id": 13810684,
+        "revision_id": 1380575423,
+        "revision_timestamp": "2026-10-16T16:02:38Z",
+        "response_sha256": "b281aa19d426c26c75e259ca0745377a41a78edbaf610ac71f328022febb352d",
+        "content_kind": "mediawiki_revision_wikitext",
+        "observed_on": "2026-11-24",
+        "description": "SoftServe was founded in 1993 in Lviv, Ukraine.",
+        "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+        "change_note": "Sentence wording unchanged; links, formatting and citation markers omitted."
+      },
+      "offerings": [
+        {
+          "label": "Synthetic data for model training and testing",
+          "source_indexes": [
+            0,
+            1
+          ]
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://www.softserveinc.com/en-us/industries/manufacturing",
+          "title": "Manufacturing Software Solutions | SoftServe",
+          "observed_on": "2026-11-24",
+          "published_on": null,
+          "response_sha256": "a4ad2713a1db29172696ec49d052d02cfdfbb3188b0358d98f312ee70f7dd46c",
+          "content_kind": "raw_http_body",
+          "locator": "Manufacturing solutions, Synthetic Data Generation Platform; model-training/testing data and official platform-demo link."
+        },
+        {
+          "url": "https://www.softserveinc.com/en-us/generative-ai",
+          "title": "Generative AI Solutions for Business | SoftServe",
+          "observed_on": "2026-11-24",
+          "published_on": null,
+          "response_sha256": "bebc46161736d6aefe228dfd6cf070a8938a3fa6dc7f518649860e43d2264f99",
+          "content_kind": "raw_http_body",
+          "locator": "Generative AI services; synthetic-data and robotics resources."
+        },
+        {
+          "url": "https://www.softserveinc.com/en-us/news/softserve-pledges-1-2m-toward-ambulance-ukraine",
+          "title": "SoftServe pledges $1.2M for Ukraine during 30th anniversary",
+          "observed_on": "2026-11-24",
+          "published_on": "2023-08-30",
+          "response_sha256": "d9212d06efad00b574cf20cd6ce0e3e6d5e4c9570fdfbb7f6a8c026fadacdf0d",
+          "content_kind": "raw_http_body",
+          "locator": "30th-anniversary announcement, founding history: 1993; Lviv, Ukraine."
+        },
+        {
+          "url": "https://www.softserveinc.com/en-us/about-us",
+          "title": "About SoftServe",
+          "observed_on": "2026-11-24",
+          "published_on": null,
+          "response_sha256": "0e06e67b2ba82f9d397b1830fea64f298cc602ec700dfdcdc0b51de9c9d15871",
+          "content_kind": "raw_http_body",
+          "locator": "About SoftServe: company and official-domain identity; SoftServe Inc."
+        }
+      ],
+      "current_identity": {
+        "scope": "current_only",
+        "name": "SoftServe",
+        "aliases": [],
+        "website": "https://www.softserveinc.com/",
+        "source_indexes": [
+          2,
+          3
+        ]
       }
     }
   ]

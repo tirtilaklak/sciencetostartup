@@ -40,6 +40,26 @@ class CurrentCompanyFactsTests(unittest.TestCase):
         with self.assertRaisesRegex(CompanyUpdatesValidationError, "duplicate current facts"):
             validate_profile_current_facts(content, self.data)
 
+    def test_additional_registry_ids_are_explicit_and_canonical_scope_stays_strict(self):
+        content = example()
+        content["entries"][0]["company_id"] = "org.reviewed"
+        original = copy.deepcopy((content, self.data))
+        with self.assertRaisesRegex(CompanyUpdatesValidationError, "known company"):
+            validate_profile_current_facts(content, self.data)
+        self.assertIs(validate_profile_current_facts(content, self.data, additional_company_ids={"org.reviewed"}), content)
+        with self.assertRaisesRegex(CompanyUpdatesValidationError, "known company"):
+            validate_profile_current_facts(content, self.data, additional_company_ids={"org.other"})
+        with self.assertRaisesRegex(CompanyUpdatesValidationError, "validated organization IDs"):
+            validate_profile_current_facts(content, self.data, additional_company_ids={"unreviewed"})
+        self.assertEqual((content, self.data), original)
+
+    def test_explicit_registry_review_ceiling_does_not_refresh_fact_dates(self):
+        content = example()
+        validate_profile_current_facts(content, self.data, reviewed_through="2026-11-16")
+        with self.assertRaisesRegex(CompanyUpdatesValidationError, "after the registry review"):
+            validate_profile_current_facts(content, self.data, reviewed_through="2026-11-15")
+        self.assertEqual(content["entries"][0]["current_facts"]["reviewed_on"], "2026-11-16")
+
     def test_source_dates_are_distinct_and_calendar_valid(self):
         for field, value, message in [
             ("published_on", "2026-11-17", "after observation"),

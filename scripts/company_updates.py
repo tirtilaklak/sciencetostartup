@@ -8,11 +8,13 @@ class CompanyUpdatesValidationError(ValueError):
     """A current company fact lacks a valid scope or source receipt."""
 
 
-def validate_profile_current_facts(profile_content, data):
+def validate_profile_current_facts(profile_content, data, *, additional_company_ids=(), reviewed_through=None):
     """Return the supplied profile content after validating optional current_facts.
 
     Profiles without current facts need no current-source receipt. This keeps
     historical profile content independent of current company maintenance.
+    Callers may explicitly admit IDs from an already validated current registry;
+    ordinary profile validation remains restricted to canonical company IDs.
     """
     def require(condition, message):
         if not condition:
@@ -32,7 +34,11 @@ def validate_profile_current_facts(profile_content, data):
         require(not re.search(r"[<>\x00-\x1f\x7f-\x9f\u200e\u200f\u2028\u2029\u202a-\u202e\u2066-\u2069]", value), where + " must be plain text")
 
     require(isinstance(profile_content, dict) and isinstance(profile_content.get("entries"), list), "profiles must contain entries")
-    companies = {row["id"] for row in data.get("companies", [])}
+    additional_company_ids = tuple(additional_company_ids)
+    require(all(isinstance(cid, str) and re.fullmatch(r"org\.[a-z0-9][a-z0-9_.-]*", cid) for cid in additional_company_ids), "additional company IDs must be validated organization IDs")
+    companies = {row["id"] for row in data.get("companies", [])} | set(additional_company_ids)
+    if reviewed_through is not None:
+        day(reviewed_through, "reviewed_through")
     updated = set()
     for entry in profile_content["entries"]:
         require(isinstance(entry, dict), "profile entry must be an object")
@@ -46,6 +52,8 @@ def validate_profile_current_facts(profile_content, data):
         prefix = cid + ".current_facts"
         require(isinstance(facts, dict) and set(facts) == {"reviewed_on", "rows", "sources"}, prefix + " must contain reviewed_on, rows and sources")
         reviewed = day(facts["reviewed_on"], prefix + ".reviewed_on")
+        if reviewed_through is not None:
+            require(reviewed <= reviewed_through, prefix + ".reviewed_on is after the registry review")
         sources = facts["sources"]
         require(isinstance(sources, list) and sources, prefix + ".sources must be non-empty")
         for index, source in enumerate(sources):
