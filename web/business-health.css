@@ -208,10 +208,11 @@ html[data-bh-masthead-scroll]:has(#market-view:not([hidden]) .bh-coverage-disclo
 }
 @media(max-width:600px){
  #market-view{padding-top:18px}
- .bh-heading{gap:10px;margin-bottom:8px}
+ .bh-heading{flex-wrap:wrap;gap:10px;margin-bottom:8px}
+ .bh-heading>div{flex:1 1 60%}
  .bh-heading h1{font-size:29px}
  .bh-heading p{font-size:12px}
- .bh-heading>a{flex-direction:column;align-items:flex-end;justify-content:center;gap:0;line-height:1.4;text-align:end}
+ .bh-heading>a{flex-direction:column;align-items:flex-end;justify-content:center;gap:0;max-width:100%;line-height:1.4;text-align:end;overflow-wrap:break-word}
  .bh-download-meta{font-size:11px;color:var(--bh-muted)}
  .bh-download-meta::before{content:none}
  .bh-overview-tabs{flex-wrap:wrap;gap:0 6px;justify-content:space-between}

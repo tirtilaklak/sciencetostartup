@@ -113,7 +113,8 @@
   function openSearch(snapshot, trigger = document.activeElement) {
     if (!dialog.open) {
       if (typeof snapshot?.directoryQuery === 'string' && recoveryOpener) trigger = recoveryOpener;
-      returnFocus = trigger instanceof HTMLElement && trigger !== document.body && !dialog.contains(trigger)
+      if (trigger === document) returnFocus = document;
+      else returnFocus = trigger instanceof HTMLElement && trigger !== document.body && !dialog.contains(trigger)
         ? trigger : opener;
       if (returnFocus === recoveryOpener) {
         dialog.dataset.directoryQuery = document.getElementById('company-query')?.value || '';
@@ -233,6 +234,17 @@
       dialog.returnValue = '';
       return;
     }
+    if (target === document) {
+      // Return Tab to the start of the document without moving the reading position.
+      const { body } = document;
+      const focused = document.activeElement;
+      if (focused && focused !== body && focused !== document.documentElement && !dialog.contains(focused)) return;
+      const hadTabIndex = body.hasAttribute('tabindex');
+      if (!hadTabIndex) body.tabIndex = -1;
+      body.focus({ preventScroll: true });
+      if (!hadTabIndex) body.removeAttribute('tabindex');
+      return;
+    }
     if (target?.isConnected) target.focus({ preventScroll: true });
     if (document.activeElement !== target) opener.focus({ preventScroll: true });
     const focused = document.activeElement;
@@ -246,7 +258,9 @@
     if (event.key.toLowerCase() === 'k' && (event.metaKey || event.ctrlKey)
         && !event.target.closest?.('input, textarea, select, [contenteditable]:not([contenteditable="false"])')) {
       event.preventDefault();
-      openSearch();
+      const focused = document.activeElement;
+      const documentFocused = focused === document.body || focused === document.documentElement;
+      openSearch(undefined, documentFocused ? document : focused);
     }
   });
 

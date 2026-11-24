@@ -146,6 +146,10 @@
 .r-source-lookup-fields{display:flex;flex-wrap:wrap;gap:8px;max-width:640px}
 .r-source-lookup-fields input{flex:1 1 11rem;min-width:0;max-width:100%;min-height:44px;padding:8px 12px;border:1px solid #7d8b80;border-radius:3px;background:white;color:var(--ink);font:inherit}
 .r-source-lookup-fields button{max-width:100%;margin:0;font-size:1rem;cursor:pointer}
+@media(max-width:360px){
+ .r-source-lookup-fields input{flex-basis:9rem}
+ .r-source-lookup-fields button{padding-inline:12px}
+}
 .r-source-lookup-fields :is(input,button):focus-visible{outline:3px solid var(--r-accent);outline-offset:2px}
 .r-source-lookup [role="status"]{margin:0}
 .r-source-lookup [role="status"]:not(:empty){margin-top:12px}

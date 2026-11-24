@@ -165,6 +165,7 @@ console.log(JSON.stringify({companies:data.companies.length,average_letters_unti
 
     def test_search_dialog_keyboard(self):
         checks = r'''
+Object.defineProperty(location,'href',{get:()=>`https://example.test/explore/${location.hash}`});
 run('initialize()');
 // A little more DOM than the stub has: options read back from the rendered list, synthetic input events.
 context.Event=class{constructor(type,init={}){this.type=type;this.bubbles=Boolean(init.bubbles);this.isTrusted=false;}};
@@ -176,6 +177,7 @@ const rendered=()=>[...node('site-search-results').innerHTML.matchAll(/<div clas
 const anyAll=document.querySelectorAll;
 document.querySelectorAll=s=>s==='#site-search-results [role=option]'?rendered().map(option):anyAll(s);
 const dialog=node('site-search'),input=node('site-search-input'),opener=node('site-search-open'),list=node('site-search-results');
+dialog.contains=element=>[dialog,input,list,node('site-search-close')].includes(element)||[...options.values()].includes(element);
 const items=()=>plain(run('siteSearchItems'));
 const type=q=>{input.value=q;input.callbacks.input({type:'input',target:input});options.clear();};
 const press=(key,extra={})=>{let prevented=false;input.callbacks.keydown({key,target:input,isComposing:false,preventDefault(){prevented=true;},...extra});return prevented;};

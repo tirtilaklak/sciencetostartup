@@ -430,7 +430,7 @@ enlargedText.describe('Market with a 28px minimum font', () => {
     await expect(bar).toBeFocused();
   });
 
-  enlargedText('the Market bookmark clears the sticky header and Tab reaches the download', async ({ enlargedPage: page }) => {
+  enlargedText('the Market bookmark clears the sticky header and Tab reaches a readable download', async ({ enlargedPage: page }) => {
     await page.goto('/explore/#business-health');
     const heading = page.locator('#business-health-heading');
     const section = page.locator('#business-health');
@@ -439,7 +439,26 @@ enlargedText.describe('Market with a 28px minimum font', () => {
     await expect.poll(() => section.evaluate(node => (
       Math.abs(node.getBoundingClientRect().top - parseFloat(getComputedStyle(document.documentElement).scrollPaddingTop))
     ))).toBeLessThan(2);
+    await page.evaluate(() => document.fonts.ready);
     await page.keyboard.press('Tab');
-    await expect(section.getByRole('link', { name: /^Download data/ })).toBeFocused();
+    const download = section.getByRole('link', { name: /^Download data.*JSON.*kB/ });
+    await expect(download).toBeFocused();
+    await expect(download).toBeInViewport({ ratio: 1 });
+    await expect.poll(() => download.evaluate(link => {
+      const box = link.getBoundingClientRect();
+      const range = document.createRange();
+      return {
+        targetTallEnough: box.height >= 44,
+        focusVisible: link.matches(':focus-visible'),
+        insideTarget: [...link.children].map(part => {
+          range.selectNodeContents(part);
+          const lines = [...range.getClientRects()];
+          return lines.length === 1 && lines.every(({ left, top, right, bottom, width, height }) => (
+            left >= box.left && right <= box.right && top >= box.top && bottom <= box.bottom
+            && link.contains(document.elementFromPoint(left + width / 2, top + height / 2))
+          ));
+        }),
+      };
+    })).toEqual({ targetTallEnough: true, focusVisible: true, insideTarget: [true, true] });
   });
 });

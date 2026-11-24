@@ -2,7 +2,7 @@
 (() => {
   'use strict';
 
-  const shell = {"config":{"schemaVersion":"1.0.0","buildId":"f80a8d01debb3708a2cd","editorialReleaseId":"2026-11-22.10","datasetVersion":"2.5.0","search":{"href":"/presentation/search.fb3291b883fb814b.json","sha256":"fb3291b883fb814b65af21ff3128c3784e89da013058eb3c937b0b5ec7d985c0","bytes":387476}},"dialog":"<dialog id=\"home-search\" class=\"site-search\" aria-labelledby=\"home-search-title\">\n<div class=\"site-search-panel\"><div class=\"site-search-bar\">\n<label id=\"home-search-title\" class=\"sr-only\" for=\"home-search-input\">Search the guide</label>\n<svg class=\"ui-icon\" xmlns=\"http://www.w3.org/2000/svg\" width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.75\" aria-hidden=\"true\" focusable=\"false\"><circle cx=\"10.5\" cy=\"10.5\" r=\"6.5\"/><path d=\"m16 16 4 4\"/></svg>\n<input id=\"home-search-input\" class=\"site-search-input\" type=\"search\" role=\"combobox\" aria-autocomplete=\"list\" aria-expanded=\"false\" aria-controls=\"home-search-results\" aria-describedby=\"home-search-message\" autocomplete=\"off\" autocapitalize=\"off\" spellcheck=\"false\" enterkeyhint=\"go\" placeholder=\"Search\">\n<button type=\"button\" id=\"home-search-close\" class=\"site-search-close\" aria-label=\"Close search\"><svg class=\"ui-icon\" xmlns=\"http://www.w3.org/2000/svg\" width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.75\" aria-hidden=\"true\" focusable=\"false\"><path d=\"m6 6 12 12M18 6 6 18\"/></svg></button>\n</div><div class=\"site-search-content\" tabindex=\"-1\">\n<p id=\"home-search-message\" class=\"site-search-message\">Search research or companies and their products. Try a role or skill for paid work.</p>\n<div id=\"home-search-results\" class=\"site-search-results\" role=\"listbox\" aria-label=\"Search results\" tabindex=\"-1\" hidden></div>\n<p class=\"site-search-fallback\"><a href=\"/companies/\">Browse companies</a><a id=\"home-search-work-recovery\" href=\"/work/\">Browse paid work</a></p>\n<button id=\"home-search-more\" class=\"site-search-more\" type=\"button\" hidden>Show more</button>\n</div><p id=\"home-search-status\" class=\"sr-only\" role=\"status\"></p></div>\n</dialog>\n"};
+  const shell = {"config":{"schemaVersion":"1.0.0","buildId":"2119a8f06604a5f45557","editorialReleaseId":"2026-11-22.10","datasetVersion":"2.5.0","search":{"href":"/presentation/search.da8f787ebab255cf.json","sha256":"da8f787ebab255cff4ac45633599e46508bbf77813320588a0c439a9e2a9a2ec","bytes":387476}},"dialog":"<dialog id=\"home-search\" class=\"site-search\" aria-labelledby=\"home-search-title\">\n<div class=\"site-search-panel\"><div class=\"site-search-bar\">\n<label id=\"home-search-title\" class=\"sr-only\" for=\"home-search-input\">Search the guide</label>\n<svg class=\"ui-icon\" xmlns=\"http://www.w3.org/2000/svg\" width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.75\" aria-hidden=\"true\" focusable=\"false\"><circle cx=\"10.5\" cy=\"10.5\" r=\"6.5\"/><path d=\"m16 16 4 4\"/></svg>\n<input id=\"home-search-input\" class=\"site-search-input\" type=\"search\" role=\"combobox\" aria-autocomplete=\"list\" aria-expanded=\"false\" aria-controls=\"home-search-results\" aria-describedby=\"home-search-message\" autocomplete=\"off\" autocapitalize=\"off\" spellcheck=\"false\" enterkeyhint=\"go\" placeholder=\"Search\">\n<button type=\"button\" id=\"home-search-close\" class=\"site-search-close\" aria-label=\"Close search\"><svg class=\"ui-icon\" xmlns=\"http://www.w3.org/2000/svg\" width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.75\" aria-hidden=\"true\" focusable=\"false\"><path d=\"m6 6 12 12M18 6 6 18\"/></svg></button>\n</div><div class=\"site-search-content\" tabindex=\"-1\">\n<p id=\"home-search-message\" class=\"site-search-message\">Search research or companies and their products. Try a role or skill for paid work.</p>\n<div id=\"home-search-results\" class=\"site-search-results\" role=\"listbox\" aria-label=\"Search results\" tabindex=\"-1\" hidden></div>\n<p class=\"site-search-fallback\"><a href=\"/companies/\">Browse companies</a><a id=\"home-search-work-recovery\" href=\"/work/\">Browse paid work</a></p>\n<button id=\"home-search-more\" class=\"site-search-more\" type=\"button\" hidden>Show more</button>\n</div><p id=\"home-search-status\" class=\"sr-only\" role=\"status\"></p></div>\n</dialog>\n"};
   if (shell && typeof window.HTMLDialogElement?.prototype.showModal === 'function') {
     const configNode = document.createElement('script');
     configNode.id = 'home-config';
@@ -113,7 +113,8 @@
   function openSearch(snapshot, trigger = document.activeElement) {
     if (!dialog.open) {
       if (typeof snapshot?.directoryQuery === 'string' && recoveryOpener) trigger = recoveryOpener;
-      returnFocus = trigger instanceof HTMLElement && trigger !== document.body && !dialog.contains(trigger)
+      if (trigger === document) returnFocus = document;
+      else returnFocus = trigger instanceof HTMLElement && trigger !== document.body && !dialog.contains(trigger)
         ? trigger : opener;
       if (returnFocus === recoveryOpener) {
         dialog.dataset.directoryQuery = document.getElementById('company-query')?.value || '';
@@ -233,6 +234,17 @@
       dialog.returnValue = '';
       return;
     }
+    if (target === document) {
+      // Return Tab to the start of the document without moving the reading position.
+      const { body } = document;
+      const focused = document.activeElement;
+      if (focused && focused !== body && focused !== document.documentElement && !dialog.contains(focused)) return;
+      const hadTabIndex = body.hasAttribute('tabindex');
+      if (!hadTabIndex) body.tabIndex = -1;
+      body.focus({ preventScroll: true });
+      if (!hadTabIndex) body.removeAttribute('tabindex');
+      return;
+    }
     if (target?.isConnected) target.focus({ preventScroll: true });
     if (document.activeElement !== target) opener.focus({ preventScroll: true });
     const focused = document.activeElement;
@@ -246,7 +258,9 @@
     if (event.key.toLowerCase() === 'k' && (event.metaKey || event.ctrlKey)
         && !event.target.closest?.('input, textarea, select, [contenteditable]:not([contenteditable="false"])')) {
       event.preventDefault();
-      openSearch();
+      const focused = document.activeElement;
+      const documentFocused = focused === document.body || focused === document.documentElement;
+      openSearch(undefined, documentFocused ? document : focused);
     }
   });
 

@@ -7,6 +7,7 @@ const SITE_SEARCH_SUGGESTED=['scale_ai','mercor','surge_ai','labelbox'];
 const SITE_SEARCH_HISTORY='s2sExploreSearchReturn';
 const SITE_SEARCH_FRAGMENT_OWNER='s2sExploreSearchFragmentOwner';
 let siteSearchEntries=null,siteSearchItems=[],siteSearchActive=-1,siteSearchStatusTimer=0,siteSearchGeneration=0,siteSearchReturn=null;
+let siteSearchDocumentPosition=null;
 const siteSearchFragmentDestinations=new Map();
 let pendingSiteSearchFragment=null;
 const siteSearchTools=globalThis.S2SSearch;
@@ -250,6 +251,7 @@ function siteSearchChoose(item,event){
  if(item.action==='companies'){preparePage('companies');reset();}
  const sameRoute=location.hash===item.href;
  const snapshot=sameRoute?null:siteSearchSnapshot(result,event);
+ siteSearchDocumentPosition=null;
  $('site-search').close();
  const reveal=item.type==='product'||item.type==='work'?()=>queueMicrotask(()=>{const pending=window.APP_ROUTE_READY;Promise.resolve(pending).then(()=>{if(location.hash===item.href&&pending===window.APP_ROUTE_READY)siteSearchReveal(item);}).catch(()=>{});}):null;
  if(sameRoute){siteSearchForget();if(item.action==='work')flushWorkRoute();route({type:'hashchange'});reveal?.();return;}
@@ -269,22 +271,25 @@ function siteSearchKey(event){
  else if(event.key==='Enter'){event.preventDefault();siteSearchChoose(siteSearchItems[siteSearchActive]||(siteSearchWords(event.target.value).length?siteSearchItems[0]:null));}
  else if(event.key==='Escape'&&event.target.value){event.preventDefault();event.target.value='';siteSearchRequestRender();}
 }
-function siteSearchOpen(text,snapshot=null){
+function siteSearchOpen(text,snapshot=null,documentPosition=null){
  const dialog=$('site-search'),input=$('site-search-input');
  if(dialog.open&&!snapshot)return;
  siteSearchReturn=snapshot;
+ siteSearchDocumentPosition=documentPosition;
  if(typeof text==='string')input.value=text;
  if(!dialog.open)dialog.showModal();$('site-search-open').setAttribute('aria-expanded','true');
  input.focus();input.select();siteSearchRequestRender();
 }
 // Ctrl or Cmd+K opens search when a text field or another dialog does not own the keyboard.
 function siteSearchTyping(el){return Boolean(el?.isContentEditable||el?.closest?.('textarea,select')||(el?.matches?.('input')&&!/^(?:checkbox|radio|button|submit|reset|range|color|file|image)$/.test(el.type)));}
+function siteSearchHasDocumentFocus(active){return !active||active===document.body||active===document.documentElement;}
 function siteSearchShortcut(event){
  if(event.defaultPrevented||event.isComposing||event.altKey)return;
  const command=(event.ctrlKey||event.metaKey)&&!event.shiftKey&&(String(event.key).toLowerCase()==='k'||event.code==='KeyK');
  if(!command)return;
  if(siteSearchTyping(event.target)||document.querySelector('dialog[open]'))return;
- event.preventDefault();siteSearchOpen();
+ const documentPosition=siteSearchHasDocumentFocus(document.activeElement)?{url:location.href,left:scrollX,top:scrollY}:null;
+ event.preventDefault();siteSearchOpen(undefined,null,documentPosition);
 }
 
 function measureSiteHeader(header=document.querySelector('body > header.topbar')){
@@ -307,7 +312,7 @@ function initSiteNav(){
  button.setAttribute('aria-keyshortcuts','Control+K Meta+K');
  button.addEventListener('click',event=>{
   if(event&&!normalSelfLinkActivation(event,button))return;
-  event?.preventDefault();siteSearchOpen();
+  event?.preventDefault();button.focus({preventScroll:true});siteSearchOpen();
  });
  const dismiss=()=>{siteSearchForget();dialog.close();};
  $('site-search-close').addEventListener('click',dismiss);
@@ -321,8 +326,18 @@ function initSiteNav(){
  // Native focus restoration returns to the opener; a search opened on load can fall back to the header action.
  dialog.addEventListener('close',()=>{
   if(dialog.open)return;
+  const position=siteSearchDocumentPosition;
+  siteSearchDocumentPosition=null;
   siteSearchGeneration++;siteSearchReturn=null;clearTimeout(siteSearchStatusTimer);dialog.removeAttribute('aria-busy');button.setAttribute('aria-expanded','false');$('site-search-status').textContent='';
-  const active=document.activeElement;if(!active||active===document.body||dialog.contains(active))button.focus();
+  const active=document.activeElement,insideDialog=dialog.contains(active);
+  if(position?.url===location.href&&(siteSearchHasDocumentFocus(active)||insideDialog)){
+   // Restore the Tab starting point as well as any focus left inside the closed dialog.
+   const body=document.body,temporaryTabindex=!body.hasAttribute('tabindex');
+   if(temporaryTabindex)body.setAttribute('tabindex','-1');
+   body.focus({preventScroll:true});
+   if(temporaryTabindex)body.removeAttribute('tabindex');
+   if(scrollX!==position.left||scrollY!==position.top)window.scrollTo({left:position.left,top:position.top,behavior:'instant'});
+  }else if(!active||active===document.body||insideDialog)button.focus();
  });
  dialog.addEventListener('click',event=>{
   if(!event.target.closest?.('[data-retry-site-search]'))return;
