@@ -1004,13 +1004,14 @@ function rememberExploreOrigin(event){
  const href=link.getAttribute('href'),view=routeParts()[0];
  const work=view==='work'&&link.id==='work-native-compare';
  const compare=view==='compare'&&link.closest('#compare-content')&&(link.dataset.compareOrigin||href.startsWith('#company/'));
+ const profile=view==='company'&&typeof profilePeerReading==='function'?profilePeerReading(link):null;
  let market=null;
  if((!view||view==='market'||VIEW_ANCHORS[view]==='market')&&link.closest('#market-view')){
   const selector=MARKET_RETURN_LINKS.find(selector=>link.matches(selector));
   const evidence=link.matches('#bh-evidence-dialog a.bh-profile')&&window.BusinessHealth?.evidenceOpener?.();
   if(selector||evidence)market={selector,evidence};
  }
- if(!work&&!compare&&!market){
+ if(!work&&!compare&&!market&&!profile){
   if(history.state?.exploreReturnOrigin){const {exploreReturnOrigin,...rest}=history.state;history.replaceState(rest,'');}
   return;
  }
@@ -1020,7 +1021,7 @@ function rememberExploreOrigin(event){
  if(work)flushWorkRoute();
  const destination=link.href;
  const opener=compare?{action:link.dataset.compareOrigin,pair:state.mobileCompare,expanded:comparisonExpanded,left:link.closest('.comparison-scroll')?.scrollLeft||0}:null;
- history.replaceState({...history.state,exploreReturnOrigin:{href,destination,work,compare:opener,market}},'');
+ history.replaceState({...history.state,exploreReturnOrigin:{href,destination,work,compare:opener,market,profile}},'');
  pendingExploreLink=href.startsWith('#')?{key:exploreEntryKey,destination}:null;
  keepEntryScroll();
 }
@@ -1029,7 +1030,9 @@ function exploreReturnOrigin({traversedFragment=false,initial=false,persisted=fa
  const origin=history.state?.exploreReturnOrigin;
  if(!origin)return null;
  const view=routeParts()[0];
- if(origin.market){
+ if(origin.profile){
+  if(!traversedFragment||view!=='company'||profileRouteCompany()!==origin.profile.company)return null;
+ }else if(origin.market){
   if(!traversedFragment||(view&&view!=='market'&&VIEW_ANCHORS[view]!=='market'))return null;
  }else if(view!==(origin.work?'work':'compare'))return null;
  if(traversedFragment)return explorePreviousKey&&exploreFragmentDestinations.get(historyKey())===explorePreviousKey?origin:null;
@@ -1043,9 +1046,11 @@ function exploreReturnOrigin({traversedFragment=false,initial=false,persisted=fa
  }else if(!persisted&&window.performance?.getEntriesByType?.('navigation')[0]?.type!=='back_forward')return null;
  return origin;
 }
-function focusExploreOrigin({work,compare,market,href}){
+function focusExploreOrigin({work,compare,market,profile,href}){
  if(market?.evidence)return window.BusinessHealth?.focusEvidenceOpener?.(market.evidence);
- const links=work?[$('work-native-compare')]:[...(market?$('market-view').querySelectorAll(market.selector||MARKET_RETURN_LINKS.join(', ')):$('compare-content').querySelectorAll('a[href]'))];
+ const links=profile?[...$('profile-view').querySelectorAll('.profile-peers a[href]')]
+  :work?[$('work-native-compare')]
+  :[...(market?$('market-view').querySelectorAll(market.selector||MARKET_RETURN_LINKS.join(', ')):$('compare-content').querySelectorAll('a[href]'))];
  const target=links.find(link=>link?.getAttribute('href')===href&&link.dataset.compareOrigin===compare?.action&&link.getClientRects().length);
  if(!target)return null;
  const scrollbox=compare&&target.closest('.comparison-scroll');
@@ -1174,6 +1179,8 @@ function route(event){
  }}
  if(view!=='compare'&&previousRoute==='compare'&&typeof measureSiteHeader==='function')measureSiteHeader();
  renderTray(shortlist?.notice);
+ // The peer link sits below the panes and archive, so restore their height before scrolling.
+ if(returnOrigin?.profile)restoreProfilePeerReading(returnOrigin.profile);
  const waitForShortlist=shortlist&&restore!==null&&searchContextPending(state.query);
  const section=profileRouteSection(parts[2]),anchor=view==='company'&&section?$('profile-'+section):null;if(anchorId)showViewAnchor($(anchorId));if(restore!==null){const hash=location.hash,back=()=>{if(location.hash===hash)window.scrollTo({left:0,top:restore,behavior:'instant'});};back();if(!waitForShortlist)queueMicrotask(back);}else if(!anchorId){if(anchor){let p=anchor;while(p){if(p.tagName==='DETAILS')p.open=true;p=p.parentElement;}if(previousRoute)anchor.scrollIntoView({block:'start',behavior:'instant'});}else if(previousRoute&&(view!==previousRoute||previousSection))window.scrollTo({left:0,top:view!==previousRoute&&['market','companies','work'].includes(view)?viewScroll[view]||0:0,behavior:'instant'});}previousRoute=view;previousSection=anchorId;
  const linkedOpener=returnOrigin&&focusExploreOrigin(returnOrigin);

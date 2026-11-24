@@ -144,6 +144,81 @@ test('Explore guide search opens published hourly pay and restores the selected 
   await expect(first).toHaveAttribute('aria-selected', 'true');
 });
 
+test('Back from an Explore Search product restores the query and selected result', async ({ page, isMobile }) => {
+  const origin = '/explore/#market';
+  const destination = '/explore/#company/mercor/products';
+  const query = 'APEX-Agents';
+  const opener = page.locator('#site-search-open');
+  const dialog = page.getByRole('dialog', { name: 'Search the guide' });
+  const input = dialog.getByRole('combobox');
+  const result = dialog.getByRole('option', { name: 'APEX-Agents From Mercor', exact: true });
+  const product = page.locator('[data-profile-product="APEX-Agents"]').getByRole('heading', { level: 3 });
+  const choose = async () => {
+    if (isMobile) await result.tap();
+    else {
+      await input.press('ArrowDown');
+      await expect(result).toHaveAttribute('aria-selected', 'true');
+      await input.press('Enter');
+    }
+  };
+
+  await page.goto(origin);
+  await opener.click();
+  await input.fill(query);
+  await expect(result).toBeVisible();
+  await choose();
+  await expect(page).toHaveURL(destination);
+  await expect(dialog).toBeHidden();
+  await expect(product).toBeFocused();
+
+  await page.goBack();
+  await expect(page).toHaveURL(origin);
+  await expect(input).toBeFocused();
+  await expect(input).toHaveValue(query);
+  await expect(result).toHaveAttribute('aria-selected', 'true');
+  await expect(input).toHaveAttribute('aria-activedescendant', await result.getAttribute('id'));
+
+  await page.goForward();
+  await expect(page).toHaveURL(destination);
+  await expect(dialog).toBeHidden();
+  await opener.click();
+  await input.fill(query);
+  await choose();
+  await expect(product).toBeFocused();
+  await page.goBack();
+  await expect(page).toHaveURL(origin);
+  await expect(input).toBeFocused();
+  await expect(result).toHaveAttribute('aria-selected', 'true');
+  await dialog.getByRole('button', { name: 'Close search' }).click();
+
+  await page.goForward();
+  await expect(page).toHaveURL(destination);
+  await page.goBack();
+  await expect(page).toHaveURL(origin);
+  await expect(dialog).toBeHidden();
+});
+
+test('Explore Search native results keep their modified-click navigation', async ({ page, context, isMobile }) => {
+  test.skip(isMobile, 'Uses a desktop modifier key.');
+  const origin = '/explore/#market';
+  const destination = '/research/benchmarks/benchmark.apex-agents/';
+  await page.goto(origin);
+  await page.locator('#site-search-open').click();
+  const dialog = page.getByRole('dialog', { name: 'Search the guide' });
+  const input = dialog.getByRole('combobox');
+  const result = dialog.locator(`a[role=option][href="${destination}"]`);
+  await input.fill('APEX-Agents');
+  const [tab] = await Promise.all([
+    context.waitForEvent('page'),
+    result.click({ modifiers: ['ControlOrMeta'] }),
+  ]);
+  await expect(tab).toHaveURL(destination);
+  await expect(page).toHaveURL(origin);
+  await expect(dialog).toBeVisible();
+  await expect(input).toHaveValue('APEX-Agents');
+  await tab.close();
+});
+
 test('a result on the current day closes Search and focuses its headline', async ({ page, isMobile }) => {
   const day = '/daily/2026-11-18/';
   const fragment = '#regularized-score-centering';

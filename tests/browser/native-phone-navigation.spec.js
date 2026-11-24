@@ -99,6 +99,28 @@ test.describe('native navigation with standard text', () => {
     test('standard-text navigation stays keyboard reachable at tablet widths', async ({ page }) => {
       await checkInlineNavigation(page);
     });
+
+    test('research navigation fits in two tappable rows at 320px', async ({ page }) => {
+      await page.setViewportSize({ width: 320, height: 720 });
+      await page.goto('/research/data/');
+      const nav = page.getByRole('navigation', { name: 'Research', exact: true });
+      const links = nav.getByRole('link');
+      await expect(links).toHaveText([
+        'Research', 'Report', 'Papers', 'Datasets', 'Benchmarks', 'Workflows', 'Data & sources', 'Review',
+      ]);
+      await expect(nav.getByRole('link', { name: 'Data & sources', exact: true })).toHaveAttribute('aria-current', 'page');
+      const rowCount = await links.evaluateAll(nodes =>
+        new Set(nodes.map(node => node.getBoundingClientRect().top)).size);
+      expect(rowCount).toBe(2);
+
+      await links.first().focus();
+      await expectHitArea(links.first(), { minWidth: 24, label: true });
+      for (const link of (await links.all()).slice(1)) {
+        await tabTo(page, link);
+        await expectHitArea(link, { minWidth: 24, label: true });
+      }
+      await expectViewportWidth(page, 320);
+    });
   });
 
   for (const path of ['/work/', '/companies/']) {

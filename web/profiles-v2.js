@@ -315,6 +315,46 @@ function ensureProfileArchive(root){
  return evidence.querySelector('.profile-archive');
 }
 
+// Index disclosures within their nearest parent so lazy children can be restored after their parent renders.
+function profileChildDisclosures(scope){
+ const parent=scope.closest('details');
+ return [...scope.querySelectorAll('details')].filter(disclosure=>disclosure.parentElement.closest('details')===parent);
+}
+function readProfileDisclosures(scope){
+ return profileChildDisclosures(scope).map(disclosure=>disclosure.open?readProfileDisclosures(disclosure):null);
+}
+function restoreProfileDisclosures(scope,reading){
+ if(!reading.length)return;
+ const disclosures=profileChildDisclosures(scope);
+ for(const [index,children] of reading.entries()){
+  const disclosure=disclosures[index];
+  if(!disclosure)continue;
+  disclosure.open=children!==null;
+  if(disclosure.open){
+   w4FillLazy(disclosure);
+   restoreProfileDisclosures(disclosure,children);
+  }
+ }
+}
+function profilePeerReading(link){
+ if(!link.matches('.profile-peers a[href^="#company/"]'))return null;
+ const root=link.closest('.profile-v2'),company=root?.dataset.profileCompany;
+ if(!company||company!==profileRouteCompany())return null;
+ const archive=root.querySelector('.profile-evidence'),pane=root.querySelector('[data-profile-pane]:not([hidden])');
+ return {company,archive:archive.open?readProfileDisclosures(archive):null,pane:readProfileDisclosures(pane)};
+}
+function restoreProfilePeerReading(reading){
+ const root=$('profile-view').querySelector('.profile-v2');
+ if(root?.dataset.profileCompany!==reading.company)return;
+ const archive=root.querySelector('.profile-evidence');
+ archive.open=reading.archive!==null;
+ if(archive.open){
+  ensureProfileArchive(root);
+  restoreProfileDisclosures(archive,reading.archive);
+ }
+ restoreProfileDisclosures(root.querySelector('[data-profile-pane]:not([hidden])'),reading.pane);
+}
+
 function renderCompanyProfile(id){
  const container=$('profile-view'),existing=container.querySelector?.('.profile-v2');
  const render=()=>{
@@ -415,7 +455,7 @@ route=function(event){
   const freshEntry=!window.navigation&&typeof history.state?.scrollY!=='number';
   const newFragment=event?.type==='hashchange'&&(fragmentNavigation?fragmentNavigation.url===event.newURL&&['push','replace'].includes(fragmentNavigation.type):freshEntry);
   if(newFragment&&previousCompany&&parts[0]==='company'&&isCompanyId(parts[1])&&parts[1]!==previousCompany&&!parts[2])window.scrollTo({left:0,top:0,behavior:'instant'});
-  if(routeRestoredScroll===null&&parts[0]==='company'&&isCompanyId(parts[1])&&parts[2]){
+  if(!result&&routeRestoredScroll===null&&parts[0]==='company'&&isCompanyId(parts[1])&&parts[2]){
     const section=profileRouteSection(parts[2]);
     const primary=['business','traction','people','work'].includes(section);
     const destination=profileRouteDestination(section);
