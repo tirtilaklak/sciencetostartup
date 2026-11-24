@@ -247,7 +247,8 @@ test('leaving an interrupted Compare reload keeps the reading position for Back'
   try {
     await page.reload({ waitUntil: 'domcontentloaded' });
     await expect(page.locator('#compare-content')).toHaveAttribute('aria-busy', 'true');
-    await page.locator('.topbar a[href="/companies/"]').press('Enter');
+    const inlineNav = page.locator('.topbar > nav[aria-label="Main"]');
+    await inlineNav.getByRole('link', { name: 'Companies', exact: true }).press('Enter');
     await expect(page).toHaveURL('/companies/');
   } finally {
     release();

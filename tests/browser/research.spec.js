@@ -594,7 +594,9 @@ test('at 320 pixels the public header, navigation and page fit without horizonta
   ]) {
     await page.goto('/explore/#companies');
     await expect(page.locator('html')).toHaveAttribute('data-view-state', 'ready');
-    const link = page.getByRole('navigation', { name: 'Main', exact: true }).getByRole('link', { name, exact: true });
+    const menu = page.locator('.topbar .site-menu');
+    await menu.locator('summary').press('Enter');
+    const link = menu.getByRole('navigation', { name: 'Main', exact: true }).getByRole('link', { name, exact: true });
     await expect(link).toHaveAttribute('href', target);
     await link.click();
     await expect(page).toHaveURL(new URL(target, page.url()).href);

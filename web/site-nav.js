@@ -301,18 +301,30 @@ function measureSiteHeader(header=document.querySelector('body > header.topbar')
 function initSiteNav(){
  const button=$('site-search-open'),dialog=$('site-search'),input=$('site-search-input'),list=$('site-search-results');
  const header=document.querySelector('body > header.topbar');
+ const menu=document.querySelector('body > header.topbar > .site-menu');
  if(header){
   const measure=()=>measureSiteHeader(header);
   if(typeof ResizeObserver==='function')new ResizeObserver(measure).observe(header);
   window.addEventListener('resize',measure);
   measure();
  }
+ if(menu){
+  menu.addEventListener('keydown',event=>{
+   if(event.defaultPrevented||event.key!=='Escape'||!menu.open)return;
+   event.preventDefault();menu.open=false;menu.querySelector('summary').focus();
+  });
+  document.addEventListener('click',event=>{
+   // Search opened by shortcut can return focus to a link in the open Menu.
+   if(menu.open&&!menu.contains(event.target)&&!dialog.contains(event.target))menu.open=false;
+  });
+ }
  button.setAttribute('aria-haspopup','dialog');
  button.setAttribute('aria-expanded','false');
  button.setAttribute('aria-keyshortcuts','Control+K Meta+K');
  button.addEventListener('click',event=>{
   if(event&&!normalSelfLinkActivation(event,button))return;
-  event?.preventDefault();button.focus({preventScroll:true});siteSearchOpen();
+  event?.preventDefault();if(menu?.open)menu.open=false;
+  button.focus({preventScroll:true});siteSearchOpen();
  });
  const dismiss=()=>{siteSearchForget();dialog.close();};
  $('site-search-close').addEventListener('click',dismiss);

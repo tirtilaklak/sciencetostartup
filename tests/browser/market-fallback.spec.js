@@ -14,6 +14,39 @@ async function expectMarketLanding(page) {
 test.describe('Explore without JavaScript', () => {
   test.use({ javaScriptEnabled: false });
 
+  test('320px Explore Menu and Search reach native destinations', async ({ page }) => {
+    await page.setViewportSize({ width: 320, height: 720 });
+    const header = page.locator('body > header.topbar');
+    const search = header.locator('#site-search-open');
+    const menu = header.locator('details.site-menu');
+    const nav = header.getByRole('navigation', { name: 'Main', exact: true });
+    const headerStops = [page.getByRole('link', { name: 'Skip to content' }), header.locator('.wordmark'), search];
+
+    await page.goto('/explore/');
+    await expect(nav).toHaveCount(0);
+    for (const control of [...headerStops, menu.locator('summary')]) {
+      await page.keyboard.press('Tab');
+      await expect(control).toBeFocused();
+    }
+    await page.keyboard.press('Enter');
+    await expect(menu).toHaveAttribute('open', '');
+    for (const name of ['Daily scan', 'Research', 'Companies']) {
+      await page.keyboard.press('Tab');
+      await expect(nav.getByRole('link', { name, exact: true })).toBeFocused();
+    }
+    await page.keyboard.press('Enter');
+    await expect(page).toHaveURL('/companies/');
+
+    await page.goto('/explore/');
+    for (const control of headerStops) {
+      await page.keyboard.press('Tab');
+      await expect(control).toBeFocused();
+    }
+    await page.keyboard.press('Enter');
+    await expect(page).toHaveURL('/?search#browse-guide');
+    await expect(page.locator('#browse-guide')).toBeInViewport();
+  });
+
   for (const fragment of ['', '#work', '#business-health']) {
     test(`${fragment || 'base URL'} starts at the skip link and reaches the plain directory`, async ({ page }) => {
       await page.goto('/explore/' + fragment);

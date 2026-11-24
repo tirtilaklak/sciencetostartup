@@ -67,19 +67,26 @@ for (const [fragment, width, height, mastheadPosition] of readingViews) {
   });
 }
 
-test('Explore Search restores a focused link after the shortcut and the masthead after a pointer activation', async ({ page, isMobile }) => {
-  await page.setViewportSize({ width: 390, height: 480 });
+test('Explore Search restores a compact Menu link after the shortcut and Search after a pointer activation', async ({ page, isMobile }) => {
+  await page.setViewportSize({ width: 320, height: 720 });
   const opener = await openExplore(page, '#market');
-  const research = page.getByRole('navigation', { name: 'Main' }).getByRole('link', { name: 'Research' });
+  const menu = page.locator('.topbar .site-menu');
+  const research = menu.getByRole('link', { name: 'Research', exact: true });
   const dialog = page.getByRole('dialog', { name: 'Search the guide' });
   const input = dialog.getByRole('combobox');
   const close = dialog.getByRole('button', { name: 'Close search' });
 
-  await research.focus();
+  await menu.locator('summary').press('Enter');
+  await expect(menu).toHaveJSProperty('open', true);
+  await page.keyboard.press('Tab');
+  await expect(menu.getByRole('link', { name: 'Daily scan', exact: true })).toBeFocused();
+  await page.keyboard.press('Tab');
+  await expect(research).toBeFocused();
   await page.keyboard.press('ControlOrMeta+k');
   await expect(input).toBeFocused();
   await page.keyboard.press('Escape');
   await expect(opener).toHaveAttribute('aria-expanded', 'false');
+  await expect(menu).toHaveJSProperty('open', true);
   await expect(research).toBeFocused();
 
   if (isMobile) await opener.tap();
@@ -88,6 +95,7 @@ test('Explore Search restores a focused link after the shortcut and the masthead
   if (isMobile) await close.tap();
   else await close.click();
   await expect(opener).toHaveAttribute('aria-expanded', 'false');
+  await expect(menu).toHaveJSProperty('open', false);
   await expect(opener).toBeFocused();
 });
 

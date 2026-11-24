@@ -402,7 +402,7 @@ h1,h2,h3,h4{font-family:var(--fg-sans);color:var(--ink)}
 .site-footer .footer-note p{max-width:78ch;font-size:inherit;line-height:1.6}
 @media(max-width:700px){.site-footer .footer-line{display:block}.site-footer .footer-line nav{gap:0 16px}}
 
-/* Five destinations remain visible and wrap naturally on small screens. */
+/* Inline destinations wrap on small screens. */
 @media(max-width:700px){:where(.landing-page) .site-header nav[aria-label=Main],.topbar nav[aria-label=Main]{display:flex;flex-wrap:wrap;justify-content:flex-start;gap:0 12px;height:auto;min-height:48px;overflow:visible}:where(.landing-page) .site-header nav[aria-label=Main] a,.topbar nav[aria-label=Main] a{font-size:13px;min-height:44px;white-space:nowrap}}
 @media(max-width:400px){:where(.landing-page) .site-header nav[aria-label=Main],.topbar nav[aria-label=Main]{justify-content:space-between;gap:0 5px}:where(.landing-page) .site-header nav[aria-label=Main] a,.topbar nav[aria-label=Main] a{font-size:12px}}
 
@@ -438,6 +438,64 @@ h1,h2,h3,h4{font-family:var(--fg-sans);color:var(--ink)}
   border-color: var(--print-control);
   border-radius: 0;
   color: var(--ink);
+}
+.explore-page .topbar > .site-menu { display: none; }
+@media (max-width: 359px) {
+  .explore-page .topbar {
+    justify-content: flex-end;
+    gap: 0 8px;
+    min-height: 56px;
+    padding: 4px 20px;
+  }
+  .explore-page .topbar > .wordmark { flex: 1 1 auto; }
+  .explore-page .topbar > .site-search-open { order: 0; }
+  .explore-page .topbar > nav[aria-label=Main] { display: none; }
+  .explore-page .topbar:has(> .site-menu[open]) { align-items: flex-start; }
+  .explore-page .topbar > .site-menu {
+    display: block;
+    flex: none;
+    margin: 0;
+  }
+  .explore-page .site-menu > summary {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: max-content;
+    min-width: 44px;
+    min-height: 44px;
+    margin-inline-start: auto;
+    padding-inline: 4px;
+    color: var(--ink);
+  }
+  .explore-page .site-menu > summary::after { content: none; }
+  .explore-page .site-menu > .site-nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 8px;
+    width: max-content;
+    max-width: calc(100vw - 40px);
+    margin-inline-start: auto;
+    padding: 2px 10px;
+    border: 1px solid var(--border);
+    background: var(--bg);
+    overflow-wrap: anywhere;
+  }
+  .explore-page .site-menu > .site-nav a {
+    min-width: 44px;
+    max-width: 100%;
+    padding-inline: 4px;
+    white-space: normal;
+  }
+  @supports selector(::details-content) and (contain: inline-size) {
+    /* The open panel adds height without widening the summary. */
+    .explore-page .site-menu::details-content {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      justify-items: end;
+      contain: inline-size;
+    }
+    .explore-page .site-menu > .site-nav { margin-inline-start: 0; }
+  }
 }
 .explore-page :is(.market-hero h1, .bh-heading h2, #compare-view .page-heading h1) {
   font-family: var(--print-display);
