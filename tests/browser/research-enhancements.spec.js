@@ -331,7 +331,7 @@ test('category title and evidence links retain native modifier and ordinary navi
   }
   const href = await row.locator('th a').getAttribute('href');
   await row.locator('th a').click();
-  expect(new URL(page.url()).pathname).toBe(href);
+  await page.waitForURL(url => url.pathname === href, { waitUntil: 'commit' });
   await page.goBack();
   await expect(page).toHaveURL(/\/research\/papers\/\?status=approved$/);
   await expect(page.locator('select[name="status"]')).toHaveValue('approved');

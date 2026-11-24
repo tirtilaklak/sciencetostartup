@@ -1,5 +1,8 @@
 const { test, expect } = require('@playwright/test');
 
+// Keep failure screenshots without serializing the full evidence catalog at every action.
+test.use({ trace: { mode: 'retain-on-failure', snapshots: false, screenshots: true, sources: true } });
+
 const catalog = '/research/data/';
 const indexPath = '/research/data/source-lookup.json';
 const title = 'Prolific Pricing | Platform & managed services | Prolific';
@@ -42,7 +45,7 @@ test('catalog finds existing source captures and retains results after native Ba
   const faq = results.locator(`a[href="${pricingRecords[2]}"]`);
   await expect(faq).toHaveAccessibleDescription(/Pricing FAQ/);
   await faq.press('Enter');
-  expect(new URL(page.url()).pathname + new URL(page.url()).hash).toBe(pricingRecords[2]);
+  await expect(page).toHaveURL(url => url.pathname + url.hash === pricingRecords[2]);
   await expect(page.locator('article:target')).toBeInViewport();
   await expect(page.locator('article:target').getByRole('heading', { name: title })).toBeVisible();
 

@@ -117,10 +117,93 @@
     lookup(value);
   });
 
-  const saved = new URL(location.href).searchParams.get(input.name);
+  const savedQuery = new URL(location.href).searchParams.get(input.name);
+  let query, initialLookup;
   form.hidden = false;
-  if (saved?.trim()) {
-    input.value = saved.slice(0, input.maxLength).trim();
-    lookup(input.value);
+  if (savedQuery?.trim()) {
+    query = savedQuery.slice(0, input.maxLength).trim();
+    input.value = query;
+    initialLookup = lookup(query);
   }
+
+  const browserHistory = window.navigation;
+  if (!browserHistory) return;
+
+  let resultClick, departure;
+  results.addEventListener('click', event => { resultClick = event; });
+  browserHistory.addEventListener('navigate', event => {
+    const click = resultClick;
+    resultClick = departure = undefined;
+    if (!click?.isTrusted || click.defaultPrevented || click.button !== 0 ||
+        click.ctrlKey || click.metaKey || click.shiftKey || click.altKey) return;
+    const link = event.sourceElement;
+    if (!event.isTrusted || event.navigationType !== 'push' || event.destination.sameDocument ||
+        !(link instanceof HTMLAnchorElement) || click.target.closest?.('a[href]') !== link ||
+        event.destination.url !== link.href) return;
+    const href = link.getAttribute('href');
+    if (!sourceHref.test(href)) return;
+    departure = { event, opener: { page: location.href, href, top: link.getBoundingClientRect().top } };
+  });
+  addEventListener('pagehide', () => {
+    const visit = departure;
+    departure = undefined;
+    if (!visit || visit.event.defaultPrevented || visit.event.signal.aborted) return;
+    try { history.replaceState({ ...history.state, sourceLookupReturn: visit.opener }, ''); } catch {}
+  });
+
+  function nextRecord(opener) {
+    if (opener?.page !== location.href || !sourceHref.test(opener.href)) return;
+    const entry = browserHistory.currentEntry;
+    if (!entry) return;
+    const record = browserHistory.entries()[entry.index + 1];
+    if (record?.url === new URL(opener.href, location.origin).href &&
+        (opener.recordKey === undefined || record.key === opener.recordKey)) return record;
+  }
+
+  addEventListener('pageshow', () => {
+    const opener = history.state?.sourceLookupReturn;
+    if (!opener) return;
+    // A push has no destination key until it commits. Bind it even after a cached Back,
+    // so Forward can revisit this record but another entry at the same address cannot replay it.
+    const record = nextRecord(opener);
+    if (record && opener.recordKey === record.key) return;
+    const state = { ...history.state };
+    if (record) state.sourceLookupReturn = { ...opener, recordKey: record.key };
+    else delete state.sourceLookupReturn;
+    try { history.replaceState(state, ''); } catch {}
+  });
+
+  const opener = history.state?.sourceLookupReturn;
+  const record = nextRecord(opener);
+  const activation = browserHistory.activation;
+  if (!initialLookup || !record || !Number.isFinite(opener.top) ||
+      performance.getEntriesByType('navigation')[0]?.type !== 'back_forward' || activation?.navigationType !== 'traverse' ||
+      activation.from?.key !== record.key) return;
+
+  const interaction = new AbortController();
+  const { signal } = interaction;
+  const initialSequence = searchSequence;
+  for (const type of ['keydown', 'pointerdown', 'touchstart', 'wheel', 'focusin', 'input']) {
+    addEventListener(type, event => { if (event.isTrusted) interaction.abort(); }, { capture: true, passive: true, signal });
+  }
+  addEventListener('pagehide', () => interaction.abort(), { once: true, signal });
+  addEventListener('pageshow', async event => {
+    try {
+      if (event.persisted) return;
+      await initialLookup;
+      const link = Array.from(results.querySelectorAll('a[href]')).find(result => result.getAttribute('href') === opener.href);
+      if (signal.aborted || !link) return;
+      await document.fonts.ready;
+      // Both the results and the browser's own history scroll need to settle.
+      await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+      if (signal.aborted || initialSequence !== searchSequence || location.href !== opener.page || input.value !== query ||
+          (document.activeElement !== document.body && document.activeElement !== link)) return;
+      const { top, height } = link.getBoundingClientRect();
+      const offset = Math.max(0, Math.min(opener.top, innerHeight - height));
+      scrollBy({ top: top - offset, behavior: 'instant' });
+      link.focus({ preventScroll: true });
+    } finally {
+      interaction.abort();
+    }
+  }, { once: true, signal });
 })();

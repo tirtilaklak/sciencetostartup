@@ -2,6 +2,79 @@
 (() => {
   'use strict';
   const search = globalThis.S2SSearch;
+  const resultLinkSelector = '[data-index-row] a[href]:not([data-disclosure-return])';
+  function installResultReturn(index, rowsById) {
+    const navigation = window.navigation;
+    if (!navigation) return;
+
+    let clicked, departure;
+    index.addEventListener('click', event => {
+      clicked = null;
+      const link = event.target.closest?.(resultLinkSelector);
+      if (!link || !event.isTrusted || event.defaultPrevented || event.button !== 0 ||
+          event.ctrlKey || event.metaKey || event.shiftKey || event.altKey || link.hasAttribute('download') ||
+          (link.target && link.target.toLowerCase() !== '_self') || link.origin !== location.origin) return;
+      clicked = { link, event };
+    });
+    navigation.addEventListener('navigate', event => {
+      const activation = clicked;
+      clicked = null;
+      departure = event.destination.sameDocument ? null : { event };
+      const link = activation?.link;
+      if (!departure || !event.isTrusted || event.navigationType !== 'push' ||
+          !link || activation.event.defaultPrevented || event.sourceElement !== link ||
+          event.destination.url !== link.href) return;
+      departure.result = { page: location.href, href: link.href, row: link.closest('[data-index-row]').dataset.recordId };
+    });
+    addEventListener('pagehide', () => {
+      const leaving = departure;
+      departure = null;
+      if (!leaving || leaving.event.defaultPrevented || leaving.event.signal.aborted ||
+          leaving.event.navigationType === 'traverse') return;
+      const { researchIndexReturn, ...state } = history.state || {};
+      if (leaving.result?.page === location.href) state.researchIndexReturn = leaving.result;
+      if (researchIndexReturn || state.researchIndexReturn) {
+        try { history.replaceState(state, ''); } catch {}
+      }
+    });
+    addEventListener('pageshow', event => {
+      const { researchIndexReturn: saved, ...state } = history.state || {};
+      if (!saved) return;
+      const { from, entry } = navigation.activation || {};
+      if (saved.page !== location.href || !from || !entry || from.index !== entry.index + 1 ||
+          from.url !== saved.href || (saved.destinationKey && saved.destinationKey !== from.key)) {
+        if (!saved.destinationKey) {
+          try { history.replaceState(state, ''); } catch {}
+        }
+        return;
+      }
+      if (!saved.destinationKey) {
+        // A subsequent Forward and Back must come from the same history entry.
+        try { history.replaceState({ ...state, researchIndexReturn: { ...saved, destinationKey: from.key } }, ''); } catch {}
+      }
+      if (event.persisted || performance.getEntriesByType('navigation')[0]?.type !== 'back_forward') return;
+      const input = new AbortController();
+      for (const type of ['keydown', 'pointerdown', 'touchstart', 'wheel', 'pagehide']) {
+        addEventListener(type, event => { if (event.isTrusted) input.abort(); },
+          { capture: true, passive: true, signal: input.signal });
+      }
+      requestAnimationFrame(() => {
+        if (input.signal.aborted) return;
+        input.abort();
+        if (document.activeElement !== document.body || navigation.currentEntry?.key !== entry.key ||
+            location.href !== saved.page) return;
+        const row = rowsById.get(saved.row)?.node;
+        const link = row && [...row.querySelectorAll(resultLinkSelector)].find(link => link.href === saved.href);
+        if (!link?.getClientRects().length) return;
+        link.focus({ preventScroll: true });
+        const bounds = link.getBoundingClientRect();
+        if (bounds.bottom <= 0 || bounds.top >= innerHeight) {
+          link.scrollIntoView({ block: 'nearest', inline: 'nearest', behavior: 'instant' });
+        }
+      });
+    });
+  }
+
   document.querySelectorAll('[data-research-index]').forEach(index => {
     const form = index.querySelector('[data-index-controls]');
     const field = form.elements.q;
@@ -116,5 +189,6 @@
     window.addEventListener('popstate', restore);
     restore();
     form.hidden = false;
+    installResultReturn(index, byId);
   });
 })();
