@@ -6,6 +6,8 @@ const SITE_SEARCH_GROUPS={company:['Companies',5],group:['Business groups',2],wo
 const SITE_SEARCH_SUGGESTED=['scale_ai','mercor','surge_ai','labelbox'];
 const SITE_SEARCH_HISTORY='s2sExploreSearchReturn';
 let siteSearchEntries=null,siteSearchItems=[],siteSearchActive=-1,siteSearchStatusTimer=0,siteSearchGeneration=0,siteSearchReturn=null;
+const siteSearchFragmentDestinations=new Map();
+let pendingSiteSearchFragment=null;
 const siteSearchTools=globalThis.S2SSearch;
 const siteSearchFold=v=>String(v??'').normalize('NFKD').replace(/\p{M}+/gu,'').toLowerCase();
 const siteSearchWords=v=>siteSearchFold(Array.isArray(v)?v.join(' '):v).match(/[\p{L}\p{N}]+(?:\+\+|#)?/gu)||[];
@@ -203,25 +205,52 @@ function siteSearchReveal(item){
  if(gap<0)window.scrollBy({top:gap,behavior:'instant'});
  card.classList.add('site-search-target');target.addEventListener('blur',()=>card.classList.remove('site-search-target'),{once:true});
 }
+function siteSearchSnapshot(item,event){
+ const index=siteSearchItems.indexOf(item),option=index>=0?$('site-search-option-'+index):null;
+ const resultFocus=option&&(document.activeElement===option||(option.tagName==='A'&&event?.pointerType==='touch'));
+ if(index>=0&&index!==siteSearchActive)siteSearchSetActive(index);
+ if(resultFocus)option.focus({preventScroll:true});
+ return {query:$('site-search-input').value,href:item.href,type:item.type,id:item.id,focus:resultFocus?'result':'input',scrollTop:$('site-search-results').scrollTop};
+}
+function siteSearchSave(snapshot){
+ try{history.replaceState({...history.state,[SITE_SEARCH_HISTORY]:snapshot},'');}catch{}
+}
+function siteSearchForget(){
+ if(!history.state?.[SITE_SEARCH_HISTORY])return;
+ siteSearchFragmentDestinations.delete(historyKey());
+ const state={...history.state};delete state[SITE_SEARCH_HISTORY];
+ try{history.replaceState(state,'');}catch{}
+}
+function siteSearchCommitFragment(){
+ const pending=pendingSiteSearchFragment;
+ pendingSiteSearchFragment=null;
+ if(pending&&!routeTraversal&&pending.key===explorePreviousKey&&pending.destination===location.href){
+  siteSearchFragmentDestinations.set(pending.key,historyKey());
+ }
+}
 function siteSearchChoose(item,event){
  if(!item)return;
  if(typeof item.href==='string'&&item.href.startsWith('/')&&!item.href.startsWith('//')){
-  const index=siteSearchItems.indexOf(item),option=index>=0?$('site-search-option-'+index):null;
-  const resultFocus=option&&(document.activeElement===option||event?.pointerType==='touch');
-  if(index>=0&&index!==siteSearchActive)siteSearchSetActive(index);
-  if(resultFocus)option.focus({preventScroll:true});
-  const snapshot={query:$('site-search-input').value,href:item.href,type:item.type,id:item.id,focus:resultFocus?'result':'input',scrollTop:$('site-search-results').scrollTop};
-  try{history.replaceState({...history.state,[SITE_SEARCH_HISTORY]:snapshot},'');}catch{}
+  siteSearchSave(siteSearchSnapshot(item,event));
   location.assign(item.href);return;
  }
+ const result=item;
  // Set up the Paid work page first, so its search field listens before it receives the query.
  if(item.action==='work'){preparePage('work');applyWorkCriteria({q:item.query||''});item={...item,href:workHashFor({q:item.query||''})};renderWork();}
  if(item.action==='companies'){preparePage('companies');reset();}
+ const sameRoute=location.hash===item.href;
+ const snapshot=sameRoute?null:siteSearchSnapshot(result,event);
  $('site-search').close();
  const reveal=item.type==='product'||item.type==='work'?()=>queueMicrotask(()=>{const pending=window.APP_ROUTE_READY;Promise.resolve(pending).then(()=>{if(location.hash===item.href&&pending===window.APP_ROUTE_READY)siteSearchReveal(item);}).catch(()=>{});}):null;
- if(location.hash===item.href){if(item.action==='work')flushWorkRoute();route({type:'hashchange'});reveal?.();return;}
+ if(sameRoute){siteSearchForget();if(item.action==='work')flushWorkRoute();route({type:'hashchange'});reveal?.();return;}
  if(reveal)window.addEventListener('hashchange',reveal,{once:true});
- keepEntryScroll();location.hash=item.href;
+ keepEntryScroll();
+ if(location.href){
+  snapshot.destination=new URL(item.href,location.href).href;
+  siteSearchSave(snapshot);
+  pendingSiteSearchFragment={key:historyKey(),destination:snapshot.destination};
+ }
+ location.hash=item.href;
 }
 function siteSearchKey(event){
  if(event.isComposing)return;
@@ -232,10 +261,10 @@ function siteSearchKey(event){
 }
 function siteSearchOpen(text,snapshot=null){
  const dialog=$('site-search'),input=$('site-search-input');
- if(dialog.open)return;
+ if(dialog.open&&!snapshot)return;
  siteSearchReturn=snapshot;
  if(typeof text==='string')input.value=text;
- dialog.showModal();$('site-search-open').setAttribute('aria-expanded','true');
+ if(!dialog.open)dialog.showModal();$('site-search-open').setAttribute('aria-expanded','true');
  input.focus();input.select();siteSearchRequestRender();
 }
 // Ctrl or Cmd+K opens search when a text field or another dialog does not own the keyboard.
@@ -270,20 +299,19 @@ function initSiteNav(){
   if(event&&!normalSelfLinkActivation(event,button))return;
   event?.preventDefault();siteSearchOpen();
  });
- $('site-search-close').addEventListener('click',()=>dialog.close());
+ const dismiss=()=>{siteSearchForget();dialog.close();};
+ $('site-search-close').addEventListener('click',dismiss);
+ dialog.addEventListener('cancel',siteSearchForget);
  input.addEventListener('input',()=>{siteSearchReturn=null;siteSearchRequestRender();});
  input.addEventListener('keydown',siteSearchKey);
  // Options keep focus in the field; a click chooses one.
  list.addEventListener('mousedown',event=>{if(!event.ctrlKey&&!event.metaKey&&!event.shiftKey&&event.button===0)event.preventDefault();});
  list.addEventListener('click',event=>{const option=event.target.closest?.('[role=option]');if(!normalSelfLinkActivation(event,option))return;const item=siteSearchItems[Number(option.dataset.siteSearchIndex)];if(item?.href?.startsWith('/'))event.preventDefault();siteSearchChoose(item,event);});
- dialog.addEventListener('click',event=>{if(event.target===dialog)dialog.close();});
+ dialog.addEventListener('click',event=>{if(event.target===dialog)dismiss();});
  // Native focus restoration returns to the opener; a search opened on load can fall back to the header action.
  dialog.addEventListener('close',()=>{
+  if(dialog.open)return;
   siteSearchGeneration++;siteSearchReturn=null;clearTimeout(siteSearchStatusTimer);dialog.removeAttribute('aria-busy');button.setAttribute('aria-expanded','false');$('site-search-status').textContent='';
-  if(history.state?.[SITE_SEARCH_HISTORY]){
-   const state={...history.state};delete state[SITE_SEARCH_HISTORY];
-   try{history.replaceState(state,'');}catch{}
-  }
   const active=document.activeElement;if(!active||active===document.body||dialog.contains(active))button.focus();
  });
  dialog.addEventListener('click',event=>{
@@ -291,7 +319,18 @@ function initSiteNav(){
   siteSearchRequestRender();input.focus();
  });
  document.addEventListener('keydown',siteSearchShortcut);
- window.addEventListener('hashchange',()=>{if(dialog.open)dialog.close();});
+ // Pair Search results at commit, before a delayed hashchange can be overtaken by Back.
+ if(window.navigation)window.navigation.addEventListener('currententrychange',({navigationType})=>{
+  if(navigationType==='push'||navigationType==='traverse')siteSearchCommitFragment();
+ });
+ else window.addEventListener('popstate',siteSearchCommitFragment);
+ window.addEventListener('hashchange',event=>{
+  if(event.newURL&&event.newURL!==location.href)return;
+  const snapshot=history.state?.[SITE_SEARCH_HISTORY];
+  if(snapshot?.destination&&routeTraversal&&explorePreviousKey&&siteSearchFragmentDestinations.get(historyKey())===explorePreviousKey){
+   siteSearchOpen(snapshot.query,snapshot);
+  }else if(dialog.open)dialog.close();
+ });
  // Static pages link to /?search (or /?q=text): open search once, then drop the query from the address.
  const params=String(location.search||'');
  if(/[?&](?:search|q)(?:[=&]|$)/.test(params)){
@@ -299,6 +338,7 @@ function initSiteNav(){
   history.replaceState(history.state,'',location.pathname.replace(/^\/{2,}/,'/')+location.hash);siteSearchOpen(text);
  }else if(globalThis.performance?.getEntriesByType?.('navigation')?.[0]?.type==='back_forward'){
   const snapshot=history.state?.[SITE_SEARCH_HISTORY];
-  if(typeof snapshot?.query==='string')siteSearchOpen(snapshot.query,snapshot);
+  const activation=window.navigation?.activation;
+  if(typeof snapshot?.query==='string'&&(!snapshot.destination||!activation||activation.from?.index===activation.entry?.index+1))siteSearchOpen(snapshot.query,snapshot);
  }
 }

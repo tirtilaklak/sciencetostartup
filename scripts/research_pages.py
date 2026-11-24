@@ -36,6 +36,7 @@ CORRECTIONS_PATH = "/research/corrections/"
 LEDGER_BUCKETS = "0123456789abcdef"
 SOURCE_ANCHORS = "data/research-source-anchors.json"
 SOURCE_RECHECKS = "data/research-source-rechecks.json"
+SOURCE_LOOKUP_PATH = "/research/data/source-lookup.json"
 COMPANY_WEBSITES = "data/research-company-websites.json"
 # Earlier public fragment IDs preserved by the current website wrapper.
 RETIRED_ASSERTION_IDS = (
@@ -415,7 +416,9 @@ def _render(context, title, description, path, body, page_type="WebPage", parent
              '<link rel="alternate" type="application/atom+xml" title="Research corrections" href="/research/corrections/atom.xml">\n')
     if company_page:
         extra += '<link rel="stylesheet" href="/company-profile.css">\n'
-    if (page_type == 'Chapter' or path in {'/research/', '/research/papers/', REPORT_PATH}
+    # The static document already loads this script for company dossiers.
+    if not company_page and (
+            page_type == 'Chapter' or path in {'/research/', '/research/papers/', REPORT_PATH}
             or 'data-disclosure-return' in body):
         extra += '<script src="/native-details.js" defer></script>\n'
     if page_type == 'Chapter' and path.endswith('/chapters/technical-landscape/'):
@@ -435,6 +438,8 @@ def _render(context, title, description, path, body, page_type="WebPage", parent
                 extra += '<link rel="' + relation + '" href="' + sp.escape(_reader_path(context['report']['sections'][index], base)) + '">\n'
     if 'data-research-index' in body:
         extra += '<script src="/research-index.js" defer></script>\n'
+    if path == '/research/data/':
+        extra += '<script src="/research-source-lookup.js" defer></script>\n'
     return text.replace("</head>", extra + "</head>", 1)
 
 
@@ -1330,6 +1335,34 @@ def _edition_downloads(context, metadata, ledger_path, reuse_path):
         + '. Credit the publisher, release ID, original sources, and your changes. Source material retains its own rights and qualifications.</p></section>')
 
 
+def _source_lookup(context):
+    sources = [source for source in _ledger_records(context)[2].values() if not source.get('_withheld')]
+    titles = Counter((source['title'], source['publisher']) for source in sources)
+    records = []
+    for source in sorted(sources, key=lambda row: (row['title'].casefold(), row['publisher'].casefold(), row['id'])):
+        record = {'title': source['title'], 'publisher': source['publisher'],
+                  'href': _evidence_url('source', source['id'])}
+        if source['captured_on']:
+            record['captured'] = _date(source['captured_on'])
+        if titles[source['title'], source['publisher']] > 1:
+            locator = ' '.join(source['locator'].split())
+            record['locator'] = locator if len(locator) <= 112 else locator[:111].rstrip() + '…'
+        records.append(record)
+    return {'version': 1, 'sources': records}
+
+
+def _source_lookup_panel():
+    return ('<section class="r-section r-source-lookup" id="find-source" aria-labelledby="find-source-title">'
+            '<h2 id="find-source-title">Find a source</h2>'
+            f'<form role="search" aria-labelledby="find-source-title" data-source-lookup="{SOURCE_LOOKUP_PATH}" hidden>'
+            '<label for="source-lookup-query">Source title or publisher</label>'
+            '<div class="r-source-lookup-fields"><input type="search" name="source" id="source-lookup-query" '
+            'autocomplete="off" maxlength="512"><button type="submit" class="r-button">Find sources</button></div></form>'
+            '<p class="r-meta" data-source-status role="status"></p>'
+            '<ul class="r-source-lookup-results" data-source-results role="list" hidden></ul>'
+            '<p class="r-source-lookup-browse">' + _link('#sources', 'Browse the source ledger parts') + '</p></section>')
+
+
 def _data(context, *, ledger_path='/research/data/', metadata=None, reuse_path='', download_sizes=None):
     graph, gate, report = context["graph"], context["gate"], context["report"]
     archive = report.get('archive', {})
@@ -1416,6 +1449,7 @@ def _data(context, *, ledger_path='/research/data/', metadata=None, reuse_path='
                  + _link('#downloads', 'Downloads')
                  + _link('#citation', 'Cite and reproduce')
                  + '</nav></header>'
+                 + _source_lookup_panel()
                  + download_citation
                  + operating_status_notice(context)
                  + '<details class="r-section r-disclosure" id="coverage"><summary>Publication checks and coverage</summary>'
@@ -1689,10 +1723,15 @@ def _company_detail(context, entity):
         body.append('<details class="company-fold" id="company-history"><summary>Historical evidence</summary>'
                     '<div class="company-fold-body"><h2>Historical evidence</h2>'
                     + "".join(_assertion(context, a) for a in historical) + '</div></details>')
+    source_links = []
+    for sid in source_ids:
+        source = sources.get(sid, {})
+        label = f'Source metadata withheld · {sid}' if source.get('_withheld') else source.get('title', sid)
+        source_links.append('<li>' + _link(_evidence_url('source', sid), label, disclosure_return=True) + '</li>')
     body.append('<details class="company-fold" id="company-sources"><summary>Sources</summary>'
                 '<div class="company-fold-body"><h2>Connected evidence</h2>'
-                + ('<ul class="r-evidence-links">' + "".join('<li>' + _link(_evidence_url("source", sid), ("Source metadata withheld · " + sid) if sources.get(sid, {}).get("_withheld") else sources.get(sid, {}).get("title", sid)) + '</li>' for sid in source_ids) + '</ul>'
-                   if source_ids else '<p>No source records are attached yet.</p>')
+                + ('<ul class="r-evidence-links">' + ''.join(source_links) + '</ul>'
+                   if source_links else '<p>No source records are attached yet.</p>')
                 + '</div></details></div></article>')
     return "".join(body)
 
@@ -1725,7 +1764,7 @@ def _detail(context, entity):
             + ('<ul class="r-evidence-links">' + "".join('<li>' + _link(_evidence_url("source", sid), ("Source metadata withheld · " + sid) if sources.get(sid, {}).get("_withheld") else sources.get(sid, {}).get("title", sid)) + '</li>' for sid in source_ids) + '</ul>'
                if source_ids else '<p>No source records are attached yet.</p>')
             + '</section></div><aside class="r-detail-aside">'
-            + _record_correction(context, entity['id'], entity_url(entity, context), title)
+            + _record_correction(context, entity['id'], entity_url(entity, context), title, disclosure_return=True)
             + '<h2>Read this record carefully</h2>'
             '<p>Approval applies to a specific assertion and its qualifications. It does not imply provider endorsement, '
             'commercial quality, or a contribution to another artifact.</p>'
@@ -2165,7 +2204,10 @@ def write_research_pages(output, context):
             records.append(_sitemap_record(snapshot, bucket_path))
     (output / 'research.css').write_bytes((ROOT / 'web/research.css').read_bytes())
     from frontend_packaging import optional_script_source
-    (output / 'research-index.js').write_text(optional_script_source(ROOT, 'research-index.js'), encoding='utf-8')
+    for script in ('research-index.js', 'research-source-lookup.js'):
+        (output / script).write_text(optional_script_source(ROOT, script), encoding='utf-8')
+    (output / SOURCE_LOOKUP_PATH.lstrip('/')).write_text(
+        json.dumps(_source_lookup(context), ensure_ascii=False, separators=(',', ':')) + '\n', encoding='utf-8')
     _feeds(output, context, editions)
     _correction_feeds(output, context, corrections)
     return records

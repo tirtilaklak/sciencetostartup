@@ -145,6 +145,19 @@
 .r-data-jumps a{display:inline-flex;align-items:center;min-height:44px;font-size:.9375rem;text-underline-offset:.22em}
 .research:has(.r-data-jumps) :is(#assertions,#sources,#downloads){scroll-margin-top:24px}
 @media(max-width:480px){.r-data-jumps{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 16px}}
+.r-source-lookup{max-width:900px}
+.r-source-lookup label{display:block;margin-bottom:6px;font-size:1rem}
+.r-source-lookup-fields{display:flex;flex-wrap:wrap;gap:8px;max-width:640px}
+.r-source-lookup-fields input{flex:1 1 11rem;min-width:0;max-width:100%;min-height:44px;padding:8px 12px;border:1px solid #7d8b80;border-radius:3px;background:white;color:var(--ink);font:inherit}
+.r-source-lookup-fields button{max-width:100%;margin:0;font-size:1rem;cursor:pointer}
+.r-source-lookup-fields :is(input,button):focus-visible{outline:3px solid var(--r-accent);outline-offset:2px}
+.r-source-lookup [role="status"]{margin:0}
+.r-source-lookup [role="status"]:not(:empty){margin-top:12px}
+.r-source-lookup-results{margin:12px 0 0;padding:0;list-style:none}
+.r-source-lookup-results li{margin:0;padding:8px 0 12px;border-bottom:1px solid var(--r-rule)}
+.r-source-lookup-results a,.r-source-lookup-browse a{display:inline-flex;align-items:center;min-height:44px;max-width:100%}
+.r-source-lookup-results .r-meta{display:block;margin:0}
+.r-source-lookup-browse{margin:8px 0 0}
 .r-ledger-parts{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,170px),1fr));list-style:none;gap:6px 24px;padding:0;margin:20px 0}
 .r-ledger-parts a{display:block;min-height:44px;padding:10px 0;border-bottom:1px solid var(--r-rule);font-size:14px}
 .r-ledger-parts a[aria-current="page"]{font-weight:600;color:var(--r-ink)}
@@ -165,6 +178,7 @@
   /* Resolve every preceding height before a native fragment or keyboard jump.
      This also preserves native Back/Forward positions across browser engines. */
   .research:has(:target) :is(.r-assertion,.r-source,.r-source-stub),.research:has(.r-assertion:focus-within,.r-source:focus-within,.r-source-stub:focus-within) :is(.r-assertion,.r-source,.r-source-stub){content-visibility:visible;contain-intrinsic-size:none}
+  .r-detail-layout:has(.r-record-correction[open]) .r-assertion{content-visibility:visible;contain-intrinsic-size:none}
  }
  @media print{
   .r-assertion,.r-source,.r-source-stub{content-visibility:visible;contain:none;contain-intrinsic-size:none}
@@ -264,6 +278,7 @@
 }
 @media(max-width:480px){.r-browse-grid{grid-template-columns:minmax(0,1fr)}.r-browse-icon{margin-bottom:16px}.r-browse-card p{margin-bottom:16px}.r-disclosure>summary>span{display:block;margin-left:20px}}
 @media(max-width:380px){.r-toc ol{columns:1}.r-page-head h1.r-record-title{font-size:36px}.r-progress{gap:20px 16px}.r-progress-item:last-child strong{font-size:23px}.r-meta{font-size:11px}}
+@media(max-width:360px){.r-nav:has(> a[href="/research/data/"]){column-gap:8px}}
 @media(prefers-reduced-motion:reduce){.research{scroll-behavior:auto}}
 @media(forced-colors:active){.r-status,.r-report-card,.r-detail-aside{border-color:CanvasText}.r-meter{border:1px solid CanvasText}.r-meter span{background:CanvasText}.r-status::before{background:CanvasText}}
 

@@ -57,7 +57,8 @@ process.stdout.write(JSON.stringify(ids));
     return json.loads(result.stdout)
 
 
-SEARCH_COMPONENTS = frozenset({"home-search.js", "companies-page.js", "work-page.js", "research-index.js"})
+SEARCH_COMPONENTS = frozenset({"home-search.js", "companies-page.js", "work-page.js", "research-index.js",
+                               "research-source-lookup.js"})
 
 def optional_script_source(root, name):
     """Share matching code without a runtime dependency or a second request."""

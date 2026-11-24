@@ -591,6 +591,37 @@ console.log(JSON.stringify({scenarios: scenarios.length, passed: true}));
         self.assertNotIn('/company/org.fixture_translated/', paths)
         self.assertNotIn('href="/company/org.fixture_translated/"', self.page('/research/data/'))
 
+    def test_current_source_lookup_indexes_only_public_ledger_records(self):
+        hidden_title = 'Unpublished title for a withheld source'
+        self.context['graph']['sources'].append({**self.context['graph']['sources'][0],
+                                                  'id': 'fixture.withheld-source', 'title': hidden_title})
+        paths = {row['path'] for row in self.build()}
+        index_path = rp.SOURCE_LOOKUP_PATH
+        payload = json.loads((self.output / index_path.lstrip('/')).read_bytes())
+        self.assertEqual(payload['version'], 1)
+        public_ids = {pin['source_id'] for claim in self.context['graph']['assertions']
+                      if claim['status'] in {'approved', 'historical'} for pin in claim['evidence']}
+        expected = {rp._evidence_url('source', row['id']): (row['title'], row['publisher'])
+                    for row in self.context['graph']['sources'] if row['id'] in public_ids}
+        actual = {row['href']: (row['title'], row['publisher']) for row in payload['sources']}
+        self.assertEqual(len(actual), len(payload['sources']))
+        self.assertEqual(actual, expected)
+        for row in payload['sources']:
+            self.assertTrue({'title', 'publisher', 'href'} <= set(row) <= {'title', 'publisher', 'href', 'captured', 'locator'})
+            self.assertLessEqual(len(row.get('locator', '')), 112)
+
+        live = ReaderTree(self.page('/research/data/'))
+        form, = (node for node in live.elements if node['tag'] == 'form' and 'data-source-lookup' in node['attrs'])
+        self.assertEqual(form['attrs']['data-source-lookup'], index_path)
+        self.assertIn('hidden', form['attrs'])
+        self.assertIn('#sources', {node['attrs'].get('href') for node in live.elements if node['tag'] == 'a'})
+        self.assertNotIn(index_path, paths)
+        for path in paths:
+            if path.startswith('/research/editions/') and path.endswith('/data/'):
+                html = self.page(path)
+                self.assertNotIn('data-source-lookup', html)
+                self.assertNotIn('/research-source-lookup.js', html)
+
     def test_source_and_assertion_permalinks_resolve_to_unique_visible_targets(self):
         self.build()
         data = Facts(self.page('/research/data/'))

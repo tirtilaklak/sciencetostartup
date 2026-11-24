@@ -405,6 +405,26 @@ test('Back restores private correction links on current assertion and source rec
   }
 });
 
+for (const [type, id] of [['papers', 'paper.arxiv.2603.04370v1'], ['datasets', 'dataset.hh_rlhf']]) {
+  test(`Back restores the private correction link for ${id}`, async ({ page }) => {
+    await page.setViewportSize({ width: 320, height: 720 });
+    const record = `/research/${type}/${id}/`;
+    await page.goto(record);
+    const correction = page.locator('.r-record-correction');
+    await correction.getByText('Request a correction', { exact: true }).press('Enter');
+    const contact = correction.getByRole('link', { name: 'Continue to private email' });
+    await contact.press('Enter');
+    await expect(page.locator('#correction-record a')).toHaveText(id);
+    await expect(page.locator('#correction-record a')).toHaveAttribute('href', record);
+
+    await page.goBack({ waitUntil: 'commit' });
+    await expect(page).toHaveURL(url => url.pathname === record);
+    await expect(correction).toHaveAttribute('open', '');
+    await expect(contact).toBeFocused();
+    await expect(contact).toBeInViewport({ ratio: 1 });
+  });
+}
+
 test('home search finds human feedback research and opens its native report', async ({ page }) => {
   await page.goto('/');
   await page.locator('#home-search-open').click();
