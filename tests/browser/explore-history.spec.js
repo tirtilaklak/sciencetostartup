@@ -122,6 +122,7 @@ test('Back to Explore Companies restores the original filter after browsing a pr
   await expect(count).toHaveText(/Showing 1 of \d+ companies/);
   await page.locator('#company-cards h3 a[href="#company/mercor"]').press('Enter');
   await expect(page.getByRole('heading', { name: 'Mercor', exact: true })).toBeVisible();
+  await expect(page.locator('html')).toHaveAttribute('data-view-state', 'ready');
 
   await page.locator(`.profile-group-link[href="#companies/${group}"]`).press('Enter');
   await expect(page).toHaveURL(`${directory}/${group}`);

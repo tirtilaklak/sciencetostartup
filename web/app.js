@@ -860,6 +860,11 @@ function directoryCriteria(){
  const {query,category,stage,financial,work,sort}=state;
  return {query,category,stage,financial,work,sort};
 }
+const directoryEntryCriteria=new Map();
+function rememberDirectoryCriteria(){
+ const key=historyKey();
+ if(key&&routeParts()[0]==='companies')directoryEntryCriteria.set(key,directoryCriteria());
+}
 function applyDirectoryCriteria(criteria){
  Object.assign(state,criteria);
  $('search').value=state.query;
@@ -871,7 +876,7 @@ function restoreDirectoryReading(criteria,slug=''){
  if(!criteria||groupSlug(criteria.category)!==slug.toLowerCase())return;
  if(Object.entries(criteria).every(([key,value])=>state[key]===value))return;
  applyDirectoryCriteria(criteria);
- directoryShown=false;
+ renderDirectory();
 }
 function restoreDirectoryShortlist({selected,notice,...criteria}){
  applyDirectoryCriteria(criteria);
@@ -915,7 +920,6 @@ const keepEntryScroll=()=>{
   // Keep the saved reading position while the table is replaced by a loading or failure notice.
   if(comparison&&!table&&entry?.compareReading?.selection===compareHash()&&Number.isFinite(entry.scrollY))return entry.scrollY;
   const reading={scrollY};
-  if(routeParts()[0]==='companies'&&!$('companies-view').hidden)reading.directoryCriteria=directoryCriteria();
   // The scroll position only refers to the same rows when the Compare layout is restored with it.
   if(table)reading.compareReading={selection:compareHash(),pair:state.mobileCompare,expanded:comparisonExpanded};
   if(window.navigation)window.navigation.updateCurrentEntry({state:{...entry,...reading}});else history.replaceState({...entry,...reading},'');
@@ -1150,13 +1154,13 @@ function route(event){
  else{document.title=VIEW_TITLES[view];if(view==='companies'){
   renderComparisonScope(view);
   if(shortlist)restoreDirectoryShortlist(shortlist);
-  else if(wasTraversal)restoreDirectoryReading(entry?.directoryCriteria,parts[1]);
+  else if(wasTraversal)restoreDirectoryReading(directoryEntryCriteria.get(key),parts[1]);
   if(restoreFallback){
    applyDirectoryCriteria(fallback.criteria);
    directoryFallbackFocus=returnedFromDirectoryFallback(fallback);
    directoryShown=false;
   }
-  syncDirectoryRoute(parts.slice(1));showDirectory();
+  syncDirectoryRoute(parts.slice(1));showDirectory();rememberDirectoryCriteria();
  }if(view==='method'){showDirectory();renderExploreCorrections(anchorId==='corrections');}if(view==='work')syncWorkRoute(wasTraversal);if(view==='compare'){
   const reading=returnOrigin?.compare||entry?.compareReading;
   if(reading){
@@ -1354,6 +1358,7 @@ function renderDirectory(preserveFocus=false){
  }
 }
 function renderDirectoryFilters(){
+ rememberDirectoryCriteria();
  const query=state.query.trim(),secondaryCount=[state.stage,state.financial,state.work,state.sort!=='name'].filter(Boolean).length;
  const summary=document.querySelector('.more-filters>summary');if(summary)summary.textContent=secondaryCount?`More filters (${secondaryCount})`:'More filters';
  $('reset').hidden=!(state.query||state.category||secondaryCount);
