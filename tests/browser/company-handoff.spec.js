@@ -151,17 +151,17 @@ test('a fresh-document Back reopens the directory sources left open before a pro
 test('the directory links to native profile sources when it shows no evidence preview', async ({ page, context, baseURL }) => {
   await mirrorPublishedOrigin(context, baseURL);
   await page.setViewportSize({ width: 320, height: 720 });
-  const directory = canonical + '/companies/?q=APTO';
+  const directory = canonical + '/companies/?q=Giskard';
   await page.goto(directory);
-  const opener = page.getByRole('link', { name: 'Profile sources for APTO', exact: true });
+  const opener = page.getByRole('link', { name: 'Profile sources for Giskard', exact: true });
   await expect(opener).toBeInViewport({ ratio: 1 });
   await opener.press('Enter');
-  await expect(page).toHaveURL(canonical + '/company/apto/#sources');
+  await expect(page).toHaveURL(canonical + '/company/giskard/#sources');
   const disclosure = page.locator('#sources');
   await expect(disclosure).toBeInViewport({ ratio: 1 });
   await expect(disclosure.locator('..')).toHaveJSProperty('open', true);
-  await expect(page.getByRole('link', { name: 'Company profile and history', exact: true }))
-    .toHaveAttribute('href', 'https://apto.co.jp/company/about-us/');
+  await expect(page.getByRole('link', { name: 'About Giskard: team and funding timeline', exact: true }))
+    .toHaveAttribute('href', 'https://www.giskard.ai/about');
   await page.goBack();
   await expect(page).toHaveURL(directory);
   await expect(opener).toBeFocused();
