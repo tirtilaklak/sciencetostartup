@@ -244,42 +244,74 @@ async function downloadedWorkRows(page, button) {
   return JSON.parse(parsed);
 }
 
-for (const selection of [
-  { query: 'kind=named&arrangement=onsite', matches: true },
-  { query: 'q=' + encodeURIComponent('no such opening + C++ & 研究'), matches: false },
-]) {
-  test('native Work, Compare and both CSV downloads preserve ' + selection.query, async ({ page }) => {
-    await page.goto('/work/?' + selection.query);
-    const compare = page.getByRole('button', { name: 'Compare results', exact: true })
-      .or(page.getByRole('link', { name: 'Compare results', exact: true }));
-    await expect(compare).toBeVisible();
-    const download = page.locator('[data-work-export]');
-    const ids = await page.locator('[data-work-route]:visible').evaluateAll(rows => rows.map(row => row.dataset.workRoute));
-    expect(ids.length > 0).toBe(selection.matches);
-    expect(new Set(ids).size).toBe(ids.length);
-    const nativeCsv = await downloadedWorkRows(page, download);
-    expect(nativeCsv.columns).toEqual(expect.arrayContaining(['route_id', 'pay_qualification', 'review_evidence', 'original_url_details']));
-    expect(nativeCsv.rows.map(row => row.route_id)).toEqual(ids);
+test('native Work, Compare and both CSV downloads preserve named onsite listings', async ({ page }) => {
+  await page.goto('/work/?kind=named&arrangement=onsite');
+  const compare = page.getByRole('button', { name: 'Compare results', exact: true })
+    .or(page.getByRole('link', { name: 'Compare results', exact: true }));
+  await expect(compare).toBeVisible();
+  const download = page.locator('[data-work-export]');
+  const ids = await page.locator('[data-work-route]:visible').evaluateAll(rows => rows.map(row => row.dataset.workRoute));
+  expect(ids.length).toBeGreaterThan(0);
+  expect(new Set(ids).size).toBe(ids.length);
+  const nativeCsv = await downloadedWorkRows(page, download);
+  expect(nativeCsv.columns).toEqual(expect.arrayContaining(['route_id', 'pay_qualification', 'review_evidence', 'original_url_details']));
+  expect(nativeCsv.rows.map(row => row.route_id)).toEqual(ids);
 
-    await compare.click();
-    await expect(page.locator('#work-integrated-table')).toBeVisible();
-    const tableIds = () => page.locator('[data-compare-route]:visible').evaluateAll(rows => rows.map(row => row.dataset.compareRoute));
-    expect(await tableIds()).toEqual(ids);
-    await page.reload();
-    await expect(page.locator('#work-integrated-table')).toBeVisible();
-    expect(await tableIds()).toEqual(ids);
+  await compare.click();
+  await expect(page.locator('#work-integrated-table')).toBeVisible();
+  const tableIds = () => page.locator('[data-compare-route]:visible').evaluateAll(rows => rows.map(row => row.dataset.compareRoute));
+  expect(await tableIds()).toEqual(ids);
+  await page.reload();
+  await expect(page.locator('#work-integrated-table')).toBeVisible();
+  expect(await tableIds()).toEqual(ids);
 
-    await page.locator('[data-work-explore]').click();
-    await expect(page.locator('html')).toHaveAttribute('data-view-state', 'ready');
-    const exploreIds = page.locator('#work-cards [data-work-route]:visible');
-    await expect(exploreIds).toHaveCount(ids.length);
-    expect(await exploreIds.evaluateAll(rows => rows.map(row => row.dataset.workRoute))).toEqual(ids);
-    expect(await downloadedWorkRows(page, page.locator('#work-export'))).toEqual(nativeCsv);
-    await page.goBack();
-    await expect(page.locator('#work-integrated-table')).toBeVisible();
-    expect(await tableIds()).toEqual(ids);
-  });
-}
+  await page.locator('[data-work-explore]').click();
+  await expect(page.locator('html')).toHaveAttribute('data-view-state', 'ready');
+  const exploreIds = page.locator('#work-cards [data-work-route]:visible');
+  await expect(exploreIds).toHaveCount(ids.length);
+  expect(await exploreIds.evaluateAll(rows => rows.map(row => row.dataset.workRoute))).toEqual(ids);
+  expect(await downloadedWorkRows(page, page.locator('#work-export'))).toEqual(nativeCsv);
+  await page.goBack();
+  await expect(page.locator('#work-integrated-table')).toBeVisible();
+  expect(await tableIds()).toEqual(ids);
+});
+
+test('empty Work results keep the exact query through a shared comparison and Explore', async ({ page }) => {
+  const query = 'no such opening + C++ & 研究';
+  const listings = '/work/?' + new URLSearchParams({ q: query });
+  const comparison = '/work/?' + new URLSearchParams({ q: query, view: 'compare' });
+  const download = page.locator('[data-work-export]');
+  const search = page.getByRole('searchbox', { name: 'Search listings' });
+  const listed = page.locator('[data-work-route]:visible');
+
+  await page.goto(listings);
+  await expect(search).toHaveValue(query);
+  await expect(page.getByRole('link', { name: 'Compare results', exact: true })).toBeHidden();
+  await expect(download).toBeHidden();
+  await expect(listed).toHaveCount(0);
+
+  await page.goto(comparison);
+  const back = page.getByRole('link', { name: 'Back to listings', exact: true });
+  await expect(back).toHaveAttribute('href', listings);
+  await expect(page.locator('#work-integrated-table')).toBeHidden();
+  await expect(download).toBeHidden();
+  await page.reload();
+  await expect(search).toHaveValue(query);
+  await expect(back).toBeVisible();
+
+  await page.locator('[data-work-explore]').click();
+  await expect(page.locator('html')).toHaveAttribute('data-view-state', 'ready');
+  await expect(page.locator('#work-search')).toHaveValue(query);
+  await expect(page.locator('#work-cards [data-work-route]:visible')).toHaveCount(0);
+  const csv = await downloadedWorkRows(page, page.locator('#work-export'));
+  expect(csv.columns).toEqual(expect.arrayContaining(['route_id', 'pay_qualification', 'review_evidence', 'original_url_details']));
+  expect(csv.rows).toEqual([]);
+
+  await page.goBack();
+  await expect(page).toHaveURL(comparison);
+  await expect(search).toHaveValue(query);
+  await expect(back).toBeVisible();
+});
 
 test('work CSV preserves the selected historical Sage terms and their review', async ({ page }) => {
   await ready(page, '#work?q=Sage&kind=closed');

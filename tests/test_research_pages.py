@@ -736,13 +736,17 @@ console.log(JSON.stringify({scenarios: scenarios.length, passed: true}));
             for bucket in '0123456789abcdef':
                 path = '/research/data/' + ('assertions' if kind == 'assertion' else 'sources') + '/' + bucket + '/'
                 self.assertIn(path, paths)
-                facts = Facts(self.page(path))
+                html = self.page(path)
+                facts = Facts(html)
                 matching = {key: value for key, value in facts.records.items() if key.startswith(kind + '-')}
                 self.assertFalse(observed & set(matching))
                 observed.update(matching)
                 all_records.update(matching)
                 self.assertEqual(facts.canonicals, [rp.sp.ORIGIN + path])
-                self.assertTrue(all(item.get('type') == 'application/ld+json' for item in facts.scripts))
+                # Ledger records render in the document. Only the optional
+                # return to a correction disclosure needs a deferred script.
+                enhancement = [{'src': '/native-details.js', 'defer': None}] if 'data-disclosure-return' in html else []
+                self.assertEqual([item for item in facts.scripts if item.get('type') != 'application/ld+json'], enhancement)
             self.assertTrue(expected <= observed)
             for row in rows:
                 anchor = kind + '-' + row['id']
