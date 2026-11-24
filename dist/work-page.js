@@ -629,14 +629,20 @@ const S2SWork = (() => {
       if (sectionDetails && typeof open === 'boolean') sectionDetails.open = open;
     }
 
-    function appendComparisonFields(cell, fields) {
-      for (const value of fields) {
-        if (!value) continue;
-        const field = document.createElement('div');
+    function appendComparisonFields(cell, label, fields, className = 'work-compare-fields') {
+      const values = fields.filter(Boolean);
+      if (!values.length) return;
+      const group = document.createElement('dl');
+      group.className = className;
+      const term = document.createElement('dt');
+      term.textContent = label;
+      group.append(term);
+      for (const value of values) {
+        const field = document.createElement('dd');
         field.textContent = value;
-        if (cell.hasChildNodes()) cell.append('\n');
-        cell.append(field);
+        group.append(field);
       }
+      cell.append(group);
     }
 
     function comparisonRows(results) {
@@ -667,7 +673,7 @@ const S2SWork = (() => {
         const pay = card.querySelector('.work-pay');
         const amount = pay?.querySelector('strong');
         const historicalLabel = amount?.previousElementSibling?.textContent.trim();
-        appendComparisonFields(row.insertCell(), [
+        appendComparisonFields(row.insertCell(), 'Pay', [
           [historicalLabel, amount?.textContent.trim()].filter(Boolean).join(' ') || 'Pay not listed',
           ...Array.from(pay?.querySelectorAll('strong ~ .sub') || [], note => note.textContent.trim()),
         ]);
@@ -675,16 +681,17 @@ const S2SWork = (() => {
         const groupKind = card.closest('[data-work-group]')?.dataset.workKindLabel;
         const conditionFields = Array.from(card.querySelector('.work-listing-conditions').children, field => field.textContent.trim());
         if (groupKind && conditionFields.length) conditionFields[0] = groupKind + ' · ' + conditionFields[0];
-        appendComparisonFields(detail, [
-          text(card, '.work-place'),
+        appendComparisonFields(detail, 'Location', [text(card, '.work-place')]);
+        appendComparisonFields(detail, 'Terms and review', [
           ...conditionFields,
           text(card, '.work-reviewed'),
-        ]);
+        ], 'work-compare-terms');
         const action = card.querySelector('.work-listing-action a');
         if (action) {
           const copy = action.cloneNode(true);
           copy.removeAttribute('id');
-          detail.append('\n', copy);
+          copy.classList.add('work-compare-action');
+          detail.append(copy);
         }
       }
       region.append(table);

@@ -10,10 +10,12 @@ const reviewed = Date.parse(approved.checked_at);
 const day = 86_400_000;
 const expires = reviewed + release.publication_policy.homepage_work_max_age_days * day;
 const recordedProgram = '[data-recorded-program="invisible.work.meridial-network"]';
+const reportTitle = 'State of AI Data Labs and Human Feedback';
+const reportPath = '/research/state-of-ai-data-labs/';
 
 test('home leads with the field guide and links dated examples to their sources', async ({ page }) => {
   await page.clock.setFixedTime(new Date(expires));
-  for (const viewport of [{ width: 390, height: 844 }, { width: 1280, height: 720 }]) {
+  for (const viewport of [{ width: 320, height: 720 }, { width: 390, height: 844 }, { width: 1280, height: 720 }]) {
     await page.setViewportSize(viewport);
     await page.goto('/');
     await page.evaluate(() => document.fonts.ready);
@@ -21,11 +23,15 @@ test('home leads with the field guide and links dated examples to their sources'
     await expect(heading).toBeInViewport({ ratio: 1 });
     const main = page.getByRole('main');
     await expect(main.getByText('See what suppliers sell. Check the pay and terms for training work.')).toBeVisible();
-    const report = main.getByRole('article', { name: 'State of AI Data Labs and Human Feedback', exact: true });
+    const report = main.getByRole('article', { name: reportTitle, exact: true });
     await expect(report).toBeVisible();
     await expect(report.locator('time')).toHaveAttribute('datetime', '2026-11-12');
-    await expect(report.getByRole('link', { name: 'State of AI Data Labs and Human Feedback', exact: true }))
-      .toHaveAttribute('href', '/research/state-of-ai-data-labs/');
+    await expect(report.getByText('12 Nov 2026 snapshot', { exact: true })).toBeVisible();
+    await expect(report.getByRole('link')).toHaveCount(1);
+    const reportLink = report.getByRole('link', { name: `Read the report ${reportTitle}`, exact: true });
+    await expect(reportLink).toHaveAttribute('href', reportPath);
+    await expect(reportLink).toHaveAccessibleDescription('Prolific, for example, sells participant access and managed collection.');
+    await expect(reportLink.getByRole('heading', { level: 2, name: reportTitle, exact: true })).toBeVisible();
     await expect(main.locator('.hero-actions [data-count="work"]')).toHaveText(String(release.counts.work_routes));
 
     const company = page.locator('[data-observation="snorkel_ai.metric.major-growth_metrics-0"]');
@@ -36,6 +42,9 @@ test('home leads with the field guide and links dated examples to their sources'
     await expect(company.locator('time')).toHaveAttribute('datetime', '2026-09-22');
     await expect(company.getByRole('link', { name: 'Original disclosure' }))
       .toHaveAttribute('href', 'https://snorkel.ai/blog/data-2-0-and-the-research-era-of-ai-data/');
+    const figure = await company.locator('.example-pay').boundingBox();
+    expect(figure.y).toBeLessThan((await company.locator('.example-summary').boundingBox()).y);
+    if (viewport.width === 320) expect(figure.y).toBeLessThan(viewport.height);
 
     const program = page.locator(recordedProgram);
     await expect(program).toBeVisible();
@@ -53,17 +62,28 @@ test('home leads with the field guide and links dated examples to their sources'
   await expect(page.getByRole('heading', { name: 'How figures are shown' })).toBeVisible();
 });
 
-test('a short phone opens the report from its visible title without JavaScript', async ({ browser, baseURL }) => {
+test('a short phone opens the whole report card by pointer or keyboard without JavaScript', async ({ browser, browserName, baseURL }) => {
   const context = await browser.newContext({ baseURL, javaScriptEnabled: false, viewport: { width: 320, height: 640 } });
   try {
     const page = await context.newPage();
     await page.goto('/');
-    const title = page.getByRole('heading', { level: 2, name: 'State of AI Data Labs and Human Feedback' });
-    const report = title.getByRole('link');
+    const report = page.getByRole('link', { name: `Read the report ${reportTitle}`, exact: true });
+    const priorLink = page.getByRole('navigation', { name: 'Browse the guide' })
+      .getByRole('link', { name: 'Research', exact: true });
+    const tab = browserName === 'webkit' && process.platform === 'darwin' ? 'Alt+Tab' : 'Tab';
     await expect(report).toBeInViewport({ ratio: 1 });
-    await report.press('Enter');
-    await expect(page).toHaveURL(/\/research\/state-of-ai-data-labs\/$/);
-    await expect(page.getByRole('heading', { level: 1, name: 'State of AI Data Labs and Human Feedback' })).toBeVisible();
+    await expect(report.getByText('Read the report →', { exact: true })).toBeInViewport({ ratio: 1 });
+    await priorLink.focus();
+    await page.keyboard.press(tab);
+    await expect(report).toBeFocused();
+    await expect(report).toHaveCSS('outline-style', 'solid');
+    await page.keyboard.press('Enter');
+    await expect(page).toHaveURL(reportPath);
+    await expect(page.getByRole('heading', { level: 1, name: reportTitle })).toBeVisible();
+
+    await page.goto('/');
+    await report.click({ position: { x: 6, y: 6 } });
+    await expect(page).toHaveURL(reportPath);
   } finally {
     await context.close();
   }

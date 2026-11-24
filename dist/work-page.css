@@ -79,8 +79,8 @@ html[data-work-load="pending"] [data-work-group] .work-load-status{position:abso
 .work-terms a{display:inline-flex;align-items:center;min-height:44px}
 .work-terms li>small{display:block;font-size:inherit;color:var(--muted)}
 .work-listing-action{grid-area:action;align-self:start;justify-self:start;margin:0;min-width:0}
-.work-listing-action>a{display:inline-flex;align-items:center;gap:6px;min-width:44px;max-width:100%;min-height:44px;font-size:.8125rem;line-height:1.5;text-underline-offset:3px}
-.work-listing-action>a::after{flex:none}
+.work-listing-action>a,.work-compare-action{display:inline-flex;align-items:center;gap:6px;min-width:44px;max-width:100%;min-height:44px;font-size:.8125rem;line-height:1.5;text-underline-offset:3px}
+:is(.work-listing-action>a,.work-compare-action)::after{flex:none}
 .work-listing-action .sub{font-size:.8125rem;line-height:1.5;margin-top:2px}
 .work-page-secondary{padding:0;border:0;border-top:1px solid var(--border);border-bottom:1px solid var(--border);border-radius:0;background:transparent;margin-bottom:-1px}
 .work-page-secondary>summary{display:flex;align-items:center;justify-content:space-between;gap:16px;min-height:56px;padding:12px 0;font-size:17px;line-height:1.4;list-style:none;cursor:pointer}
@@ -97,6 +97,19 @@ html[data-work-load="pending"] [data-work-group] .work-load-status{position:abso
 .work-compare-scroll{overflow-x:auto}
 .work-compare-scroll table{width:100%}
 .work-compare-scroll :is(th,td){padding:8px;text-align:left}
+.work-compare-scroll :is(dl,dd){margin:0}
+@media(min-width:701px){
+ .work-compare-scroll dt{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+}
+@media(max-width:700px){
+ .work-compare-scroll tbody tr{display:grid;grid-template-columns:minmax(0,1fr);row-gap:8px}
+ .work-compare-scroll tbody :is(th,td){margin:0;padding:0}
+ .work-compare-scroll tbody th{font-size:1rem;line-height:1.4}
+ .work-compare-scroll dt{color:var(--muted);font-size:.8125rem;font-weight:600;line-height:1.6}
+ .work-compare-fields{display:grid;grid-template-columns:4rem minmax(0,1fr);column-gap:8px}
+ .work-compare-fields dd{grid-column:2}
+ .work-compare-fields+.work-compare-terms{margin-top:8px}
+}
 @media(max-width:759px){
  .work-listing-columns{display:none}
  .work-listing{grid-template-columns:minmax(0,1fr) minmax(0,1fr);grid-template-areas:"identity identity" "offer review" "conditions conditions" "action terms";column-gap:16px}

@@ -14,6 +14,40 @@ async function mirrorPublishedOrigin(context, baseURL) {
   });
 }
 
+test('an empty business group can search the directory without losing the query', async ({ page, hasTouch }) => {
+  await page.setViewportSize({ width: 320, height: 844 });
+  await page.goto('/companies/?q=APTO&group=frontier-data-rl-environments&reader=keep#main');
+  const search = page.getByRole('searchbox', { name: 'Search companies' });
+  const allGroups = page.getByRole('button', { name: 'Search all groups' });
+  const empty = page.locator('#company-empty');
+  await expect(empty).toContainText('No matches in AI training data & practice environments.');
+  await expect(page.getByRole('link', { name: 'Search the full guide' })).toBeHidden();
+  await expect(allGroups).toBeVisible();
+  expect((await allGroups.boundingBox()).height).toBeGreaterThanOrEqual(44);
+  const historyLength = await page.evaluate(() => history.length);
+  if (hasTouch) await allGroups.tap();
+  else await allGroups.press('Enter');
+
+  await expect(page).toHaveURL('/companies/?q=APTO&reader=keep#main');
+  expect(await page.evaluate(() => history.length)).toBe(historyLength);
+  await expect(search).toHaveValue('APTO');
+  await expect(search).toBeFocused();
+  await expect(page.getByRole('combobox', { name: 'Business group' })).toHaveValue('');
+  await expect(empty).toBeHidden();
+  await expect(page.locator('#company-count')).toHaveText('1 company');
+  const result = page.locator('[data-company]:visible');
+  await expect(result).toHaveAttribute('data-company', 'apto');
+  const compare = result.getByRole('link', { name: 'Compare APTO' });
+  if (hasTouch) await compare.tap();
+  else await compare.press('Enter');
+  await expect(page).toHaveURL(/\/explore\/#compare\/apto$/);
+  await expect(page.locator('#compare-content [data-remove="apto"]')).toBeVisible();
+  await page.goBack({ waitUntil: 'commit' });
+  await expect(page).toHaveURL('/companies/?q=APTO&reader=keep#main');
+  await expect(search).toHaveValue('APTO');
+  await expect(compare).toBeFocused();
+});
+
 test('native Companies carries the exact saved search result into Compare', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/companies/?group=expert-data-evaluation&reader=keep');

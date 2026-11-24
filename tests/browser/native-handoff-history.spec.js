@@ -120,26 +120,35 @@ for (const handoff of companyHandoffs) {
     await trackDocument(page, true);
     await page.setViewportSize({ width: 390, height: 844 });
     if (handoff.result === '.company-dossier') await routePublishedPages(page, baseURL);
-    if (handoff.source === '[data-full-guide-search]') await page.route('**/guide-search-shell.js', route => route.abort());
+    const fullGuide = handoff.source === '[data-full-guide-search]';
+    if (fullGuide) await page.route('**/guide-search-shell.js', route => route.abort());
     const group = handoff.group ?? directoryGroup;
     await page.goto(`/companies/?group=${group}&reader=keep`);
     const search = page.getByRole('searchbox', { name: 'Search companies' });
     const source = page.locator(handoff.source);
     await search.fill(handoff.query);
+    if (fullGuide) {
+      await expect(source).toBeHidden();
+      await page.getByRole('button', { name: 'Search all groups' }).press('Enter');
+      await expect(search).toHaveValue(handoff.query);
+      await expect(search).toBeFocused();
+    }
     await expect(source).toHaveAttribute('href', handoff.href);
     const orderedCompanies = () => page.locator('[data-company]:visible').evaluateAll(cards => cards.map(card => card.dataset.company));
     const before = await orderedCompanies();
     if (!handoff.following) expect(before.length).toBeGreaterThan(1);
     const origin = page.url();
-    expect(Object.fromEntries(new URL(origin).searchParams)).toEqual({ group, reader: 'keep', q: handoff.query.trim() });
+    const criteria = { reader: 'keep', q: handoff.query.trim() };
+    if (!fullGuide) criteria.group = group;
+    expect(Object.fromEntries(new URL(origin).searchParams)).toEqual(criteria);
     const position = await activate(source);
     await expect(page.locator(handoff.result)).toBeVisible();
-    if (handoff.source === '[data-full-guide-search]') await expect(page.locator('#home-search-input')).toHaveValue(handoff.query);
+    if (fullGuide) await expect(page.locator('#home-search-input')).toHaveValue(handoff.query);
 
     await page.goBack({ waitUntil: 'commit' });
     await expect(page).toHaveURL(origin);
     await expect(search).toHaveValue(handoff.query);
-    await expect(page.getByRole('combobox', { name: 'Business group' })).toHaveValue(group);
+    await expect(page.getByRole('combobox', { name: 'Business group' })).toHaveValue(fullGuide ? '' : group);
     await expect(source).toHaveAttribute('href', handoff.href);
     expect(await orderedCompanies()).toEqual(before);
     if (handoff.following) {

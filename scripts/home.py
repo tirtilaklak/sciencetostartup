@@ -128,9 +128,9 @@ def company_example(companies, sidecars):
         amount = escape(value_text(figure))
     return (f'<article class="example-card company-example" data-observation="{SNORKEL_METRIC}" data-source="{SNORKEL_METRIC_SOURCE}">'
             f'<p class="example-kind">Company disclosure</p><h3 class="example-title">{escape(companies["snorkel_ai"]["name"])}</h3>'
-            f'<p class="example-summary">{escape(entry["summary"])}</p>'
             f'<p class="example-pay">{amount} {escape(figure["label"].lower())}</p>'
             f'<p class="example-meta">{escape(figure["evidence_assurance"])} · {date_tag(figure["as_of"])}</p>'
+            f'<p class="example-summary">{escape(entry["summary"])}</p>'
             '<div class="example-actions"><a class="example-action" href="/company/snorkel_ai/">Read profile</a>'
             f'<a class="example-action" href="{escape(source["url"], quote=True)}">Original disclosure</a></div></article>')
 

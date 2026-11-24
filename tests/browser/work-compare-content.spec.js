@@ -1,6 +1,7 @@
 const { test, expect } = require('@playwright/test');
 
-test('native Work Compare preserves separate pay and terms fields for every record', async ({ page }) => {
+test('native Work Compare preserves labeled fields and full-size actions', async ({ page, hasTouch }) => {
+  await page.setViewportSize(hasTouch ? { width: 320, height: 720 } : { width: 1440, height: 900 });
   await page.goto('/work/');
   const compareLink = page.getByRole('link', { name: 'Compare results', exact: true });
   await expect(compareLink).toBeVisible();
@@ -34,7 +35,7 @@ test('native Work Compare preserves separate pay and terms fields for every reco
     const cards = new Map([...document.querySelectorAll('.work-page-list [data-work-route]')]
       .map(card => [card.dataset.workRoute, card]));
     const text = node => node?.textContent.trim() || '';
-    const lines = cell => cell.innerText.split(/\n+/).map(line => line.trim()).filter(Boolean);
+    const values = cell => [...cell.querySelectorAll('dd')].map(text);
     const link = anchor => anchor && [text(anchor), anchor.getAttribute('href'), anchor.getAttribute('aria-label')];
     const equal = (actual, expected) => JSON.stringify(actual) === JSON.stringify(expected);
     const sharedKinds = { named: 'Specific listing', programs: 'Expert network or program', boards: 'Career page' };
@@ -50,25 +51,34 @@ test('native Work Compare preserves separate pay and terms fields for every reco
       const conditionFields = [...card.querySelector('.work-listing-conditions').children].map(text);
       const kind = sharedKinds[card.closest('[data-work-group]').dataset.workGroup];
       if (kind) conditionFields[0] = kind + ' · ' + conditionFields[0];
-      const details = [
-        text(card.querySelector('.work-place')),
-        ...conditionFields,
-        text(card.querySelector('.work-reviewed')),
-        text(nativeAction),
-      ].filter(Boolean);
+      const place = text(card.querySelector('.work-place'));
+      const details = [place, ...conditionFields, text(card.querySelector('.work-reviewed'))].filter(Boolean);
       const [identityCell, payCell, detailCell] = row.cells;
       const identity = ['.work-company', 'h3', '.work-status'].map(selector => text(card.querySelector(selector)))
         .filter(Boolean).join(' · ');
       const differences = [
         ['identity', identityCell.innerText, identity],
-        ['pay', lines(payCell), pay],
-        ['location and terms', lines(detailCell), details],
+        ['pay', values(payCell), pay],
+        ['location and terms', values(detailCell), details],
+        ['detail labels', [...detailCell.querySelectorAll('dt')].map(text), [place && 'Location', 'Terms and review'].filter(Boolean)],
         ['action', link(detailCell.querySelector('a')), link(nativeAction)],
       ].filter(([, actual, expected]) => !equal(actual, expected));
       return differences.length ? [{ id, fields: differences.map(([field]) => field) }] : [];
     });
   });
   expect(mismatches).toEqual([]);
+
+  const g2i = rows.filter({ has: page.getByRole('link', { name: /Read role details.*G2i/ }) });
+  const labels = g2i.getByRole('term');
+  await expect(labels).toHaveText(['Pay', 'Location', 'Terms and review']);
+  expect(await labels.evaluateAll(terms => terms.every(term => term.offsetWidth > 1))).toBe(hasTouch);
+  const action = g2i.getByRole('link', { name: /Read role details.*G2i/ });
+  await action.scrollIntoViewIfNeeded();
+  expect(await action.evaluate(link => {
+    const { left, width, height, bottom } = link.getBoundingClientRect();
+    return width >= 44 && height >= 44 && link.contains(document.elementFromPoint(left + width / 2, bottom - 2));
+  })).toBe(true);
+  expect(await compare.evaluate(box => box.scrollWidth <= box.clientWidth)).toBe(true);
 
   await expect(compare.getByRole('cell', { name: /Contract work Schedule conflict\..*Six months Experience writing content/ }))
     .toHaveCount(1);
