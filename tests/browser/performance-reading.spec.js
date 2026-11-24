@@ -27,7 +27,9 @@ test.describe('native ledger rendering', () => {
       for (const path of paths) {
         await page.goto(path);
         await expect(page.locator('h1')).toContainText(kind === 'source' ? 'Source ledger' : 'Assertion ledger');
-        await expect(page.locator('script:not([type="application/ld+json"])')).toHaveCount(0);
+        const enhancement = await page.locator('a[data-disclosure-return]').count() ? 1 : 0;
+        await expect(page.locator('script[src="/native-details.js"][defer]')).toHaveCount(enhancement);
+        await expect(page.locator('script:not([type="application/ld+json"])')).toHaveCount(enhancement);
         if (kind === 'assertion') {
           await expect(page.locator('.r-assertion:not([data-status="approved"]):not([data-status="historical"]) .r-assertion-text')).toHaveCount(0);
           observed.push(...await page.locator('.r-assertion[data-status="approved"],.r-assertion[data-status="historical"]').evaluateAll(rows => rows.map(row => row.id)));

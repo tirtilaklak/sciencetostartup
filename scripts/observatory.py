@@ -882,7 +882,7 @@ def add_native_handoff_to_site_pages(destination):
         parts = page.relative_to(destination).parts
         if parts[0] == "publication" or parts[:2] == ("research", "editions"):
             continue
-        # The evidence ledgers are intentionally script-free.
+        # The ledger renderer opts into individual handoffs as needed.
         if parts[:3] in (("research", "data", "assertions"), ("research", "data", "sources")):
             continue
         role = "participant" if parts[0] in ("index.html", "company", "companies", "explore", "work") else "consumer"

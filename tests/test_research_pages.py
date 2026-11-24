@@ -161,8 +161,8 @@ class ResearchPageTests(unittest.TestCase):
     def test_current_reader_labels_only_available_archived_formats(self):
         html, pdf = 'publication/report.html', 'publication/report.pdf'
         self.context['publication_assets'] = [html, pdf]
-        self.assertIn('Read offline: <a href="/publication/report.html">Complete HTML report</a> · '
-                      '<a href="/publication/report.pdf">Full report PDF</a>', rp._reader_downloads(self.context))
+        self.assertIn('Read offline: <a href="/publication/report.html" data-disclosure-return>Complete HTML report</a> · '
+                      '<a href="/publication/report.pdf" data-disclosure-return>Full report PDF</a>', rp._reader_downloads(self.context))
 
         self.context['report'].update(updated_on='2026-11-15', archive={
             'status': 'published', 'artifact_sha256': rp.EDITION_MIRROR_ARCHIVE_SHA256})
@@ -736,13 +736,17 @@ console.log(JSON.stringify({scenarios: scenarios.length, passed: true}));
             for bucket in '0123456789abcdef':
                 path = '/research/data/' + ('assertions' if kind == 'assertion' else 'sources') + '/' + bucket + '/'
                 self.assertIn(path, paths)
-                facts = Facts(self.page(path))
+                html = self.page(path)
+                facts = Facts(html)
                 matching = {key: value for key, value in facts.records.items() if key.startswith(kind + '-')}
                 self.assertFalse(observed & set(matching))
                 observed.update(matching)
                 all_records.update(matching)
                 self.assertEqual(facts.canonicals, [rp.sp.ORIGIN + path])
-                self.assertTrue(all(item.get('type') == 'application/ld+json' for item in facts.scripts))
+                # Ledger records render in the document. Only the optional
+                # return to a correction disclosure needs a deferred script.
+                enhancement = [{'src': '/native-details.js', 'defer': None}] if 'data-disclosure-return' in html else []
+                self.assertEqual([item for item in facts.scripts if item.get('type') != 'application/ld+json'], enhancement)
             self.assertTrue(expected <= observed)
             for row in rows:
                 anchor = kind + '-' + row['id']

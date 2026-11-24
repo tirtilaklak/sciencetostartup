@@ -52,10 +52,11 @@ test.afterEach(async ({}, info) => {
   expect(info._researchRuntimeErrors || [], 'Unexpected browser runtime errors').toEqual([]);
 });
 
-for (const [name, start, disclosureSelector, destination] of [
+for (const [name, start, disclosureSelector, destination, redirectedDestination = destination] of [
   ['Research chapter list', '/research/', '#chapters', reportPath + 'chapters/methods-and-appendices/'],
   ['Research coverage', '/research/', '#coverage', '/research/data/'],
   ['chapter contents', reportPath + 'chapters/weekly-developments/', '.r-chapter-index', '/research/data/'],
+  ['current edition downloads', readingPages[3], '.r-editorial-edition', '/publication/report.html', '/publication/report'],
   ['paper source versions', '/research/papers/', '[data-parent-record="paper.arxiv.2603.04370"] .r-paper-versions',
     '/research/papers/paper.arxiv.2603.04370v1/#approved-findings'],
 ]) {
@@ -67,7 +68,7 @@ for (const [name, start, disclosureSelector, destination] of [
     const link = disclosure.locator(`a[href=${JSON.stringify(destination)}]`);
     await expect(link).toBeVisible();
     await link.press('Enter');
-    await expect(page).toHaveURL(url => url.pathname + url.hash === destination);
+    await expect(page).toHaveURL(url => [destination, redirectedDestination].includes(url.pathname + url.hash));
 
     await page.goBack({ waitUntil: 'commit' });
     await expect(page).toHaveURL(url => url.pathname + url.hash === start);
@@ -370,6 +371,37 @@ test('a fresh Method tab prepares the original edition and record in private ema
     const generic = new URL(await email.getAttribute('href'));
     expect(generic.pathname).toBe(draft.pathname);
     expect(generic.searchParams.get('subject')).toBe('ScienceToStartup correction');
+  }
+});
+
+test('Back restores private correction links on current assertion and source records', async ({ page }) => {
+  await page.setViewportSize({ width: 320, height: 720 });
+  await page.goto(reportPath);
+  let evidence = page.locator('.r-paragraph-citations a').first();
+  for (const kind of ['assertion', 'source']) {
+    const recordURL = new URL(await evidence.getAttribute('href'), page.url());
+    const fragment = decodeURIComponent(recordURL.hash.slice(1));
+    expect(fragment).toMatch(new RegExp('^' + kind + '-'));
+    await evidence.press('Enter');
+    await expect(page).toHaveURL(recordURL.href);
+
+    const record = page.locator('[id=' + JSON.stringify(fragment) + ']');
+    const correction = record.locator('.r-record-correction');
+    await correction.locator('summary').first().press('Enter');
+    const contact = correction.getByRole('link', { name: 'Continue to private email' });
+    const contactURL = new URL(await contact.getAttribute('href'), page.url());
+    await contact.press('Enter');
+    await expect(page).toHaveURL(contactURL.href);
+    const methodRecord = page.locator('#correction-record a');
+    await expect(methodRecord).toHaveText(fragment.slice(kind.length + 1));
+    await expect(methodRecord).toHaveAttribute('href', recordURL.pathname + recordURL.hash);
+
+    await page.goBack({ waitUntil: 'commit' });
+    await expect(page).toHaveURL(recordURL.href);
+    await expect(correction).toHaveAttribute('open', '');
+    await expect(contact).toBeFocused();
+    await expect(contact).toBeInViewport();
+    evidence = record.locator('.r-evidence-links a').first();
   }
 });
 

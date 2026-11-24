@@ -1,8 +1,17 @@
 const { test, expect } = require('@playwright/test');
+const canonical = 'https://sciencetostartup.com';
 
 async function openCompareSetup(page) {
   const setup = page.locator('#compare-setup');
   if (!await setup.evaluate(element => element.open)) await setup.locator('summary').press('Enter');
+}
+
+async function mirrorPublishedOrigin(context, baseURL) {
+  await context.route(canonical + '/**', async route => {
+    const { pathname, search } = new URL(route.request().url());
+    const response = await route.fetch({ url: new URL(pathname + search, baseURL).href });
+    await route.fulfill({ response });
+  });
 }
 
 test('native Companies carries the exact saved search result into Compare', async ({ page }) => {
@@ -66,6 +75,60 @@ test('the directory offers historical comparisons and current-only profile links
   await market.click();
   await expect(page).toHaveURL(/\/explore\/#business-health$/);
   await expect(page.locator('#business-health-heading')).toBeInViewport();
+});
+
+test('a fresh-document Back reopens the directory sources left open before a profile', async ({ page, context, baseURL }) => {
+  await mirrorPublishedOrigin(context, baseURL);
+  await context.addInitScript(() => {
+    if (location.pathname !== '/companies/') return;
+    addEventListener('unload', () => {});
+    addEventListener('pageshow', event => { window.directoryReturnPersisted = event.persisted; });
+  });
+  await page.setViewportSize({ width: 390, height: 844 });
+  const directory = canonical + '/companies/?group=managed-ai-data-services&q=DataForce';
+  await page.goto(directory);
+  const result = page.locator('[data-company="org.dataforce"]');
+  const opener = result.getByRole('link', { name: 'TransPerfect / DataForce', exact: true });
+  const companyContext = result.getByText('Company context and sources', { exact: true });
+  const receipts = result.getByText('Official sources', { exact: true });
+  const source = result.getByRole('link', { name: 'AI Home | DataForce', exact: true });
+  await companyContext.press('Enter');
+  await receipts.press('Enter');
+  await expect(source).toBeVisible();
+  await opener.press('Enter');
+  await expect(page).toHaveURL(canonical + '/company/org.dataforce/');
+
+  await page.goBack();
+  await expect(page).toHaveURL(directory);
+  await expect.poll(() => page.evaluate(() => window.directoryReturnPersisted)).toBe(false);
+  await expect(opener).toBeFocused();
+  await expect(opener).toBeInViewport({ ratio: 1 });
+  await expect(page.getByRole('searchbox', { name: 'Search companies' })).toHaveValue('DataForce');
+  await expect(page.getByRole('combobox', { name: 'Business group' })).toHaveValue('managed-ai-data-services');
+  await expect(source).toBeVisible();
+
+  await page.reload();
+  await expect(companyContext.locator('..')).toHaveJSProperty('open', false);
+  await expect(receipts.locator('..')).toHaveJSProperty('open', false);
+});
+
+test('the directory links to native profile sources when it shows no evidence preview', async ({ page, context, baseURL }) => {
+  await mirrorPublishedOrigin(context, baseURL);
+  await page.setViewportSize({ width: 320, height: 720 });
+  const directory = canonical + '/companies/?q=APTO';
+  await page.goto(directory);
+  const opener = page.getByRole('link', { name: 'Profile sources for APTO', exact: true });
+  await expect(opener).toBeInViewport({ ratio: 1 });
+  await opener.press('Enter');
+  await expect(page).toHaveURL(canonical + '/company/apto/#sources');
+  const disclosure = page.locator('#sources');
+  await expect(disclosure).toBeInViewport({ ratio: 1 });
+  await expect(disclosure.locator('..')).toHaveJSProperty('open', true);
+  await expect(page.getByRole('link', { name: 'Company profile and history', exact: true }))
+    .toHaveAttribute('href', 'https://apto.co.jp/company/about-us/');
+  await page.goBack();
+  await expect(page).toHaveURL(directory);
+  await expect(opener).toBeFocused();
 });
 
 test.describe('without JavaScript', () => {

@@ -61,6 +61,90 @@ test('editing Explore Work before cross-document navigation preserves literal cr
   await expect(page).toHaveURL(/#work\?q=Python$/);
 });
 
+async function openExploreWorkListing(page) {
+  await page.goto('/explore/#work');
+  await expect(page.locator('html')).toHaveAttribute('data-view-state', 'ready');
+  const group = page.locator('section:has(> #work-listed) > details');
+  const listing = group.locator('[data-work-route="afterquery.work.product-manager"]');
+  const disclosures = [group, listing.locator('details.w4-compact-toggle'), listing.locator('details.w4-details')];
+  const opener = listing.getByRole('link', { name: 'AfterQuery', exact: true });
+
+  for (const disclosure of disclosures) {
+    await disclosure.locator(':scope > summary').press('Enter');
+    await expect(disclosure).toHaveJSProperty('open', true);
+  }
+  return { disclosures, opener };
+}
+
+test('Back to Explore Work keeps the open listing, terms and company link', async ({ page }) => {
+  const { disclosures, opener } = await openExploreWorkListing(page);
+  await opener.evaluate(link => {
+    link.focus({ preventScroll: true });
+    link.scrollIntoView({ block: 'center', behavior: 'instant' });
+    // Measure the departure itself, after any pending focus scroll.
+    const recordPosition = () => { window.workDepartureTop = link.getBoundingClientRect().top; };
+    if (window.navigation) window.navigation.addEventListener('navigate', recordPosition, { once: true });
+    else link.addEventListener('click', recordPosition, { once: true });
+  });
+  await page.keyboard.press('Enter');
+  await expect(page).toHaveURL(/#company\/afterquery\/work$/);
+  await expect(page.locator('#profile-pane-work')).toBeVisible();
+  const position = await page.evaluate(() => window.workDepartureTop);
+  expect(Number.isFinite(position)).toBe(true);
+
+  await page.goBack();
+  await expect(page).toHaveURL(/#work$/);
+  for (const disclosure of disclosures) await expect(disclosure).toHaveJSProperty('open', true);
+  await expect(opener).toBeFocused();
+  await expect(opener).toBeInViewport({ ratio: 1 });
+  await expect.poll(() => opener.evaluate((link, previous) => Math.abs(link.getBoundingClientRect().top - previous), position)).toBeLessThan(3);
+});
+
+test('Back to Explore Work reveals a company link activated before focus scroll settles', async ({ page }) => {
+  const { disclosures, opener } = await openExploreWorkListing(page);
+  await opener.evaluate(link => {
+    // Hold the old viewport to model Enter before the browser reaches the newly focused link.
+    window.scrollTo({ top: 0, behavior: 'instant' });
+    link.focus({ preventScroll: true });
+  });
+  await expect(opener).toBeFocused();
+  await expect(opener).not.toBeInViewport();
+  await page.keyboard.press('Enter');
+  await expect(page).toHaveURL(/#company\/afterquery\/work$/);
+
+  await page.goBack();
+  await expect(page).toHaveURL(/#work$/);
+  for (const disclosure of disclosures) await expect(disclosure).toHaveJSProperty('open', true);
+  await expect(opener).toBeFocused();
+  await expect(opener).toBeInViewport({ ratio: 1 });
+});
+
+test('Back to Explore Companies restores the original filter after browsing a profile group', async ({ page }) => {
+  const directory = '/explore/#companies';
+  const group = 'expert-data-evaluation';
+  const search = page.locator('#search');
+  const count = page.locator('#result-count');
+  await page.goto(directory);
+  await search.fill('Mercor');
+  await expect(count).toHaveText(/Showing 1 of \d+ companies/);
+  await page.locator('#company-cards h3 a[href="#company/mercor"]').press('Enter');
+  await expect(page.getByRole('heading', { name: 'Mercor', exact: true })).toBeVisible();
+  await expect(page.locator('html')).toHaveAttribute('data-view-state', 'ready');
+
+  await page.locator(`.profile-group-link[href="#companies/${group}"]`).press('Enter');
+  await expect(page).toHaveURL(`${directory}/${group}`);
+  await expect(search).toHaveValue('');
+  await expect(count).toHaveText(/Showing 9 of \d+ companies/);
+
+  await page.goBack();
+  await expect(page.getByRole('heading', { name: 'Mercor', exact: true })).toBeVisible();
+  await page.goBack();
+  await expect(page).toHaveURL(directory);
+  await expect(search).toHaveValue('Mercor');
+  await expect(page.locator('#category')).toHaveValue('');
+  await expect(count).toHaveText(/Showing 1 of \d+ companies/);
+});
+
 for (const [query, target] of [
   ['arXiv:2203.02155v1', '/research/papers/paper.arxiv.2203.02155v1/'],
   ['RLHF  jobs', '/work/?q=RLHF++jobs'],

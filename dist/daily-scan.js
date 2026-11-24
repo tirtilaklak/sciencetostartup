@@ -21,6 +21,8 @@
   const rows = [...root.querySelectorAll('.scan-item')];
   const rowById = new Map(rows.map(row => [row.id, row]));
   const sourceLinks = [...root.querySelectorAll('.scan-item h2 a, .scan-sources a')];
+  const menu = document.querySelector('.site-header > .site-menu');
+  const navigationLinks = [...root.querySelectorAll('.scan-follow a'), ...(menu?.querySelectorAll('a') || [])];
   const readingKey = 's2sDailyReading';
   const filterKey = 's2sDailyFilters';
   const maxPosition = 10000000;
@@ -98,6 +100,8 @@
       row.getBoundingClientRect().top < innerHeight);
     const active = document.activeElement;
     const sourceIndex = sourceLinks.indexOf(link);
+    const navigationLink = link ?? active;
+    const navigationIndex = navigationLinks.indexOf(navigationLink);
     const reading = { url: location.href, edition: root.dataset.edition,
       x: Math.max(0, Math.min(maxPosition, scrollX)), y: Math.max(0, Math.min(maxPosition, scrollY)),
       open: rows.filter(row => row.querySelector('details').open).map(row => row.id),
@@ -107,6 +111,7 @@
       returnToFilterSummary: active === filterSummary,
       returnToPermalink: active?.matches('.scan-permalink') ? active.closest('.scan-item')?.id : null,
       returnToSource: sourceIndex < 0 ? null : { index: sourceIndex, href: link.href },
+      returnToNavigation: navigationIndex < 0 ? null : { index: navigationIndex, href: navigationLink.href },
       returnToDayStep: active?.matches('.scan-day-step') ? active.rel : null,
       returnToArchive: active?.matches('.scan-archive a') ? new URL(active.href).pathname : null,
       returnToDateGo: active === dateGo };
@@ -133,6 +138,14 @@
       // Recreated documents lose native disclosure state. Layout and position
       // must be restored together after the browser finishes its traversal.
       const reading = filters ? null : current;
+      const navigation = reading?.returnToNavigation;
+      let navigationLink = Number.isInteger(navigation?.index) ? navigationLinks[navigation.index] : null;
+      if (navigationLink?.href !== navigation?.href) navigationLink = null;
+      if (navigationLink && menu?.contains(navigationLink)) {
+        if (menu.getClientRects().length) menu.open = true;
+        else navigationLink = [...menu.parentElement.querySelectorAll(':scope > .site-nav a')]
+          .find(link => link.href === navigation.href);
+      }
       if (current) {
         for (const row of rows) row.querySelector('details').open = current.open.includes(row.id);
         if (typeof current.archiveOpen === 'boolean') archive.open = current.archiveOpen;
@@ -160,6 +173,9 @@
           const sourceLink = Number.isInteger(source?.index) ? sourceLinks[source.index] : null;
           if (sourceLink && sourceLink.href === source.href && !sourceLink.closest('[hidden], details:not([open])')) {
             returnFocus = sourceLink;
+          }
+          if (navigationLink?.getClientRects().length && !navigationLink.closest('[hidden], details:not([open])')) {
+            returnFocus ??= navigationLink;
           }
           const archiveLink = archive.open ? archiveLinks.get(reading?.returnToArchive) : null;
           const focusSummary = compact.matches && (filters?.focusSummary ?? reading?.returnToFilterSummary) === true;
@@ -292,13 +308,17 @@
     saveReading();
     location.assign(target);
   });
-  root.addEventListener('click', event => {
+  function rememberLink(event) {
     if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
     const link = event.target.closest?.('a[href]');
     if (!link || link.hasAttribute('download') || (link.target && link.target !== '_self')) return;
     const sameOrigin = new URL(link.href).origin === location.origin;
-    if (sameOrigin || sourceLinks.includes(link)) saveReading(link, !sameOrigin || Boolean(history.state?.[readingKey]));
-  });
+    if (sameOrigin || sourceLinks.includes(link) || navigationLinks.includes(link)) {
+      saveReading(link, !sameOrigin || Boolean(history.state?.[readingKey]));
+    }
+  }
+  root.addEventListener('click', rememberLink);
+  menu?.addEventListener('click', rememberLink);
   if (navigationState) navigationAPI.addEventListener('navigate', event => {
     if (event.navigationType !== 'replace') saveReading(event.sourceElement);
   });

@@ -15,7 +15,7 @@ function siteSearchPages(){
  const work=typeof w4DiscoveryGroups==='function'?w4DiscoveryGroups(workRouteRows()):{named:[],programs:[]};
  return [
   ['home','Home','','front page start','/'],
-  ['market','Market overview','Revenue and growth charts','charts market overview'],
+  ['market','Market overview','Revenue and growth charts','charts market overview','#market',['Market']],
   ['company-directory','Companies','Current company directory','index directory firms startups organizations organisations','/companies/'],
   ['companies','Historical company comparisons',`Compare ${DATA.companies.length} profiles`,'historical companies comparisons'],
   ['work','Paid work',`${w4Count(work.named.length,'named listing','named listings')} · ${w4Count(work.programs.length,'network or program','networks and programs')}`,'jobs gigs hiring careers contract contractor freelance hourly pay earn'],
@@ -26,11 +26,12 @@ function siteSearchPages(){
   ['corrections','Request a correction','Tell us when a figure or listing is wrong','corrections error mistake wrong fix report'],
   ['downloads','Download the data','JSON, CSV and SQLite files','downloads csv json sqlite dataset export license reuse'],
   ['venture','The publisher’s proposed AI lab','The publisher’s proposal, separate from the research','venture neolab investor pitch proposal']
- ].map(([id,name,meta,keys,href])=>({type:'page',id,name,meta,keys:keys.split(' '),href:href||'#'+id})).concat(
+ ].map(([id,name,meta,keys,href,aliases=[]])=>({type:'page',id,name,meta,keys:keys.split(' '),aliases:aliases.map(siteSearchAlias),href:href||'#'+id})).concat(
   (window.SEARCH_INDEX?.researchSearchEntries||[]).map(entry=>({
    type:entry.kind==='company'?'company':'page',id:entry.url,name:entry.title,
    meta:(entry.kind==='paper'?(entry.recordKind==='paper_version'?'Paper version · ':'Paper · '):entry.kind==='company'?'Company profile · ':'')+entry.summary,
-   keys:entry.keywords||[],href:entry.url,recordKind:entry.recordKind,identifiers:siteSearchTools?.identifiers(entry.identifiers)||[]
+   keys:entry.keywords||[],aliases:(entry.aliases||[]).map(siteSearchAlias),
+   href:entry.url.replace(/^\/explore\/(?=#)/,''),recordKind:entry.recordKind,identifiers:siteSearchTools?.identifiers(entry.identifiers)||[]
   }))
  );
 }
@@ -55,6 +56,10 @@ function siteSearchIndex(){
 function siteSearchRank(e,tokens,key){
  const has=words=>tokens.every(t=>words.some(w=>w.startsWith(t)));
  if(e.nameKey===key||e.aliasKeys.includes(key))return 0;
+ if(e.type==='company'&&tokens.length>1){
+  const joined=tokens.join('');
+  if(e.nameKey===joined||e.aliasKeys.includes(joined))return 0;
+ }
  if(e.nameKey.startsWith(key))return 1;
  if(e.aliasKeys.some(k=>k.startsWith(key))||(e.keyWords.length&&has(e.keyWords)))return 2;
  if(has(e.nameWords))return 3;
@@ -102,14 +107,15 @@ function siteSearchView(query){
  if(siteSearchTools?.identifier(query))return groups;
  const work=groups.find(g=>g.type==='work'),raw=String(query).slice(0,256),text=raw.trim(),matches=work?selectWorkRoutes(workRouteRows(),{q:raw}):[],count=matches.length;
  const workTitles=new Set((window.SEARCH_INDEX?.workTitles||[]).map(title=>siteSearchTools?.normalize(title)));
- if(siteSearchTools?.isWorkQuery(raw,workTitles)){
+ const hourly=siteSearchTools?.hourlyWorkShortcut(raw);
+ if(hourly||siteSearchTools?.isWorkQuery(raw,workTitles)){
   const browse=!siteSearchTools.workTerms(raw).trim();
   const pages=groups.find(g=>g.type==='page');
   if(pages){
    pages.items=pages.items.filter(item=>item.id!=='work');
    if(!pages.items.length)groups.splice(groups.indexOf(pages),1);
   }
-  const action={
+  const action=hourly?{type:'action',name:hourly.name,meta:hourly.summary,href:hourly.href}:{
    type:'action',
    name:browse?'Browse paid work':`Search paid work for “${text}”`,
    href:siteSearchTools.workUrl(browse?'':raw)
@@ -173,7 +179,8 @@ function siteSearchRequestRender(){
  window.ensureSearchContext().then(()=>{if(generation!==siteSearchGeneration||!dialog.open)return;dialog.removeAttribute('aria-busy');siteSearchEntries=null;siteSearchRender();}).catch(()=>{
   if(generation!==siteSearchGeneration||!dialog.open)return;dialog.removeAttribute('aria-busy');
   const query=$('site-search-input').value,params=query.trim()?'?'+new URLSearchParams({q:query}):'';
-  $('site-search-message').innerHTML=`Search could not load. <button type="button" data-retry-site-search>Try again</button> or browse <a href="/companies/${attr(params)}">companies</a> and <a href="/work/${attr(params)}">paid work</a>.`;
+  const workHref=siteSearchTools?.hourlyWorkShortcut(query)?.href||'/work/'+params;
+  $('site-search-message').innerHTML=`Search could not load. <button type="button" data-retry-site-search>Try again</button> or browse <a href="/companies/${attr(params)}">companies</a> and <a href="${attr(workHref)}">paid work</a>.`;
  });
 }
 function siteSearchSetActive(index){

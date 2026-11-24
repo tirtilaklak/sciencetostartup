@@ -55,6 +55,15 @@
     return explicitWork(text) ? text.trim().replace(leadingWork, '').replace(trailingWork, '').trim() : text;
   }
   const workUrl = value => '/work/' + (String(value ?? '').trim() ? '?' + new URLSearchParams({ q: value }) : '');
+  const hourlyWork = Object.freeze({
+    name: 'See roles with published hourly pay',
+    summary: 'Includes past listings',
+    href: '/work/?pay=hourly'
+  });
+  const hourlyWorkShortcut = value => {
+    const key = normalize(value);
+    return key === 'hourly' || key === 'hourly pay' ? hourlyWork : null;
+  };
   function compile(row) {
     const aliases = values(row.aliases).map(raw => ({ raw, key: normalize(aliasName(raw)) }));
     const name = normalize(row.name);
@@ -82,7 +91,7 @@
     if (!key || entry.name.includes(key)) return '';
     return entry.aliases.find(alias => alias.key === key || alias.key.startsWith(key))?.raw || '';
   }
-  globalThis.S2SSearch = Object.freeze({ normalize, identifier, identifiers, isWorkQuery, workTerms, workUrl, compile, rank, compare, matchedAlias });
+  globalThis.S2SSearch = Object.freeze({ normalize, identifier, identifiers, isWorkQuery, workTerms, workUrl, hourlyWorkShortcut, compile, rank, compare, matchedAlias });
 })();
 
 /* Filtering enhances the complete static directory; no network is needed. */
@@ -97,11 +106,16 @@
   const fullGuide=empty?.querySelector('[data-full-guide-search]');
   const selectedGroup=document.querySelector('[data-directory-selected-group]');
   const sections=[...document.querySelectorAll('.directory-section')];
-  const handoffs='.directory-compare, .directory-company-heading h3 a, [data-full-guide-search]';
+  const handoffs='.directory-compare, .directory-source-link, .directory-company-heading h3 a, [data-full-guide-search]';
   const search=globalThis.S2SSearch;
   if(!search){document.documentElement.removeAttribute('data-page-enhancement');return;}
   const aliases=node=>{try{const value=JSON.parse(node.dataset.searchAliases||'[]');return Array.isArray(value)?value:[];}catch{return [];}};
   const cards=sections.map((section,order)=>({section,order,rows:[...section.querySelectorAll('[data-company]')].map((node,index)=>({node,index,compiled:search.compile({name:node.dataset.searchName||node.querySelector('.directory-company-heading a')?.textContent||'',aliases:aliases(node),text:node.dataset.search||node.textContent})}))}));
+  const disclosures=new Map();
+  for(const detail of document.querySelectorAll('.directory-company details, .directory-scope')){
+    const company=detail.closest('[data-company]')?.dataset.company||'';
+    disclosures.set(`${company}:${detail.className}`,detail);
+  }
   const sectionParent=sections[0]?.parentNode,sectionAnchor=sections.at(-1)?.nextSibling;
   let displayedSearch;
   const read=savedQuery=>{
@@ -151,8 +165,9 @@
       link.href.split('#')[0]===location.href.split('#')[0])return;
     const {directoryReturn,...state}=history.state||{};
     if(link.matches(handoffs)){
+      const openDisclosures=[...disclosures].filter(([,detail])=>detail.open).map(([key])=>key);
       state.directoryReturn={page:location.href,href:link.href,query:query.value,top:link.getBoundingClientRect().top,
-        entry:window.S2SNativeHandoff?.begin(link.href,event)};
+        openDisclosures,entry:window.S2SNativeHandoff?.begin(link.href,event)};
     }else if(!directoryReturn)return;
     try{history.replaceState(state,'');}catch{}
   });
@@ -183,6 +198,10 @@
         if(document.activeElement!==document.body||!stillReturning()){stop();return;}
         const link=[...document.querySelectorAll(handoffs)].find(link=>link.href===saved.href&&!link.closest('[hidden]'));
         if(!link){stop();return;}
+        for(const key of saved.openDisclosures||[]){
+          const detail=disclosures.get(key);
+          if(detail)detail.open=true;
+        }
         function restorePosition(){
           const bounds=link.getBoundingClientRect();
           const headerBottom=Math.max(0,document.querySelector('.site-header')?.getBoundingClientRect().bottom||0);

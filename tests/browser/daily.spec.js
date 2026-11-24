@@ -385,6 +385,65 @@ test('Daily restores the exact external article link on cold Back', async ({ pag
   }
 });
 
+test('Daily cold Back restores the feed link inside the open archive', async ({ page }) => {
+  await page.setViewportSize({ width: 320, height: 720 });
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.addInitScript(() => {
+    if (location.pathname === '/daily/') addEventListener('unload', () => {});
+  });
+  await page.goto('/daily/');
+  const origin = page.url();
+  const document = await page.evaluate(() => performance.timeOrigin);
+  const archive = page.locator('.scan-archive-disclosure');
+  const feed = archive.getByRole('link', { name: 'JSON Feed', exact: true });
+  const feedURL = new URL('/daily/feed.json', origin).href;
+  await expect(feed).toBeHidden();
+  await archiveToggle(page).press('Enter');
+  await expect(feed).toHaveAttribute('href', '/daily/feed.json');
+  // The browser can download a feed based on its MIME type. Serve a document
+  // at the exact link to exercise its same-tab history without that variance.
+  await page.route(feedURL, route => route.fulfill({ body: 'Daily JSON Feed', contentType: 'text/html' }));
+  await feed.press('Enter');
+  await expect(page).toHaveURL(feedURL);
+  await traversePermalinkHistory(page, 'goBack', origin);
+  expect(await page.evaluate(() => performance.timeOrigin)).not.toBe(document);
+  await expect(archive).toHaveJSProperty('open', true);
+  await expect(feed).toBeFocused();
+  await page.keyboard.press('Tab');
+  await expect(archive.getByRole('link', { name: 'Research editions', exact: true })).toBeFocused();
+});
+
+test('Daily cold Back restores the open mobile menu and the chosen link', async ({ page }) => {
+  await page.setViewportSize({ width: 320, height: 720 });
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.addInitScript(() => {
+    if (location.pathname === '/daily/') addEventListener('unload', () => {});
+  });
+  await page.goto('/daily/');
+  const origin = page.url();
+  const document = await page.evaluate(() => performance.timeOrigin);
+  const story = page.locator('.scan-item details').first();
+  const menu = page.locator('.site-header > .site-menu');
+  const research = menu.getByRole('link', { name: 'Research', exact: true });
+  const destination = 'https://sciencetostartup.com/research/';
+  if (new URL(destination).origin !== new URL(origin).origin) {
+    await page.route(destination, route => route.fulfill({ body: 'Research', contentType: 'text/html' }));
+  }
+
+  await story.locator('summary').press('Enter');
+  await menu.locator('summary').press('Enter');
+  await expect(research).toHaveAttribute('href', destination);
+  await research.press('Enter');
+  await expect(page).toHaveURL(destination);
+  await traversePermalinkHistory(page, 'goBack', origin);
+  expect(await page.evaluate(() => performance.timeOrigin)).not.toBe(document);
+  await expect(menu).toHaveJSProperty('open', true);
+  await expect(story).toHaveJSProperty('open', true);
+  await expect(research).toBeFocused();
+  await page.keyboard.press('Tab');
+  await expect(menu.getByRole('link', { name: 'Companies', exact: true })).toBeFocused();
+});
+
 test('Daily deep links reveal filtered items and native disclosures support keyboard and history', async ({ page }) => {
   async function restoredReading(link, saved) {
     await expect.poll(() => page.locator('.scan-item').evaluateAll(rows => rows

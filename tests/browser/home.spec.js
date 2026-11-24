@@ -24,7 +24,8 @@ test('home leads with the field guide and links dated examples to their sources'
     const report = main.getByRole('article', { name: 'State of AI Data Labs and Human Feedback', exact: true });
     await expect(report).toBeVisible();
     await expect(report.locator('time')).toHaveAttribute('datetime', '2026-11-12');
-    await expect(report.getByRole('link', { name: 'Read the report' })).toHaveAttribute('href', '/research/state-of-ai-data-labs/');
+    await expect(report.getByRole('link', { name: 'State of AI Data Labs and Human Feedback', exact: true }))
+      .toHaveAttribute('href', '/research/state-of-ai-data-labs/');
     await expect(main.locator('.hero-actions [data-count="work"]')).toHaveText(String(release.counts.work_routes));
 
     const company = page.locator('[data-observation="snorkel_ai.metric.major-growth_metrics-0"]');
@@ -50,6 +51,22 @@ test('home leads with the field guide and links dated examples to their sources'
   await page.locator('#research a[href="/method/#method-notes"]').click();
   await expect(page).toHaveURL(/\/method\/#method-notes$/);
   await expect(page.getByRole('heading', { name: 'How figures are shown' })).toBeVisible();
+});
+
+test('a short phone opens the report from its visible title without JavaScript', async ({ browser, baseURL }) => {
+  const context = await browser.newContext({ baseURL, javaScriptEnabled: false, viewport: { width: 320, height: 640 } });
+  try {
+    const page = await context.newPage();
+    await page.goto('/');
+    const title = page.getByRole('heading', { level: 2, name: 'State of AI Data Labs and Human Feedback' });
+    const report = title.getByRole('link');
+    await expect(report).toBeInViewport({ ratio: 1 });
+    await report.press('Enter');
+    await expect(page).toHaveURL(/\/research\/state-of-ai-data-labs\/$/);
+    await expect(page.getByRole('heading', { level: 1, name: 'State of AI Data Labs and Human Feedback' })).toBeVisible();
+  } finally {
+    await context.close();
+  }
 });
 
 test('the three guide links stay readable and usable on narrow phones', async ({ page }) => {

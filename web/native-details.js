@@ -83,6 +83,8 @@
   const handoffs = [...document.querySelectorAll('details a[data-disclosure-return][href]')];
   const company = location.pathname.match(/^\/company\/([a-z0-9_.-]+)\/$/)?.[1];
   const dossier = document.querySelector('.company-dossier');
+  const sourceSummary = dossier?.querySelector('summary[data-native-sources]');
+  const sourcePanel = sourceSummary?.parentElement;
   if (company && dossier) {
     const canonical = new URL(document.querySelector('link[rel="canonical"]')?.href || location.href);
     const route = `#company/${company}`;
@@ -92,6 +94,9 @@
         url.pathname === '/explore/' && (url.hash === route || url.hash.startsWith(`${route}/`));
     });
     handoffs.push(...explore, ...dossier.querySelectorAll(`.r-record-correction a[href^="/method/?correction="], ${roleLink}`));
+    if (sourcePanel) {
+      handoffs.push(...sourcePanel.querySelectorAll(`a.ext[href], a[href="/company/${company}/work-sources/"]`));
+    }
   }
 
   if (handoffs.length) {
@@ -131,12 +136,15 @@
       if (departed) {
         if (departed.index !== activation.entry.index + 1 || !departed.url) return;
         const from = new URL(departed.url), destination = new URL(link.href);
-        if (from.origin !== destination.origin || from.pathname !== destination.pathname) return;
+        const archivedReportRedirect = destination.pathname === '/publication/report.html' &&
+          from.pathname === '/publication/report';
+        if (from.origin !== destination.origin || (from.pathname !== destination.pathname && !archivedReportRedirect)) return;
       }
       const role = workRole(link);
-      const bookmark = role && location.hash === `#${role.id}` ? role : null;
+      const sourceBookmark = sourcePanel?.contains(link) && location.hash === `#${sourceSummary.id}` ? sourceSummary : null;
+      const bookmark = role && location.hash === `#${role.id}` ? role : sourceBookmark;
       const input = new AbortController();
-      if (role) {
+      if (role || bookmark) {
         for (const type of ['keydown', 'pointerdown', 'touchstart', 'wheel']) {
           addEventListener(type, event => { if (event.isTrusted) input.abort(); },
             { capture: true, passive: true, signal: input.signal });
@@ -155,7 +163,7 @@
       // Wait for the browser's history scroll restoration before aligning the reopened link.
       requestAnimationFrame(() => {
         const active = document.activeElement;
-        // A bookmarked role can receive native fragment focus on Back.
+        // A bookmarked disclosure or role can receive native fragment focus on Back.
         if (input.signal.aborted || (active !== document.body && active !== bookmark) || location.href !== saved.page) {
           input.abort();
           return;

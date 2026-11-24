@@ -14,7 +14,7 @@ html[data-page-enhancement="pending"] .directory-groups{display:none}
 .directory-results-bar{max-width:none;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;column-gap:16px}
 .directory-results-bar .actions{gap:0 18px}
 .directory-result{margin:0;max-width:none}
-.directory-compare{display:inline-flex;align-items:center;min-height:44px;min-width:44px;max-width:100%;color:var(--green);font-size:.875rem;line-height:1.4;overflow-wrap:anywhere}
+:is(.directory-compare,.directory-source-link){display:inline-flex;align-items:center;min-height:44px;min-width:44px;max-width:100%;color:var(--green);font-size:.875rem;line-height:1.4;overflow-wrap:anywhere}
 .directory-empty{padding:16px 0}
 .directory-empty a{display:inline-flex;align-items:center;min-height:44px}
 .directory-groups{max-width:none;margin-top:20px}

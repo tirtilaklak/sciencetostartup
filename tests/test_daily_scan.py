@@ -483,7 +483,7 @@ class DailyScanTests(unittest.TestCase):
         full = json.loads((destination / summary["fullSearch"]["href"].lstrip("/")).read_text())
         expected = daily_search_entries(context)
         self.assertEqual([row["href"] for row in home["entries"] if row["group"] == "daily"], [row["url"] for row in expected])
-        self.assertEqual(full["researchSearchEntries"], expected)
+        self.assertEqual([row for row in full["researchSearchEntries"] if row["kind"] == "daily"], expected)
         self.assertEqual(summary["dailySearchScope"]["editionCount"], 1)
         for path in destination.rglob("*.json"):
             self.assertNotIn("PRIVATE-DAILY-WORKER-MARKER", path.read_text())

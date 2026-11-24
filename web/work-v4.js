@@ -455,7 +455,7 @@ function w4ProfilePrimary(rows,id){
   const rank=route=>{const index=preferred.indexOf(route.id);return index<0?preferred.length:index;};
   return [...rows].sort((a,b)=>rank(a)-rank(b));
 }
-let workReturnFocus=null,workReturnOrigin=null,workViewRendered=false;
+let workReturnFocus=null,workReturnOrigin=null,workRenderedHash=null;
 // Typing in the Paid work search draws the list once typing pauses for 180 ms, so each keystroke paints at
 // once (measured on a phone at 4x CPU slowdown). A direct render, such as a filter change, cancels a waiting one.
 let w4RenderTimer=0;
@@ -464,10 +464,19 @@ function rememberWorkCompanyLink(event){
   if(event.defaultPrevented||event.metaKey||event.ctrlKey||event.shiftKey||event.altKey||(event.button!==undefined&&event.button!==0))return;
   const link=event.target.closest?.('#work-view a[href^="#company/"]');
   if(!link||link.hasAttribute('download')||(link.getAttribute('target')&&link.getAttribute('target')!=='_self'))return;
+  if((event.detail===0||event.pointerType==='')&&document.activeElement===link){
+    const box=link.getBoundingClientRect();
+    if(box.bottom<=0||box.top>=window.innerHeight||box.right<=0||box.left>=window.innerWidth){
+      // Enter can follow focus before the browser's smooth scroll reaches the link.
+      link.scrollIntoView({block:'center',inline:'nearest',behavior:'instant'});
+      keepEntryScroll();
+    }
+  }
   workReturnFocus=link;
-  workReturnOrigin={routeId:link.closest('[data-work-route]')?.dataset.workRoute,href:link.getAttribute('href'),criteria:workHashFor()};
+  workReturnOrigin={entryKey:historyKey(),routeId:link.closest('[data-work-route]')?.dataset.workRoute,href:link.getAttribute('href'),criteria:workHashFor()};
 }
 function workReturnFocusTarget(){
+  if(workReturnOrigin?.entryKey!==historyKey())return null;
   let link=workReturnFocus;
   if(!link?.isConnected&&workReturnOrigin?.criteria===workHashFor()){
     if(workReturnOrigin.routeId)w4FillRouteGroup('#work-view',workReturnOrigin.routeId);
@@ -599,7 +608,6 @@ function renderWork(){
   workSearchGeneration++;
   $('work-cards').removeAttribute?.('aria-busy');
   if(w4RenderTimer){clearTimeout(w4RenderTimer);w4RenderTimer=0;}
-  workViewRendered=true;
   if(state.workSort===undefined)state.workSort='';
   const rows=filteredWork(),query=w4Text(state.workQuery),matcher=w4QueryMatcher(query),sort=state.workSort;
   const filters=[state.workKind,state.workGroup,state.workPay,state.workEligibility].filter(Boolean).length,filtered=Boolean(query||filters),typed=w4TypedRender(query);
@@ -615,6 +623,7 @@ function renderWork(){
   const namedLimit=Math.min(limit,filtered?Math.max(10,limit-groups.programs.length):10),programLimit=filtered?Math.max(6,limit-Math.min(groups.named.length,namedLimit)):5;
   const thin=matcher&&!filters&&groups.named.length<5&&!rows.some(route=>matcher.all(w4SearchFold([companies[route.company_id]?.name,...(companies[route.company_id]?.aliases||[])].join(' '))));
   $('work-cards').innerHTML=w4KindSection('work-listed','Named listings',groups.named,namedLimit)+w4KindSection('work-jobs','Networks and programs',groups.programs,programLimit,true)+w4OtherSection(groups,filtered,typed)+(rows.length?'':w4EmptyState(query,filters))+(thin?w4NetworkSuggestions(rows):'');
+  workRenderedHash=workHashFor();
   syncSelection();
 }
 // Clears the search, the filters, or everything (the Clear filters button in the panel).
