@@ -13,7 +13,7 @@
 }
 .landing-page :is(h1, h2, h3, p, figure) { margin: 0; }
 
-.site-header, .home-front, .home-methods, .landing-page .site-footer {
+.site-header, .home-front, .home-methods, .home-profiles, .landing-page .site-footer {
   width: var(--home-width);
   margin-inline: auto;
 }
@@ -191,7 +191,7 @@
 .example-terms summary { min-height: 44px; padding-block: 11px; color: var(--green); font-size: .875rem; }
 .example-conditions { margin: 0 0 6px; padding-inline-start: 20px; font-size: .875rem; }
 .example-actions { display: flex; flex-wrap: wrap; gap: 0 16px; margin-top: auto; padding-top: 4px; }
-.example-action, .home-methods a {
+.example-action, .home-methods a, .home-profiles a {
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -202,18 +202,23 @@
 }
 .home-arrow { display: inline-block; flex: none; width: 18px; height: 18px; vertical-align: middle; }
 
-.home-methods {
+.home-methods, .home-profiles {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: 0 20px;
   padding-block: 8px;
-  border-block: 1px solid var(--border);
-  color: var(--muted);
   font-size: .875rem;
 }
-.home-methods h2 { font-size: inherit; }
+.home-methods {
+  border-block: 1px solid var(--border);
+  color: var(--muted);
+}
+.home-methods h2, .home-profiles h2 { font-size: inherit; }
 .home-methods p { flex: 1 0 220px; max-width: 100%; }
+.home-profiles { border-bottom: 1px solid var(--border); }
+.home-profile-links { display: flex; flex: 1 1 540px; flex-wrap: wrap; gap: 0 20px; min-width: 0; }
+.home-profile-links img { flex: none; object-fit: contain; }
 .landing-page .site-footer {
   padding-block: 16px 24px;
   color: var(--muted);
