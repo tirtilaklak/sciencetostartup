@@ -131,6 +131,71 @@ async function expectUnavailableDialog(page, { heading, description, profile, di
   return dialog;
 }
 
+const exploreDestinations = [
+  ['Daily scan', '/daily/'], ['Research', '/research/'], ['Companies', '/companies/'],
+  ['Paid work', '/work/'], ['About', '/method/#about'],
+];
+
+async function expectCompactMenu(page, minimum) {
+  await page.setViewportSize({ width: 320, height: 720 });
+  await openPage(page, '/explore/', minimum);
+  await expect(page.locator('html')).toHaveAttribute('data-app', 'ready');
+  const header = page.locator('body > header.topbar');
+  const menu = header.locator('details.site-menu');
+  const summary = menu.locator('summary');
+  const nav = header.getByRole('navigation', { name: 'Main', exact: true });
+
+  await expect(nav).toHaveCount(0);
+  for (const control of [page.getByRole('link', { name: 'Skip to content' }), header.locator('.wordmark'),
+    header.locator('#site-search-open'), summary]) {
+    await page.keyboard.press('Tab');
+    await expect(control).toBeFocused();
+  }
+  await page.keyboard.press('Space');
+  await expect(menu).toHaveAttribute('open', '');
+  await expect(nav).toHaveCount(1);
+  await expect(nav).toBeInViewport({ ratio: 1 });
+  await expect(nav.getByRole('link')).toHaveCount(exploreDestinations.length);
+  for (const [name, href] of exploreDestinations) {
+    const link = nav.getByRole('link', { name, exact: true });
+    await expect(link).toHaveAttribute('href', href);
+    await page.keyboard.press('Tab');
+    await expect(link).toBeFocused();
+    await expect(link).toBeInViewport({ ratio: 1 });
+    expect(await link.evaluate(element => {
+      const { x, y, width, height } = element.getBoundingClientRect();
+      return width >= 44 && height >= 44 && element.matches(':focus-visible') &&
+        element.contains(document.elementFromPoint(x + width / 2, y + height / 2));
+    })).toBe(true);
+  }
+
+  await page.keyboard.press('Escape');
+  await expect(menu).not.toHaveAttribute('open', '');
+  await expect(summary).toBeFocused();
+  await expect(summary).toBeInViewport({ ratio: 1 });
+  expect(await summary.evaluate(element => element.matches(':focus-visible'))).toBe(true);
+  await page.keyboard.press('Tab');
+  await expect(page.locator('#business-health').getByRole('link', { name: /^Download data/ })).toBeFocused();
+  return { menu, nav };
+}
+
+test('Explore compact Menu works by keyboard through the 359px breakpoint', async ({ page }) => {
+  const { menu, nav } = await expectCompactMenu(page);
+  await page.setViewportSize({ width: 359, height: 720 });
+  await expect(menu).toBeVisible();
+  await expect(nav).toHaveCount(0);
+
+  await page.setViewportSize({ width: 360, height: 720 });
+  await expect(menu).toBeHidden();
+  await expect(nav).toHaveCount(1);
+  await expect(nav.getByRole('link')).toHaveText(exploreDestinations.map(([name]) => name));
+});
+
+enlargedText('Explore compact Menu keeps all destinations operable at 320px with enlarged Firefox text', async ({ page, browserName }) => {
+  enlargedText.skip(browserName !== 'firefox', 'Exercise Firefox minimum font sizes');
+  await expectCompactMenu(page, 32);
+});
+
 test('Market shows every chart tab and the full coverage group at 320px', async ({ page }) => {
   await page.setViewportSize({ width: 320, height: 640 });
   await openPage(page, '/explore/#business-health');
