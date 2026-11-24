@@ -7,8 +7,9 @@
   const group=document.getElementById('company-group');
   const count=document.getElementById('company-count');
   const empty=document.getElementById('company-empty');
+  const emptyMessage=empty?.querySelector('[data-directory-empty-message]');
+  const allGroups=empty?.querySelector('[data-directory-all-groups]');
   const fullGuide=empty?.querySelector('[data-full-guide-search]');
-  const selectedGroup=document.querySelector('[data-directory-selected-group]');
   const sections=[...document.querySelectorAll('.directory-section')];
   const handoffs='.directory-compare, .directory-source-link, .directory-company-heading h3 a, [data-full-guide-search]';
   const search=globalThis.S2SSearch;
@@ -46,10 +47,14 @@
     if(sectionParent) [...cards].sort((a,b)=>(key?a.best-b.best:0)||a.order-b.order).forEach(entry=>sectionParent.insertBefore(entry.section,sectionAnchor));
     count.textContent=`${visible} ${visible===1?'company':'companies'}`;
     empty.hidden=visible!==0;
-    if(fullGuide) fullGuide.href='/?'+new URLSearchParams({search:query.value})+'#browse-guide';
-    if(selectedGroup){
-      selectedGroup.hidden=!group.value;
-      selectedGroup.textContent=group.value?group.selectedOptions[0].textContent:'';
+    const scoped=Boolean(group.value);
+    if(emptyMessage)emptyMessage.textContent=scoped
+      ?`No matches in ${group.selectedOptions[0].textContent}.`
+      :'No companies match this search.';
+    if(allGroups)allGroups.hidden=!scoped;
+    if(fullGuide){
+      fullGuide.hidden=scoped&&Boolean(allGroups);
+      fullGuide.href='/?'+new URLSearchParams({search:query.value})+'#browse-guide';
     }
     if(updateURL){
       const url=new URL(location.href);
@@ -133,6 +138,7 @@
   form.addEventListener('submit',event=>event.preventDefault());
   query.addEventListener('input',()=>filter());
   group.addEventListener('change',()=>filter());
+  allGroups?.addEventListener('click',()=>{group.value='';filter();query.focus();});
   form.addEventListener('reset',event=>{event.preventDefault();query.value='';group.value='';filter();query.focus();});
   window.addEventListener('popstate',()=>{
     if(displayedSearch!==location.search){read();filter(false);}

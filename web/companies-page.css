@@ -1,8 +1,7 @@
 .directory-intro{max-width:none;padding:0 0 14px}
 .static-page .directory-crumbs ol{margin-bottom:16px}
 .static-page main .directory-intro h1{margin:0;font:400 clamp(2.75rem,5.3vw,4.875rem)/.97 var(--print-display,var(--serif));letter-spacing:-.02em}
-.directory-result,.directory-selected-group{font-size:.8125rem;color:var(--muted)}
-.directory-selected-group{margin:4px 0 0;overflow-wrap:anywhere}
+.directory-result{font-size:.8125rem;color:var(--muted)}
 .directory-filters{max-width:none;display:grid;grid-template-columns:minmax(0,1fr) minmax(200px,.45fr) auto;align-items:end;gap:12px;margin:0;padding:10px 0;background:transparent;border:0;border-block:1px solid var(--border);border-top-color:var(--print-ink,var(--ink));border-radius:0}
 html[data-page-enhancement="pending"] .static-page .directory-filters[hidden]{display:grid!important;visibility:hidden}
 html[data-page-enhancement="pending"] .directory-groups{display:none}
@@ -16,7 +15,9 @@ html[data-page-enhancement="pending"] .directory-groups{display:none}
 .directory-result{margin:0;max-width:none}
 :is(.directory-compare,.directory-source-link){display:inline-flex;align-items:center;min-height:44px;min-width:44px;max-width:100%;color:var(--green);font-size:.875rem;line-height:1.4;overflow-wrap:anywhere}
 .directory-empty{padding:16px 0}
-.directory-empty a{display:inline-flex;align-items:center;min-height:44px}
+.directory-empty p{display:inline;margin:0 8px 0 0}
+.directory-empty :is(a,button){display:inline-flex;align-items:center;min-height:44px}
+.directory-empty button{padding:0;border:0;background:transparent;color:var(--green);font:inherit;text-decoration:underline;text-underline-offset:3px;cursor:pointer}
 .directory-groups{max-width:none;margin-top:20px}
 .directory-groups ul.chips{gap:8px;margin:0}
 .directory-groups ul.chips li{min-width:0;max-width:100%}

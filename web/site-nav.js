@@ -5,6 +5,7 @@
 const SITE_SEARCH_GROUPS={company:['Companies',5],group:['Business groups',2],work:['Paid work',5],product:['Products',3],page:['Pages',3]};
 const SITE_SEARCH_SUGGESTED=['scale_ai','mercor','surge_ai','labelbox'];
 const SITE_SEARCH_HISTORY='s2sExploreSearchReturn';
+const SITE_SEARCH_FRAGMENT_OWNER='s2sExploreSearchFragmentOwner';
 let siteSearchEntries=null,siteSearchItems=[],siteSearchActive=-1,siteSearchStatusTimer=0,siteSearchGeneration=0,siteSearchReturn=null;
 const siteSearchFragmentDestinations=new Map();
 let pendingSiteSearchFragment=null;
@@ -221,11 +222,20 @@ function siteSearchForget(){
  const state={...history.state};delete state[SITE_SEARCH_HISTORY];
  try{history.replaceState(state,'');}catch{}
 }
+function siteSearchRememberFragment(){
+ const owner=history.state?.[SITE_SEARCH_FRAGMENT_OWNER],entry=historyKey();
+ if(owner?.source&&owner.entry===entry)siteSearchFragmentDestinations.set(owner.source,entry);
+}
 function siteSearchCommitFragment(){
  const pending=pendingSiteSearchFragment;
  pendingSiteSearchFragment=null;
- if(pending&&!routeTraversal&&pending.key===explorePreviousKey&&pending.destination===location.href){
-  siteSearchFragmentDestinations.set(pending.key,historyKey());
+ if(pending?.key&&!routeTraversal&&pending.key===explorePreviousKey&&pending.destination===location.href){
+  const entry=historyKey();
+  siteSearchFragmentDestinations.set(pending.key,entry);
+  // Keep the committed pair on the result entry so a reload can recover it.
+  try{history.replaceState({...history.state,[SITE_SEARCH_FRAGMENT_OWNER]:{source:pending.key,entry}},'');}catch{}
+ }else{
+  siteSearchRememberFragment();
  }
 }
 function siteSearchChoose(item,event){
@@ -319,6 +329,7 @@ function initSiteNav(){
   siteSearchRequestRender();input.focus();
  });
  document.addEventListener('keydown',siteSearchShortcut);
+ siteSearchRememberFragment();
  // Pair Search results at commit, before a delayed hashchange can be overtaken by Back.
  if(window.navigation)window.navigation.addEventListener('currententrychange',({navigationType})=>{
   if(navigationType==='push'||navigationType==='traverse')siteSearchCommitFragment();

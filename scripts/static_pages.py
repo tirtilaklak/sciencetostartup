@@ -1979,6 +1979,16 @@ def group_order(groups):
     return sorted(groups, key=lambda g: (-len(groups[g]), locale_key(g)))
 
 
+# Two neighboring descriptions read alike without a concrete example. Use the
+# reviewed product claims alongside the existing company sources.
+DIRECTORY_SUMMARIES = {
+    "abundant_ai": ("abundant_ai.claim.oct14-product-1",
+                    "Builds training data for AI agents. SWE-gen turns code changes into verified coding tasks."),
+    "benchflow": ("benchflow.claim.oct14-product-0",
+                  "Builds environments for testing AI agents. SkillsBench measures whether reusable instructions help agents complete tasks."),
+}
+
+
 def render_index(research, companies, editorial_by_id, labels, work_count, modified, business_health=None, profile_by_id=None, current_entries=None, current_reviewed_on=""):
     from presentation import company_search_aliases
 
@@ -2003,21 +2013,28 @@ def render_index(research, companies, editorial_by_id, labels, work_count, modif
             f'<div class="directory-results-bar"><p class="directory-result" id="company-count" role="status" aria-live="polite">{count} companies</p>'
             '<div class="actions"><a class="directory-compare" href="/explore/#compare">Compare companies</a>'
             '<a class="text-link" href="/explore/#business-health">Revenue &amp; growth</a></div></div>',
-            '<p class="directory-selected-group" data-directory-selected-group hidden></p>',
-            '<p id="company-empty" class="directory-empty" hidden>No companies in this directory match. <a data-full-guide-search href="/?search=#browse-guide">Search the full guide</a></p>',
+            '<div id="company-empty" class="directory-empty" hidden><p data-directory-empty-message>No companies match this search.</p> '
+            '<button type="button" data-directory-all-groups hidden>Search all groups</button>'
+            '<a data-full-guide-search href="/?search=#browse-guide">Search the full guide</a></div>',
             '<nav class="directory-groups" aria-label="Business groups"><ul class="chips">' + "".join(f'<li><a href="#{group_slug(g)}">{escape(labels.get(g, g))} <span>{len(groups[g])}</span></a></li>' for g in order) + "</ul></nav>\n"]
     for g in order:
         items = []
         for c in groups[g]:
             cid, name = c['id'], clean(c['name'])
             summary = clean((editorial_by_id.get(cid) or {}).get('summary')) or shown_text(research, c.get('description'))
+            claim_id, example = DIRECTORY_SUMMARIES.get(cid, (None, ""))
+            claim = getattr(research, "claims", {}).get(claim_id, {})
+            display_summary = example if claim.get("status") == "supported" else summary
             current_entry = current_by_id.get(cid)
             aliases = list(c.get("aliases", []))
             if current_entry:
                 aliases += (current_entry.get("current_identity") or {}).get("aliases", [])
             aliases = company_search_aliases(cid, aliases)
             products = [value for product in ((profile_by_id or {}).get(cid) or {}).get("products", []) for value in [product.get("name", ""), product.get("description", ""), *product.get("aliases", [])] if isinstance(value, str) and value]
-            search_text = " ".join([name, summary, g, *aliases, *products] + ([row["label"] for row in current_entry["offerings"]] if current_entry else []))
+            search_terms = [name, summary, g, *aliases, *products]
+            if display_summary != summary: search_terms.append(display_summary)
+            if current_entry: search_terms.extend(row["label"] for row in current_entry["offerings"])
+            search_text = " ".join(search_terms)
             matching = ' data-search-name="' + escape(name) + '" data-search-aliases="' + escape(json.dumps(aliases, ensure_ascii=False)) + '"'
             if current_entry:
                 from current_companies import current_company_html
@@ -2028,7 +2045,7 @@ def render_index(research, companies, editorial_by_id, labels, work_count, modif
                 if not evidence and cid in sourced_companies:
                     evidence = (f'<a class="directory-source-link" href="{ORIGIN}/company/{escape(cid)}/#sources" '
                                 f'aria-label="Profile sources for {escape(name)}">Profile sources</a>')
-                content = f'<p class="directory-company-summary">{escape(summary)}</p>'
+                content = f'<p class="directory-company-summary">{escape(display_summary)}</p>'
                 if evidence:
                     content += f'<div class="directory-company-evidence">{evidence}</div>'
                 compare_link = f'<a class="directory-compare" href="/explore/#compare/{escape(cid)}" aria-label="Compare {escape(name)}">Compare</a>'

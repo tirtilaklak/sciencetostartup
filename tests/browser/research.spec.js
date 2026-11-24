@@ -81,6 +81,30 @@ for (const [name, start, disclosureSelector, destination, redirectedDestination 
 test.describe('research without JavaScript', () => {
   test.use({ javaScriptEnabled: false });
 
+  test('hub chapter contents are near the report actions and have a native bookmark', async ({ page }) => {
+    await page.setViewportSize({ width: 320, height: 720 });
+    await page.goto('/research/');
+    const chapters = page.locator('.r-editorial-actions + #chapters');
+    const summary = chapters.locator('summary');
+    await expect(summary).toBeInViewport();
+    const summaryBox = await summary.boundingBox();
+    const indexBox = await page.getByRole('heading', { name: 'Research index' }).boundingBox();
+    expect(summaryBox.y + summaryBox.height).toBeLessThan(indexBox.y);
+
+    await page.goto('about:blank');
+    await page.goto('/research/#chapters');
+    await expect(summary).toBeInViewport();
+    await expect(chapters.getByRole('link').first()).toBeHidden();
+    await summary.press('Enter');
+    await expect(chapters.getByRole('list').getByRole('link')).toHaveCount(12);
+    const methods = chapters.getByRole('link', {
+      name: '12. Methods, coverage, bibliography and reproducible appendices', exact: true,
+    });
+    expect((await methods.boundingBox()).height).toBeGreaterThanOrEqual(44);
+    await methods.press('Enter');
+    await expect(page).toHaveURL(url => url.pathname === readingPages.at(-1));
+  });
+
   test('correction evidence links have separate tap targets on narrow screens', async ({ page }) => {
     for (const width of [320, 390]) {
       await page.setViewportSize({ width, height: 720 });
@@ -105,7 +129,8 @@ test.describe('research without JavaScript', () => {
     const sections = await page.locator('main [aria-labelledby="browse"], main .r-operating-status')
       .evaluateAll(nodes => nodes.map(node => node.getAttribute('aria-labelledby') || 'edition update'));
     expect(sections[0]).toBe('browse');
-    await expect(page.locator('.r-chapter-list a')).toHaveCount(12);
+    const hubChapters = await page.locator('.r-chapter-list a').evaluateAll(links =>
+      links.map(link => ({ href: link.getAttribute('href'), title: link.textContent })));
     await page.getByRole('link', { name: 'Read the report →', exact: true }).click();
     await expect(page).toHaveURL(new RegExp(reportPath + '$'));
     await expect(page.getByRole('heading', { level: 1 })).toHaveText('State of AI Data Labs and Human Feedback');
@@ -113,6 +138,7 @@ test.describe('research without JavaScript', () => {
     const chapters = await page.locator('.r-toc ol a').evaluateAll(links => links.map(link => ({ href: link.getAttribute('href'), title: link.textContent })));
     expect(chapters).toHaveLength(12);
     expect(chapters.map(chapter => chapter.href)).toEqual(readingPages.map((path, index) => index ? path + '#' + chapterIds[index] : path));
+    expect(hubChapters).toEqual(chapters.map((chapter, index) => ({ ...chapter, href: readingPages[index] })));
     for (const [index, chapter] of chapters.entries()) {
       await page.goto(chapter.href);
       const path = readingPages[index];

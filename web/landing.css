@@ -116,46 +116,48 @@
 }
 .hero-link-arrow { color: var(--green); }
 
-.home-report {
-  align-self: start;
-  padding: clamp(20px, 2.6vw, 36px);
+.home-report { align-self: start; }
+.home-report-link {
+  display: block;
+  padding: clamp(16px, 2.6vw, 36px);
   background: var(--print-ink);
   color: var(--print-paper);
+  text-decoration: none;
 }
 .home-report-line {
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
   gap: 4px 16px;
-  padding-bottom: 12px;
+  padding-bottom: clamp(8px, 1vw, 12px);
   border-bottom: 1px solid #7b9086;
   color: #e5e9dc;
   font-size: .8125rem;
   font-variant-numeric: tabular-nums;
 }
 .landing-page .home-report h2 {
-  margin-block: clamp(12px, 2vw, 27px) 12px;
+  margin-block: clamp(8px, 1.7vw, 24px) clamp(6px, 1vw, 8px);
   color: inherit;
-  font: 400 clamp(2.15rem, 3.7vw, 3.25rem)/.97 var(--print-display);
+  font: 400 clamp(1.75rem, 3.4vw, 2.875rem)/.98 var(--print-display);
   letter-spacing: -.014em;
   overflow-wrap: anywhere;
 }
 .home-report .home-report-intro {
-  max-width: 41ch;
+  max-width: 44ch;
   color: #e5e9dc;
   font-size: .9375rem;
   line-height: 1.5;
 }
-.home-report h2 a {
-  display: block;
-  min-height: 44px;
-  color: inherit;
+.home-report-action {
+  display: inline-block;
+  margin-top: clamp(6px, 1.15vw, 16px);
+  font-size: .875rem;
+  font-weight: 650;
+  text-decoration: underline;
   text-decoration-color: #9ab2a6;
-  text-decoration-thickness: .038em;
-  text-underline-offset: .12em;
+  text-underline-offset: .22em;
 }
-.home-report h2 a:hover { text-decoration-color: currentColor; }
-.home-report a:focus-visible { outline-color: var(--print-paper); }
+.home-report-link:is(:hover, :focus-visible) .home-report-action { text-decoration-color: currentColor; }
 
 .home-examples { border-top: 1px solid var(--ink); }
 .example-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -185,6 +187,7 @@
   font-variant-numeric: tabular-nums;
 }
 .example-card :is(.example-meta, .example-note) { margin-top: 4px; color: var(--muted); font-size: .875rem; }
+.company-example .example-summary { margin-top: 6px; }
 .example-terms summary { min-height: 44px; padding-block: 11px; color: var(--green); font-size: .875rem; }
 .example-conditions { margin: 0 0 6px; padding-inline-start: 20px; font-size: .875rem; }
 .example-actions { display: flex; flex-wrap: wrap; gap: 0 16px; margin-top: auto; padding-top: 4px; }

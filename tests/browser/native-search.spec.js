@@ -329,9 +329,19 @@ test('a research-only company can be recovered without leaving the directory', a
   const query = 'Humans in the Loop';
   const literal = '  ' + query + '  ';
   await directorySearch.fill(literal);
-  const origin = page.url();
+  const group = page.getByRole('combobox', { name: 'Business group' });
+  const allGroups = page.getByRole('button', { name: 'Search all groups' });
   const recovery = page.getByRole('link', { name: 'Search the full guide' });
+  await expect(recovery).toBeHidden();
+  if (isMobile) await allGroups.tap();
+  else await allGroups.press('Enter');
+  await expect(group).toHaveValue('');
+  await expect(directorySearch).toHaveValue(literal);
+  await expect(directorySearch).toBeFocused();
+  await expect(page).toHaveURL('/companies/?q=Humans+in+the+Loop#main');
+  const origin = page.url();
   const fallbackHref = '/?search=++Humans+in+the+Loop++#browse-guide';
+  await expect(recovery).toBeVisible();
   await expect(recovery).toHaveAttribute('href', fallbackHref);
   if (isMobile) await recovery.tap();
   else await recovery.press('Enter');
@@ -345,7 +355,7 @@ test('a research-only company can be recovered without leaving the directory', a
   await expect(dialog).toBeHidden();
   await expect(recovery).toBeFocused();
   await expect(directorySearch).toHaveValue(literal);
-  await expect(page.getByRole('combobox', { name: 'Business group' })).toHaveValue('expert-data-evaluation');
+  await expect(group).toHaveValue('');
   await expect(page).toHaveURL(origin);
 
   if (isMobile) await recovery.tap();
