@@ -1335,20 +1335,77 @@ def _edition_downloads(context, metadata, ledger_path, reuse_path):
         + '. Credit the publisher, release ID, original sources, and your changes. Source material retains its own rights and qualifications.</p></section>')
 
 
+_LOOKUP_SPAN = r'([0-9]{1,7})(?:\s*[-–]\s*(?:LF?)?([0-9]{1,7}))?\b'
+_LOOKUP_LINE = re.compile(rf'\b(?:lines?\s*|LF\s*|(?<=:)L){_LOOKUP_SPAN}', re.I)
+_LOOKUP_PDF_PAGE = re.compile(rf'\b(?:physical PDF|PDF|physical) (?:pages?|pp?\.?)\s*{_LOOKUP_SPAN}', re.I)
+_LOOKUP_PDF_PAGE_LINE = re.compile(
+    r'\bphysical (?:PDF )?(?:page|p\.?)\s*([0-9]{1,7})\b'
+    r'(?:, separately extracted[^;]*; one-based literal LF|[, ]+(?:per-page )?pdftotext(?:-layout)? lines?\s*)'
+    + _LOOKUP_SPAN, re.I)
+_LOOKUP_SECTION_START = re.compile(r'^(?:Abstract|Appendix|Dataset card|Figure|Section|Table)\b', re.I)
+_LOOKUP_TECHNICAL_METADATA = re.compile(
+    r'\b(?:[a-f0-9]{32,}|https?|sha-?256|manifest|capsule|private|pinned|withheld|'
+    r'record|metadata[ _]only|historical[ _]reference|capture[d]? (?:status|on))\b', re.I)
+
+
+def _lookup_coordinate(kind, start, end=None):
+    if end and int(end) != int(start):
+        return f'{kind}s {int(start)}–{int(end)}'
+    return f'{kind} {int(start)}'
+
+
+def _source_lookup_locator(value):
+    """Project an existing location from the public locator into a short search hint."""
+    locator = ' '.join(value.split())
+    first, _, rest = locator.partition('; ')
+    section = ''
+    number = ''
+    if match := _LOOKUP_PDF_PAGE_LINE.search(locator):
+        page, start, end = match.groups()
+        number = f'PDF {_lookup_coordinate("page", page)} · {_lookup_coordinate("line", start, end)}'
+    elif match := _LOOKUP_LINE.search(locator):
+        number = _lookup_coordinate('Text line', *match.groups())
+    elif match := _LOOKUP_PDF_PAGE.search(locator):
+        number = 'PDF ' + _lookup_coordinate('page', *match.groups())
+
+    if first.startswith('Captured extracted text lines '):
+        section = rest.partition('; ')[0]
+    elif _LOOKUP_SECTION_START.match(first) or rest.startswith('raw UTF-8 LF lines '):
+        section = first
+    elif _LOOKUP_PDF_PAGE.fullmatch(first.removesuffix(' (1-based)')):
+        section = rest.partition('; ')[0]
+    if (re.fullmatch(r"[\w .,:/’'()+&–—-]{2,78}", section)
+            and any(char.isalpha() for char in section) and not _LOOKUP_TECHNICAL_METADATA.search(section)):
+        hint = f'{section} · {number}' if number else section
+        if len(hint) <= 112:
+            return hint
+    return number
+
+
 def _source_lookup(context):
+    def label(value):
+        return ' '.join(value.split()).casefold()
+
     sources = [source for source in _ledger_records(context)[2].values() if not source.get('_withheld')]
-    titles = Counter((source['title'], source['publisher']) for source in sources)
+    titles = Counter((label(source['title']), label(source['publisher'])) for source in sources)
     records = []
     for source in sorted(sources, key=lambda row: (row['title'].casefold(), row['publisher'].casefold(), row['id'])):
         record = {'title': source['title'], 'publisher': source['publisher'],
                   'href': _evidence_url('source', source['id'])}
         if source['captured_on']:
             record['captured'] = _date(source['captured_on'])
-        if titles[source['title'], source['publisher']] > 1:
-            locator = ' '.join(source['locator'].split())
-            record['locator'] = locator if len(locator) <= 112 else locator[:111].rstrip() + '…'
-        records.append(record)
-    return {'version': 1, 'sources': records}
+        if titles[label(source['title']), label(source['publisher'])] > 1:
+            if hint := _source_lookup_locator(source['locator']):
+                record['locator'] = hint
+        detail = record['publisher'] + (f' · Captured {record["captured"]}' if 'captured' in record else '')
+        description = (label(record['title']), label(detail + ' ' + record.get('locator', '')))
+        records.append((record, source['id'], description))
+
+    descriptions = Counter(description for _, _, description in records)
+    for record, stable_id, description in records:
+        if descriptions[description] > 1:
+            record['locator'] = 'Record ' + stable_id
+    return {'version': 1, 'sources': [record for record, _, _ in records]}
 
 
 def _source_lookup_panel():

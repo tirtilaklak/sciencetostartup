@@ -601,14 +601,24 @@ console.log(JSON.stringify({scenarios: scenarios.length, passed: true}));
         self.assertEqual(payload['version'], 1)
         public_ids = {pin['source_id'] for claim in self.context['graph']['assertions']
                       if claim['status'] in {'approved', 'historical'} for pin in claim['evidence']}
-        expected = {rp._evidence_url('source', row['id']): (row['title'], row['publisher'])
+        expected = {rp._evidence_url('source', row['id']): (row['title'], row['publisher'],
+                    rp._date(row['captured_on']) if row['captured_on'] else None)
                     for row in self.context['graph']['sources'] if row['id'] in public_ids}
-        actual = {row['href']: (row['title'], row['publisher']) for row in payload['sources']}
+        actual = {row['href']: (row['title'], row['publisher'], row.get('captured')) for row in payload['sources']}
         self.assertEqual(len(actual), len(payload['sources']))
         self.assertEqual(actual, expected)
+        labels = set()
         for row in payload['sources']:
             self.assertTrue({'title', 'publisher', 'href'} <= set(row) <= {'title', 'publisher', 'href', 'captured', 'locator'})
-            self.assertLessEqual(len(row.get('locator', '')), 112)
+            hint = row.get('locator', '')
+            self.assertLessEqual(len(hint), 112)
+            self.assertNotRegex(hint, r'(?i)\b(?:[a-f0-9]{40,}|sha-?256|capsule|metadata[ _]only|historical[ _]reference)\b')
+            if hint.startswith('Record '):
+                self.assertEqual(hint, 'Record ' + unquote(urlsplit(row['href']).fragment).removeprefix('source-'))
+            detail = row['publisher'] + (f' · Captured {row["captured"]}' if 'captured' in row else '')
+            label = tuple(' '.join(part.split()).casefold() for part in (row['title'], detail + ' ' + hint))
+            self.assertNotIn(label, labels, row['href'])
+            labels.add(label)
 
         live = ReaderTree(self.page('/research/data/'))
         form, = (node for node in live.elements if node['tag'] == 'form' and 'data-source-lookup' in node['attrs'])
@@ -621,6 +631,30 @@ console.log(JSON.stringify({scenarios: scenarios.length, passed: true}));
                 html = self.page(path)
                 self.assertNotIn('data-source-lookup', html)
                 self.assertNotIn('/research-source-lookup.js', html)
+
+    def test_source_lookup_uses_public_coordinates_and_record_ids(self):
+        digest = 'a' * 64
+        pdf = (f'Public primary source; raw response SHA256 {digest}; '
+               'physical PDF page 3, separately extracted with pdftotext -layout UTF8; '
+               'one-based literal LF6-18 inclusive')
+        locators = {
+            'paper': (pdf, 'PDF page 3 · lines 6–18'),
+            'faq': ('Captured extracted text lines 76-81; Pricing FAQ', 'Pricing FAQ · Text lines 76–81'),
+            'section': ('Abstract, task coverage', 'Abstract, task coverage'),
+            'file': ('provider-123.txt:L76-L76; extraction manifest', 'Text line 76'),
+            'raw': (f'Captured extracted text lines 90-100; capsule metadata_only SHA256 {digest}', 'Text lines 90–100'),
+            'collision-a': ('PDF p. 3; first paragraph', 'Record collision-a'),
+            'collision-b': ('PDF p. 3; first paragraph', 'Record collision-b'),
+            'missing-a': (f'Pinned response SHA256 {digest}', 'Record missing-a'),
+            'missing-b': (f'Pinned response SHA256 {digest}', 'Record missing-b'),
+        }
+        sources = {sid: {'id': sid, 'title': 'A study', 'publisher': 'A lab', 'captured_on': None, 'locator': locator}
+                   for sid, (locator, _) in locators.items()}
+        sources['collision-b'].update(title=' A  Study ', publisher='A Lab')
+        expected = {rp._evidence_url('source', sid): hint for sid, (_, hint) in locators.items()}
+        lookup = rp._source_lookup({'_render_ledger': ({}, {}, sources)})
+        self.assertEqual({row['href']: row.get('locator') for row in lookup['sources']}, expected)
+        self.assertEqual(rp._source_lookup({'_render_ledger': ({}, {}, dict(reversed(sources.items())))}), lookup)
 
     def test_source_and_assertion_permalinks_resolve_to_unique_visible_targets(self):
         self.build()
