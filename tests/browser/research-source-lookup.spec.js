@@ -1,5 +1,8 @@
 const { test, expect } = require('@playwright/test');
 
+// Keep failure screenshots without serializing the full evidence catalog at every action.
+test.use({ trace: { mode: 'retain-on-failure', snapshots: false, screenshots: true, sources: true } });
+
 const catalog = '/research/data/';
 const indexPath = '/research/data/source-lookup.json';
 const title = 'Prolific Pricing | Platform & managed services | Prolific';
