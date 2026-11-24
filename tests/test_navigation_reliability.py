@@ -7,6 +7,8 @@ from test_site_search import run_stub
 class NavigationReliabilityTests(unittest.TestCase):
     def test_explore_search_routes_papers_and_employment_without_stealing_editing_keys(self):
         result = run_stub(r'''
+Object.defineProperty(location,'href',{get:()=>`https://example.test/explore/${location.hash}`});
+Object.assign(context,{scrollX:0,scrollY:window.scrollY});
 run('initialize()');
 run(`window.SEARCH_INDEX={workTitles:['Research Fellow'],researchSearchEntries:[
  {title:'InstructGPT',summary:'Approved',url:'/research/papers/paper.arxiv.2203.02155/',kind:'paper',recordKind:'paper',identifiers:['2203.02155','10.48550/arXiv.2203.02155']},
