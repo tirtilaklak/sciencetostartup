@@ -1,5 +1,7 @@
 const { test, expect } = require('@playwright/test');
 const canonical = 'https://sciencetostartup.com';
+const directoryCount = require('../../data/canonical.json').companies.length
+  + require('../../data/current-companies.json').entries.length;
 
 async function openCompareSetup(page) {
   const setup = page.locator('#compare-setup');
@@ -97,7 +99,7 @@ test('the directory offers historical comparisons and current-only profile links
   await expect(results.locator('.directory-compare')).toHaveCount(0);
   await expect(page.getByRole('link', { name: 'Compare companies', exact: true })).toHaveAttribute('href', '/explore/#compare');
   await page.getByRole('button', { name: 'Clear', exact: true }).click();
-  await expect(results).toHaveCount(55);
+  await expect(results).toHaveCount(directoryCount);
   const historical = results.locator('.directory-compare');
   await expect(historical).toHaveCount(39);
   expect(await historical.evaluateAll(links => links.every(link =>
@@ -149,17 +151,17 @@ test('a fresh-document Back reopens the directory sources left open before a pro
 test('the directory links to native profile sources when it shows no evidence preview', async ({ page, context, baseURL }) => {
   await mirrorPublishedOrigin(context, baseURL);
   await page.setViewportSize({ width: 320, height: 720 });
-  const directory = canonical + '/companies/?q=APTO';
+  const directory = canonical + '/companies/?q=Giskard';
   await page.goto(directory);
-  const opener = page.getByRole('link', { name: 'Profile sources for APTO', exact: true });
+  const opener = page.getByRole('link', { name: 'Profile sources for Giskard', exact: true });
   await expect(opener).toBeInViewport({ ratio: 1 });
   await opener.press('Enter');
-  await expect(page).toHaveURL(canonical + '/company/apto/#sources');
+  await expect(page).toHaveURL(canonical + '/company/giskard/#sources');
   const disclosure = page.locator('#sources');
   await expect(disclosure).toBeInViewport({ ratio: 1 });
   await expect(disclosure.locator('..')).toHaveJSProperty('open', true);
-  await expect(page.getByRole('link', { name: 'Company profile and history', exact: true }))
-    .toHaveAttribute('href', 'https://apto.co.jp/company/about-us/');
+  await expect(page.getByRole('link', { name: 'About Giskard: team and funding timeline', exact: true }))
+    .toHaveAttribute('href', 'https://www.giskard.ai/about');
   await page.goBack();
   await expect(page).toHaveURL(directory);
   await expect(opener).toBeFocused();
@@ -171,7 +173,7 @@ test.describe('without JavaScript', () => {
   test('the native directory retains its profile links and exact Compare destinations', async ({ page }) => {
     await page.goto('/companies/?q=Mercor');
     await expect(page.locator('#company-filters')).toBeHidden();
-    await expect(page.locator('[data-company]:visible')).toHaveCount(55);
+    await expect(page.locator('[data-company]:visible')).toHaveCount(directoryCount);
     await expect(page.getByRole('navigation', { name: 'Business groups' })).toBeVisible();
     await expect(page.getByRole('link', { name: 'Mercor', exact: true })).toHaveAttribute('href', /\/company\/mercor\/$/);
     await page.getByRole('link', { name: 'Compare Mercor', exact: true }).click();

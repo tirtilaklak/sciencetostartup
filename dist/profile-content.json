@@ -751,7 +751,44 @@
             "micro1.claim.major-products-0"
           ]
         }
-      ]
+      ],
+      "current_facts": {
+        "reviewed_on": "2026-11-19",
+        "rows": [
+          {
+            "label": "Company update",
+            "value": "18 Nov 2026 · flow qc",
+            "source_indexes": [
+              0
+            ]
+          },
+          {
+            "label": "Stated screening scope",
+            "value": "Benchmark contamination and duplicate tasks",
+            "source_indexes": [
+              0
+            ]
+          },
+          {
+            "label": "Evidence basis",
+            "value": "Company-described capability",
+            "source_indexes": [
+              0
+            ]
+          }
+        ],
+        "sources": [
+          {
+            "url": "https://www.micro1.ai/blog/every-task-checked-against-every-public-benchmark",
+            "title": "Every task, checked against every public benchmark",
+            "published_on": "2026-11-18",
+            "observed_on": "2026-11-19",
+            "response_sha256": "e96d9c6f0c14b30ec222f6c02afd8a29e883e519147dd2780e68d64d858615ee",
+            "locator": "Article date; TL;DR; How it works; Flag. Retained text.txt lines 26–43, 52–72.",
+            "content_kind": "raw_http_body"
+          }
+        ]
+      }
     },
     {
       "company_id": "turing",
@@ -1851,14 +1888,7 @@
           ]
         }
       ],
-      "historical_notes": [
-        {
-          "text": "EXL completed its acquisition of iMerit on August 3, 2026.",
-          "claim_ids": [
-            "imerit.claim.oct14-acquisition-completed"
-          ]
-        }
-      ],
+      "historical_notes": [],
       "notes": [],
       "current_facts": {
         "reviewed_on": "2026-11-16",
@@ -3752,7 +3782,56 @@
           ]
         }
       ],
-      "notes": []
+      "notes": [],
+      "current_facts": {
+        "reviewed_on": "2026-11-19",
+        "rows": [
+          {
+            "label": "Head office relocated",
+            "value": "Effective 19 Nov 2026 · completed",
+            "source_indexes": [
+              0,
+              1
+            ]
+          },
+          {
+            "label": "Current head office",
+            "value": "5F, Yunuo Building, 23-1 Kanda Higashimatsushita-cho, Chiyoda-ku, Tokyo 101-0042, Japan",
+            "source_indexes": [
+              0,
+              1
+            ]
+          },
+          {
+            "label": "Toyosu Data Factory",
+            "value": "Address unchanged",
+            "source_indexes": [
+              0,
+              1
+            ]
+          }
+        ],
+        "sources": [
+          {
+            "url": "https://apto.co.jp/en/news/notice-of-head-office-relocation/",
+            "title": "Notice of Head Office Relocation | APTO News",
+            "published_on": "2026-11-19",
+            "observed_on": "2026-11-19",
+            "response_sha256": "c088350cc2ab5d86a03d60f258dd5e0247cebbef9f31822e860bdf4ede0bebec",
+            "locator": "News date; relocation statement; New head office; Toyosu Data Factory note. Retained text.txt lines 34–39.",
+            "content_kind": "raw_http_body"
+          },
+          {
+            "url": "https://apto.co.jp/news/4060/",
+            "title": "本社移転のお知らせ | お知らせ | 株式会社APTO | イノベーティブなアノテーションでAI開発に変革を",
+            "published_on": "2026-11-19",
+            "observed_on": "2026-11-19",
+            "response_sha256": "220025b98889a39979143eaf476119c0f418b55e904c6b37444de0de0340bdfb",
+            "locator": "Article date and completed move; new head office address; Toyosu unchanged. Retained text.txt lines 92–102.",
+            "content_kind": "raw_http_body"
+          }
+        ]
+      }
     },
     {
       "company_id": "g2i",
@@ -4599,7 +4678,73 @@
           ]
         }
       ],
-      "notes": []
+      "notes": [],
+      "current_facts": {
+        "reviewed_on": "2026-11-25",
+        "rows": [
+          {
+            "label": "Reporting entity",
+            "value": "Prolific Academic Ltd · UK trading subsidiary",
+            "source_indexes": [
+              0,
+              1
+            ]
+          },
+          {
+            "label": "FY2025 UK subsidiary revenue",
+            "value": "£28,615,723 · year ended 31 Dec 2025",
+            "source_indexes": [
+              0,
+              1
+            ]
+          },
+          {
+            "label": "FY2025 subsidiary revenue split",
+            "value": "£19,314,503 commissions + £9,301,220 intra-group management income",
+            "source_indexes": [
+              0,
+              1
+            ]
+          },
+          {
+            "label": "Parent in FY2025 accounts",
+            "value": "Prolific Technologies Inc · 100% owner",
+            "source_indexes": [
+              0,
+              1
+            ]
+          }
+        ],
+        "sources": [
+          {
+            "url": "https://find-and-update.company-information.service.gov.uk/company/08991598/filing-history/MzU0ODI5NTc4M2FkaXF6a2N4/document?format=xhtml&download=1",
+            "title": "Prolific Academic Ltd FY2025 accounts (official iXBRL/XHTML filing)",
+            "published_on": "2026-09-29",
+            "observed_on": "2026-11-25",
+            "response_sha256": "b088cbe00903fb4da20697c3d689d7cfbf03df24c86a2c25ea4109f48899adb1",
+            "content_kind": "raw_http_body",
+            "locator": "Official iXBRL accounts, year ended 31 December 2025: cover; income statement; accounting policies 1.1-1.3; Note 3 Revenue; Note 25 Controlling party."
+          },
+          {
+            "url": "https://find-and-update.company-information.service.gov.uk/company/08991598/filing-history/MzU0ODI5NTc4M2FkaXF6a2N4/document",
+            "title": "Prolific Academic Ltd annual report and financial statements, year ended 31 December 2025",
+            "published_on": "2026-09-29",
+            "observed_on": "2026-11-25",
+            "response_sha256": "74de19a2a4ee0a67325a1c1e84012141c277eb5c6dd2f8c57b6a398187b26f7b",
+            "content_kind": "raw_http_body",
+            "locator": "Annual accounts: cover PDF p.1; income statement PDF p.12 (printed p.9); accounting policies PDF p.16 (printed p.13); Note 3 Revenue PDF p.20 (printed p.17); Note 25 Controlling party PDF p.28 (printed p.25)."
+          },
+          {
+            "url": "https://find-and-update.company-information.service.gov.uk/company/08991598/filing-history",
+            "title": "Companies House filing history for Prolific Academic Ltd (08991598)",
+            "published_on": null,
+            "observed_on": "2026-11-25",
+            "response_sha256": "cd100d639d7abc2ef07bca12a1b405de996b7053780f430c509292dd1fbf7137",
+            "content_kind": "raw_http_body",
+            "locator": "Filing history, 29 September 2026: full accounts made up to 31 December 2025, with direct PDF and iXBRL links."
+          }
+        ]
+      }
     },
     {
       "company_id": "rws_trainai",
@@ -4675,7 +4820,44 @@
           ]
         }
       ],
-      "notes": []
+      "notes": [],
+      "current_facts": {
+        "reviewed_on": "2026-11-25",
+        "rows": [
+          {
+            "label": "Reporting scope",
+            "value": "RWS Holdings plc group · not standalone TrainAI",
+            "source_indexes": [
+              0
+            ]
+          },
+          {
+            "label": "Expected FY2026 group revenue",
+            "value": "About £700 million · unaudited expectation",
+            "source_indexes": [
+              0
+            ]
+          },
+          {
+            "label": "Financial year ended",
+            "value": "30 Sep 2026 · statement dated 27 Oct 2026",
+            "source_indexes": [
+              0
+            ]
+          }
+        ],
+        "sources": [
+          {
+            "url": "https://www.investegate.co.uk/announcement/rns/rws-holdings--rws/trading-statement/9842326",
+            "title": "RWS Holdings plc Year End Trading Statement and Notice of Results",
+            "published_on": "2026-10-27",
+            "observed_on": "2026-11-25",
+            "response_sha256": "88353b249e742800d8bb32899fe792a46fa4f90f2b2398923aa2cdcbe287cd9d",
+            "content_kind": "raw_http_body",
+            "locator": "Issuer RNS, Year End Trading Statement and Notice of Results (27 October 2026): unaudited year ended 30 September 2026; expected c. GBP700m reported group revenue. Original announcement body, excluding the publisher's AI summary."
+          }
+        ]
+      }
     },
     {
       "company_id": "terac",
