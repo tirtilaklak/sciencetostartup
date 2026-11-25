@@ -1,0 +1,385 @@
+{
+  "schema_version": "1.0.0",
+  "date": "2026-11-25",
+  "timezone": "America/Los_Angeles",
+  "compiled_at": "2026-11-25T16:08:35.320506+00:00",
+  "items": [
+    {
+      "id": "arxiv-2611-33102",
+      "title": "Archived rollouts can recover a model’s reinforcement learning",
+      "kind": "Paper",
+      "topics": [
+        "RLHF",
+        "Evaluation"
+      ],
+      "publisher": "Jiayi Sheng and coauthors",
+      "published_on": "2026-11-24",
+      "date_basis": "arXiv v1 submission (UTC): 2026-11-24T18:38:06Z; no later revision listed at retrieval. The Nov25 announcement is not the submission date.",
+      "explanation": [
+        "A reinforcement-learning run can leave useful training data behind in the answers it generates.",
+        "Starting from the same initial model, the authors recover its learning curve by fitting those saved answers in their original order, including incorrect ones and ignoring rewards.",
+        "This suggests preserving rollout archives for reuse.",
+        "The experiments recover existing training progress in models up to four billion parameters; they do not remove the cost of the original run."
+      ],
+      "focus": "Reinforcement Learning Can Be Recovered From Its Own Rollouts. Preserve ordered training traces as reusable assets.",
+      "finding": "For Qwen3-1.7B, chronological supervised training averaged 0.2–1.1 percentage points of pass@k trajectory error across four benchmarks. Replaying the original RL objective collapsed in the tested settings.",
+      "caveat": "Same initialization for recovery; language models up to 4B. A last-step batch worked for Qwen3-1.7B but not SmolLM2-360M, where 50 late batches closed most of the gap.",
+      "read_scope": "Submission history; HTML sections 1–4.5, conclusion and Appendix A settings, with close reading of recovery Table 2. Population analysis read, not formally proved. No training or independent replication.",
+      "sources": [
+        {
+          "url": "https://arxiv.org/abs/2611.33102",
+          "label": "Paper and original submission history"
+        },
+        {
+          "url": "https://arxiv.org/html/2611.33102v1",
+          "label": "Versioned methods, recovery results and limits"
+        }
+      ]
+    },
+    {
+      "id": "arxiv-2611-33065",
+      "title": "Human disagreements help uncover an automated judge’s biases",
+      "kind": "Paper",
+      "topics": [
+        "RLHF",
+        "Evaluation"
+      ],
+      "publisher": "Hamin Koo and coauthors",
+      "published_on": "2026-11-24",
+      "date_basis": "arXiv v1 submission (UTC): 2026-11-24T18:05:47Z; no later revision listed at retrieval. NeurIPS2026 is the stated venue, not a separately verified release date.",
+      "explanation": [
+        "HuB-J starts with cases where people and automated judges disagree, then uses a language model to identify possible sources of bias.",
+        "It rewrites rejected answers at different strengths to measure which features change a judge’s decision.",
+        "Comprehensive lists produced frequent preference changes in the tested judges.",
+        "These are controlled rewriting tests, and the rewrites did not always preserve meaning, so the results need care when applied to ordinary evaluations."
+      ],
+      "focus": "Auditing the Judge: Human-Derived Bias Discovery, Quantification, and Mitigation in LLM Judges. Discover and stress-test judge-specific preference factors.",
+      "finding": "Across five judges and 500 held-out agreement pairs, comprehensive-list rewrites produced a mean 28.6% flip score; ties or inconsistent order decisions count as half.",
+      "caveat": "Ten annotators each checked 25 pairs for meaning preservation: 86% overall, 70% for narratives. The 31.8% mitigation figure is regression-estimated bias attribution, not a real-world correction rate. Author-linked code returned 404.",
+      "read_scope": "Submission history; HTML methods, results, limitations, dataset splits, human checks and regression appendix. Author-linked repository and project-page availability checks. No code execution or independent replication.",
+      "sources": [
+        {
+          "url": "https://arxiv.org/abs/2611.33065",
+          "label": "Paper and original submission history"
+        },
+        {
+          "url": "https://arxiv.org/html/2611.33065v1",
+          "label": "Versioned audit methods, results and human-check limits"
+        }
+      ]
+    },
+    {
+      "id": "arxiv-2611-33148",
+      "title": "Agent policies can transfer without copying full reasoning",
+      "kind": "Paper",
+      "topics": [
+        "RLHF",
+        "Evaluation"
+      ],
+      "publisher": "Dawid J. Kopiczko and coauthors",
+      "published_on": "2026-11-24",
+      "date_basis": "arXiv v1 submission (UTC): 2026-11-24T18:58:53Z; no later revision listed at retrieval. The Nov25 announcement is not the submission date.",
+      "explanation": [
+        "CoT-Proxy teaches an agent from a stronger model’s actions, optionally adding short reasoning summaries.",
+        "The student’s reasoning block stays empty during training, and a replay penalty limits drift from its starting model.",
+        "The authors report gains on application tasks and code repairs when the student later reasons for itself.",
+        "The strongest code-repair setting used one training run, so its headline gain has limited evidence about repeatability."
+      ],
+      "focus": "CoT-Proxy: Cross-Format Transfer for Distilling Long-Horizon Policies. Learn agent actions while retaining the student’s own inference-time reasoning.",
+      "finding": "With closed-teacher actions and API summaries, Qwen3-4B task success rose from 7.3% to 48.2% on AppWorld; SWE-bench Verified rose from 2.7% to 27.8%.",
+      "caveat": "Two student sizes and two environments with LoRA. AppWorld averages three seeds; closed-teacher SWE-bench uses one seed, 2,970 successful training trajectories and five passes. No paper-specific implementation was verified.",
+      "read_scope": "Submission history; HTML methods, setup, main results, selected ablations, conclusion and paired comparisons. No code execution or independent replication; no paper-specific implementation link verified.",
+      "sources": [
+        {
+          "url": "https://arxiv.org/abs/2611.33148",
+          "label": "Paper and original submission history"
+        },
+        {
+          "url": "https://arxiv.org/html/2611.33148v1",
+          "label": "Versioned training recipe, results and seed accounting"
+        }
+      ]
+    },
+    {
+      "id": "arxiv-2611-27155",
+      "title": "Four-bit reward models can change which answer wins",
+      "kind": "Paper",
+      "topics": [
+        "RLHF",
+        "Evaluation"
+      ],
+      "publisher": "Omkar Shewale and coauthors",
+      "published_on": "2026-11-20",
+      "date_basis": "arXiv v1 submission (UTC): 2026-11-20T05:39:34Z",
+      "explanation": [
+        "Reducing a reward model to four-bit weights can leave its benchmark accuracy almost unchanged while altering which answers it prefers.",
+        "Across the tested models, many preference decisions flipped, especially when the original scores were close.",
+        "Downstream selection often chose a different response but usually kept the same final answer.",
+        "The useful check is decision and answer disagreement; these experiments do not establish a uniform decline in quality."
+      ],
+      "focus": "The Vulnerability Window: Decision Instability in Quantized Reward Models. Decision changes hidden by near-constant aggregate accuracy after reward-model quantization.",
+      "finding": "The authors report: Eight scalar reward models, three generative judges and four 4-bit quantizers: 1.1–12.3% RewardBench decision flips; downstream unique-selection changes of 14.6–65.7% versus 2.6–9.6% changed final answers across six model/quantizer pairs.",
+      "caveat": "Weight-only 4-bit; math-only downstream selection, two reward-model families, one generator and arbiter. Harm varies by model and quantizer. The Gaussian model fails for generative judges; margin routing does not beat plain top-k.",
+      "read_scope": "Submission history; selected full-text setup, churn, harm, downstream selection, diagnostic comparisons and limitations. Full HTML captured; no execution or reproduction.",
+      "sources": [
+        {
+          "url": "https://arxiv.org/abs/2611.27155",
+          "label": "primary paper and submission history"
+        },
+        {
+          "url": "https://arxiv.org/html/2611.27155v1",
+          "label": "versioned primary full text"
+        }
+      ]
+    },
+    {
+      "id": "arxiv-2611-32294",
+      "title": "A small scorer chooses pretraining documents as learning changes",
+      "kind": "Paper",
+      "topics": [
+        "Data",
+        "Evaluation"
+      ],
+      "publisher": "Simin Fan and Martin Jaggi",
+      "published_on": "2026-11-24",
+      "date_basis": "arXiv v1 submission (UTC): 2026-11-24T09:54:25Z; no later revision listed at retrieval. The linked repository predates the paper; its creation and push timestamps do not establish a separate public release date.",
+      "explanation": [
+        "DAiSy learns which documents to train on as the language model changes.",
+        "A small scoring model learns from documents already used in training, then ranks new candidates without running the full language model on each one.",
+        "The authors report gains over several selection baselines in small language-model pretraining.",
+        "Target choice matters: steering strongly toward benchmark-like material can worsen general web-text performance, and each training configuration was run only once."
+      ],
+      "focus": "DAiSy: Online Data Selection by Adaptive Utility Estimation for LLM Pretraining. Learn a changing document-utility score from fixed embeddings and ordinary training gradients.",
+      "finding": "At 720M parameters and 33.6B training tokens, the high-quality web target with a 64-fold candidate window reaches 53.05% average zero-shot accuracy across eight tasks, versus 52.15% for the FineWeb-Edu baseline. The 124M, four-fold-window cost accounting reports about 5.6% extra training FLOPs.",
+      "caveat": "Only 124M and 720M English models; multilingual experiments use 124M. One random seed per run. Embeddings must be computed for the corpus first. Larger candidate windows can worsen general-web loss; improved target-task loss is not a universal quality gain or a zero-overhead claim. The 5.6% figure is analytic FLOP overhead. Equal-token 124M runs took 32.6–43.4 GPU-hours versus 28.8 for uniform sampling; precomputed embeddings add prior cost.",
+      "read_scope": "Read submission history; full-text method, target construction, main Tables 1–2, cost accounting and limitations; official README, complete tree and online scorer/ridge/selection code. Inspected code only; no training, model downloads, API inference or independent replication.",
+      "sources": [
+        {
+          "url": "https://arxiv.org/abs/2611.32294",
+          "label": "Primary paper and submission history"
+        },
+        {
+          "url": "https://arxiv.org/html/2611.32294v1",
+          "label": "Versioned full text, results and cost limits"
+        },
+        {
+          "url": "https://github.com/Olivia-fsm/daisy_official",
+          "label": "Author-linked reference implementation"
+        }
+      ]
+    },
+    {
+      "id": "arxiv-2611-32631",
+      "title": "Generate the record first to build labeled conversation data",
+      "kind": "Paper",
+      "topics": [
+        "Data",
+        "Evaluation"
+      ],
+      "publisher": "Konrad Stolte and Toni Fetzer",
+      "published_on": "2026-11-24",
+      "date_basis": "arXiv v1 submission (UTC): 2026-11-24T13:52:24Z; no later revision listed at retrieval. Repository metadata predates the paper (created September 9; pushed October 23); corpus generation dates are not public release dates.",
+      "explanation": [
+        "Conversim creates a structured record first, then asks a model to write a dialogue from it.",
+        "Explicit choices about speakers and topic order make the generated examples more varied.",
+        "A small German clinical extraction test improved when trained on these varied examples.",
+        "This is a useful pattern for building labeled conversation data, but the evaluation used acted scripts from the same generator and does not establish reliability on real consultations."
+      ],
+      "focus": "Generating Schema-Aligned Synthetic Dialogues and Measuring Their Diversity. Build paired conversation/record data without annotating each generated transcript afterward.",
+      "finding": "With 51 training dialogues per condition, Apertus 8B field accuracy is 64.8% with the full configuration versus 57.5% with the earlier narrow run, evaluated on 28 acted scripts; difference 7.3 percentage points, dialogue-bootstrap interval 4.5–10.4. The tree contains 401 record/script pairs, 51 script-only controls and 28 held-out pairs.",
+      "caveat": "One German STI/HIV schema and one training run per condition; the held-out conversations are generated scripts performed by people. The inspected validator checks dialogue format rather than factual completeness. Audio and the earlier control records are withheld. Synthetic profiles are designed coverage, not a population sample.",
+      "read_scope": "Read submission history and full-text generation, corpus, diversity, downstream test and limits. Inspected complete repository tree, README/data manifest/schema, generation and validation code, plus one main and one held-out record/script pair. No library run, training, audio generation or score replication.",
+      "sources": [
+        {
+          "url": "https://arxiv.org/abs/2611.32631",
+          "label": "Primary paper and submission history"
+        },
+        {
+          "url": "https://arxiv.org/html/2611.32631v1",
+          "label": "Versioned full text and small downstream test"
+        },
+        {
+          "url": "https://github.com/cronn/conversim",
+          "label": "Author-linked generator and data"
+        },
+        {
+          "url": "https://github.com/cronn/conversim/tree/master/dataset",
+          "label": "Dataset scope, split descriptions and restrictions"
+        }
+      ]
+    },
+    {
+      "id": "arxiv-2611-29972",
+      "title": "Calendar tests expose a gap between synthetic and realistic questions",
+      "kind": "Paper",
+      "topics": [
+        "Data",
+        "Evaluation"
+      ],
+      "publisher": "Melika Shirian and coauthors",
+      "published_on": "2026-11-23",
+      "date_basis": "arXiv v1 submission (UTC): 2026-11-23T03:40:13Z; no later revision listed at retrieval.",
+      "explanation": [
+        "CivilTime-Bench tests calendar calculations such as daylight saving changes and time-zone conversions.",
+        "The benchmark pairs 60,011 generated training examples with synthetic tests and 500 realistic scenarios written by a model and checked by people.",
+        "Fine-tuning scores are much higher on synthetic tests than realistic ones.",
+        "The public artifact has gaps, so these results need care before using this benchmark to select a scheduling assistant."
+      ],
+      "focus": "When 1+1 ≠ 2: Benchmarking Civil-Time Reasoning in Large Language Models. Transfer beyond generated templates.",
+      "finding": "Paper Table 6 reports 74.6–86.6% synthetic exact match; the three models with valid results on both splits reach 36.6–45.2% on HumanTime-500. Missing predictions count as wrong.",
+      "caveat": "HumanTime-500 is absent from the inspected repository tree. The published scorer accepts one ambiguity alternative, conflicting with the strict full-answer paper protocol. Some prediction dumps are incomplete or invalid.",
+      "read_scope": "Read submission history, HTML dataset/protocol, Table 6 and coverage appendix, repository README/tree and evaluate.py. No model runs or score replication.",
+      "sources": [
+        {
+          "url": "https://arxiv.org/abs/2611.29972",
+          "label": "primary paper and submission history"
+        },
+        {
+          "url": "https://arxiv.org/html/2611.29972v1",
+          "label": "versioned primary full text"
+        },
+        {
+          "url": "https://github.com/CivilTime-Bench/CivilTime-Bench",
+          "label": "official code and synthetic data"
+        }
+      ]
+    },
+    {
+      "id": "benchmarks-last-exam",
+      "title": "Audit benchmark tasks before trusting their scores",
+      "kind": "Paper",
+      "topics": [
+        "Data",
+        "Evaluation"
+      ],
+      "publisher": "Authors (arXiv preprint)",
+      "published_on": "2026-11-20",
+      "date_basis": "arXiv v1 submission (UTC): 2026-11-20T13:50:06Z",
+      "explanation": [
+        "A benchmark can reject a correct solution when its instructions, files, and grader disagree.",
+        "This paper combines the authors’ reviews of 749 tasks across eight benchmarks and reports that most confirmed defects deny credit to compliant work.",
+        "Its audit categories suggest concrete checks for evaluation builders, but the study does not measure how repaired tasks would change model rankings."
+      ],
+      "focus": "Benchmarks’ Last Exam. Review task validity before turning benchmark outcomes into model-selection decisions or training rewards.",
+      "finding": "The authors report: The authors classify 336 tasks as having confirmed defects; 241 of those defects (71.7%) withhold credit. Four benchmark cohorts are complete censuses and four are stratified 100-task samples.",
+      "caveat": "Reviews come from the authors’ own lab and shared rubric; model cohorts were not rerun on repaired harnesses. Isolation and curation comparisons are observational across benchmarks with different domains and workflows. Public repository tree contains reports but no .py or .csv files, so manuscript claims about archived scripts/CSV summaries were not verified.",
+      "read_scope": "Read abstract/history; HTML §2.1, §3.2, §4.1–4.2, §5–6; official repository README and recursive tree. Did not audit each underlying task or reproduce scores.",
+      "sources": [
+        {
+          "url": "https://arxiv.org/abs/2611.27622",
+          "label": "abstract and history"
+        },
+        {
+          "url": "https://arxiv.org/html/2611.27622v1",
+          "label": "paper"
+        },
+        {
+          "url": "https://github.com/ZekkiCat/Benchmarks-Last-Exam",
+          "label": "official reports"
+        }
+      ]
+    },
+    {
+      "id": "company-langfuse-topics-beta-20261124",
+      "title": "Langfuse launches Topics in public beta",
+      "kind": "Release",
+      "topics": [
+        "Companies",
+        "Data",
+        "Evaluation"
+      ],
+      "publisher": "Langfuse",
+      "published_on": "2026-11-24",
+      "date_basis": "Official launch visibly dated November 24, 2026 and explicitly announces public beta today in all Langfuse Cloud regions. Official v4.86.0 release published_at is 2026-11-24T18:54:46Z (not draft or prerelease); tagged source supports access changes but does not independently attest every hosted deployment.",
+      "explanation": [
+        "Langfuse launched Topics in public beta to group production traces by what users ask, their sentiment, outcomes and reported issues.",
+        "Teams can inspect the underlying conversations and use recurring problems to design more targeted evaluations.",
+        "The tool uses models chosen by the customer, so generated group names still need review.",
+        "Each new facet summary counts toward Langfuse usage, and model calls cost extra."
+      ],
+      "focus": "A public beta for discovering patterns in existing production traces, available on Langfuse Cloud and self-hosted v4; not a new annotation model or a general-availability claim.",
+      "finding": "The company describes summaries and embedding-based clusters for four facets, daily live maps and one-off snapshots, with links to supporting traces. Current docs describe a read-only unstable Topics API. The release removes personal-preview and deployment-wide Topics visibility gates while retaining project permissions.",
+      "caveat": "Company-described capabilities, not independently measured clustering accuracy or defect-detection performance. Clusters and names can change; similar conversations may have different outcomes. Recorded GENERATION inputs/outputs and configured models are required. Summary models receive selected trace content; embedding/grouping models receive summaries. Langfuse counts each new facet summary as a billable unit, with model-provider charges separate. No product account accessed, key configured or model calls made.",
+      "read_scope": "Full dated official launch and current documentation covering method, setup, permissions, sample limits, interpretation, costs and unstable API. Full v4.86.0 release metadata/notes plus focused PR descriptions and pinned Topics access helper/README read. No runtime deployment, user-interface test or independent performance evaluation.",
+      "sources": [
+        {
+          "url": "https://langfuse.com/topics",
+          "label": "Official November 24 Topics public-beta announcement"
+        },
+        {
+          "url": "https://langfuse.com/docs/observability/features/topics",
+          "label": "Official Topics documentation: setup, interpretation and costs"
+        },
+        {
+          "url": "https://github.com/langfuse/langfuse/releases/tag/v4.86.0",
+          "label": "Official v4.86.0 tagged release"
+        },
+        {
+          "url": "https://github.com/langfuse/langfuse/blob/v4.86.0/web/src/features/topics/topicsAccess.ts",
+          "label": "Pinned release source: Topics permission check"
+        }
+      ]
+    },
+    {
+      "id": "company-braintrust-patterns-ga-20261123",
+      "title": "Braintrust makes Patterns generally available",
+      "kind": "Release",
+      "topics": [
+        "Companies",
+        "Data",
+        "Evaluation"
+      ],
+      "publisher": "Braintrust",
+      "published_on": "2026-11-23",
+      "date_basis": "Company announcement visibly dated 23 November 2026; article:published_time and JSON-LD datePublished agree. The event is general availability after a public preview, not the first preview.",
+      "explanation": [
+        "Braintrust made Patterns generally available to inspect agent traces and application logs for recurring failures and unnecessary work.",
+        "Each finding links to supporting traces and its frequency, helping teams decide what deserves investigation.",
+        "Teams can investigate further in Loop or a coding agent and turn evidence into tests, but the findings still need review.",
+        "Usage billing starts December 7."
+      ],
+      "focus": "Availability change from public preview to general availability for automated investigations of traces and application logs already stored in Braintrust.",
+      "finding": "Patterns groups suspected recurring problems with trace evidence and prevalence, then offers follow-up investigation in Loop or a coding agent. The announcement connects production evidence to baseline evaluations and reviewed fixes.",
+      "caveat": "Not an independent detection-accuracy benchmark. Findings and fixes need validation; external data access remains future-facing. Patterns and Loop consume resource-based credits; billing begins December 7. Enterprise continuation requires an eligible administrator to accept updated terms by end of December 6. Current docs require logged traces, compatible model access and project Update permission; BYOC also needs a supported Loop runtime.",
+      "read_scope": "Full dated company announcement, including preview-to-GA wording, workflow, billing and Enterprise opt-in. Current official enablement docs read after direct HTTP capture, including requirements, scheduling and credit exhaustion. Company customer anecdotes were not audited or repeated as general measured effects. No product used.",
+      "sources": [
+        {
+          "url": "https://www.braintrust.dev/blog/patterns",
+          "label": "Build better agents with Patterns — dated primary GA announcement"
+        },
+        {
+          "url": "https://docs.braintrust.dev/observe/patterns/enable",
+          "label": "Official enablement documentation — permissions, prerequisites and billing limits"
+        }
+      ]
+    },
+    {
+      "id": "company-humyn-series-a-20261118",
+      "title": "Humyn Labs raises $47 million for real-world robotics training data",
+      "kind": "Company news",
+      "topics": [
+        "Companies",
+        "Data",
+        "Evaluation"
+      ],
+      "publisher": "Humyn Labs",
+      "published_on": "2026-11-18",
+      "date_basis": "Dated primary company announcement; The primary release explicitly says November 18, 2026. Funding announcement, not a dated new dataset or general-availability product release; a separate financing close date is not stated.",
+      "explanation": [
+        "Humyn Labs announced $47 million in financing: $26 million of equity led by Accel and $21 million of venture debt.",
+        "It says the funding will expand hardware and software that record human work and turn it into labelled robotics training data, alongside deployment infrastructure in Brazil, South Korea and India.",
+        "Its data-quality and provenance claims remain company statements; no open dataset or robot-performance result accompanies this announcement."
+      ],
+      "focus": "Humyn announces $47 million comprising $26 million equity led by Accel and $21 million venture debt led by Lighthouse Canton, for capture/enrichment and deployment infrastructure.",
+      "finding": "Additional financing supports recording human work and converting it into labelled robotics training data, plus collection/deployment infrastructure in Brazil, South Korea and India.",
+      "caveat": "The $47 million total includes $21 million debt and should not be called a $47 million equity round. Revenue, geographic reach, training readiness and verified-provenance descriptions are company claims, not independently audited measurements. The announcement does not release an open dataset or show that its data causes downstream robot performance improvements.",
+      "read_scope": "Humyn Labs Raises USD 47M in Series A: Full company funding announcement, including financing split, intended use and data-capture description; revenue claim not audited.",
+      "sources": [
+        {
+          "url": "https://humynlabs.ai/blog/humyn-labs-raises-usd-47m-in-series-a",
+          "label": "Humyn Labs Raises USD 47M in Series A"
+        }
+      ]
+    }
+  ]
+}
