@@ -34,7 +34,7 @@ function browserSelection(name, project) {
 
 function listBrowserTests(args = []) {
   const listed = spawnSync(process.execPath, ['node_modules/@playwright/test/cli.js', 'test',
-    '--list', '--reporter=json', ...args], {cwd: repositoryRoot, encoding: 'utf8',
+    '--list', '--reporter=json', ...args], {cwd: repositoryRoot, encoding: 'utf8', maxBuffer: 8 * 1024 * 1024,
     env: {...process.env, CI: '1', PLAYWRIGHT_JSON_OUTPUT_FILE: '', PLAYWRIGHT_JSON_OUTPUT_NAME: '', PLAYWRIGHT_JSON_OUTPUT_DIR: ''}});
   assert.equal(listed.status, 0, listed.stderr || listed.error?.message);
   const report = JSON.parse(listed.stdout);
