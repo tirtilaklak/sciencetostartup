@@ -207,8 +207,8 @@ sanitized public deployment settings; credentials never enter the repository.
 The current `/companies/` directory also reads `data/current-companies.json`.
 This additive registry selects existing research organization profiles and
 source-bound current-only profiles without changing canonical v2.5.0, the
-published research graph or archived packages. Its 30 current additions
-bring the directory to 69 entries; the historical
+published research graph or archived packages. Its 35 current additions
+bring the directory to 74 entries; the historical
 research cohort and financial model coverage remain 39. Current cards and profile
 supplements retain exact Wikipedia sentences, permanent revisions, author-history
 links, CC BY-SA 4.0 attribution, and separately sourced current offering labels.

@@ -1318,7 +1318,44 @@
           ]
         }
       ],
-      "notes": []
+      "notes": [],
+      "current_facts": {
+        "reviewed_on": "2026-11-26",
+        "rows": [
+          {
+            "label": "Profitability (company statement)",
+            "value": "Reached profitability in 2026; measure, amount and exact accounting period undisclosed",
+            "source_indexes": [
+              0
+            ]
+          },
+          {
+            "label": "Expert network (company count)",
+            "value": "More than 4 million people; company-defined network, measurement date undisclosed",
+            "source_indexes": [
+              0
+            ]
+          },
+          {
+            "label": "Network scope",
+            "value": "Activity, paid status, vetting and available capacity unverified; separate from historical Alignerr counts",
+            "source_indexes": [
+              0
+            ]
+          }
+        ],
+        "sources": [
+          {
+            "url": "https://labelbox.com/blog/labelbox-series-e/",
+            "title": "Labelbox Series E announcement",
+            "published_on": "2026-10-14",
+            "observed_on": "2026-11-26",
+            "response_sha256": "9e04e3a6cc590a2170762ef187da2a2521de08664b6fafc24177439e9be3cbe9",
+            "content_kind": "raw_http_body",
+            "locator": "Publication date: 14 October 2026. What comes next, first paragraph: profitability this year. Innovating across layers, first paragraph: expert network. Content observed 26 November; network measurement date not supplied."
+          }
+        ]
+      }
     },
     {
       "company_id": "invisible",
@@ -5147,7 +5184,54 @@
         "toloka.metric.major-financial_metrics-2",
         "toloka.metric.major-growth_metrics-1",
         "toloka.metric.oct14-0-expert-and-annotator-pool"
-      ]
+      ],
+      "current_facts": {
+        "reviewed_on": "2026-11-26",
+        "rows": [
+          {
+            "label": "Fireworks ecosystem participation",
+            "value": "Issuer-announced participant in the Fireworks Frontier Ecosystem; announced 3 Nov 2026",
+            "source_indexes": [
+              0
+            ]
+          },
+          {
+            "label": "Counterparty benchmark listing",
+            "value": "Enterprise Tool Use by Toloka; listed in the Fireworks Specialized Intelligence Index",
+            "source_indexes": [
+              1
+            ]
+          },
+          {
+            "label": "Commercial scope",
+            "value": "Commercial terms undisclosed; paying-customer contract, revenue and equity transaction unverified",
+            "source_indexes": [
+              0,
+              1
+            ]
+          }
+        ],
+        "sources": [
+          {
+            "url": "https://toloka.ai/blog/powering-production-ai-toloka-joins-the-fireworks-frontier-ecosystem/",
+            "title": "Toloka joins the Fireworks Frontier Ecosystem",
+            "published_on": "2026-11-03",
+            "observed_on": "2026-11-26",
+            "response_sha256": "c495c953884ba63009c965ffa972057d4fb2363c0abe2d297df3249fb947f715",
+            "content_kind": "raw_http_body",
+            "locator": "Opening section: joining the Fireworks Frontier Ecosystem. Benchmark collaboration section: initial agent and tool-use work and planned expansion. Visible announcement date: 3 November 2026."
+          },
+          {
+            "url": "https://fireworks.ai/specialized-intelligence-index/",
+            "title": "Fireworks Specialized Intelligence Index",
+            "published_on": null,
+            "observed_on": "2026-11-26",
+            "response_sha256": "8286363643e3a0882e143f9a25b6ecee231d0c5f42ce4aa65fca0ab156e7a17c",
+            "content_kind": "raw_http_body",
+            "locator": "Enterprise Tool Use by Toloka benchmark entry. Visible index update: 26 November 2026; observation date, not an independently established partnership date."
+          }
+        ]
+      }
     },
     {
       "company_id": "afterquery",

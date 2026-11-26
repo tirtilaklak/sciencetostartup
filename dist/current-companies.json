@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0.0",
-  "reviewed_on": "2026-11-25",
+  "reviewed_on": "2026-11-26",
   "entries": [
     {
       "entity_id": "org.innodata",
@@ -2789,6 +2789,417 @@
           "locator": "Note 1, Nature of operations, physical PDF page 12: India domicile, Pune registered office, global technology identity and international subsidiaries."
         }
       ]
+    },
+    {
+      "entity_id": "org.nvidia",
+      "name": "NVIDIA",
+      "group": "Frontier data & RL environments",
+      "website": "https://www.nvidia.com/",
+      "current_identity": {
+        "scope": "current_only",
+        "name": "NVIDIA",
+        "aliases": [
+          "NVIDIA Corporation"
+        ],
+        "website": "https://www.nvidia.com/",
+        "source_indexes": [
+          2,
+          3
+        ]
+      },
+      "offerings": [
+        {
+          "label": "Isaac Sim and Replicator software for synthetic training data",
+          "source_indexes": [
+            0,
+            1
+          ]
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://developer.nvidia.com/isaac/sim",
+          "title": "Isaac Sim - Robotics Simulation and Synthetic Data Generation | NVIDIA Developer",
+          "published_on": null,
+          "observed_on": "2026-11-26",
+          "response_sha256": "9723bdc198a001743f7ad72dc19edb8060559717fbc75cd88c70f0685ad5a6e8",
+          "content_kind": "raw_http_body",
+          "locator": "Isaac Sim introduction; Scalable Synthetic Data Generation; FAQ on free use and software distribution."
+        },
+        {
+          "url": "https://docs.omniverse.nvidia.com/extensions/latest/ext_replicator.html",
+          "title": "Replicator — Omniverse Extensions",
+          "published_on": null,
+          "observed_on": "2026-11-26",
+          "response_sha256": "3bf252545862791b2329c3ff09626ab602d83a8b62103df2d5bc9af08c05e540",
+          "content_kind": "raw_http_body",
+          "locator": "Replicator introduction; Core Components, Annotators and Writers; API documentation and tutorials."
+        },
+        {
+          "url": "https://www.nvidia.com/en-eu/about-nvidia/terms-of-service/",
+          "title": "Legal Notices Trademarks, Licenses, and More | NVIDIA",
+          "published_on": null,
+          "observed_on": "2026-11-26",
+          "response_sha256": "c2558e9f6e7184ad59ddf7a248349af0eee43f0b9fbe6cc69c6504d42d88fb59",
+          "content_kind": "raw_http_body",
+          "locator": "NVIDIA Website Terms of Use introduction; section 14.1, legal-notice address; section 15, United States offices."
+        },
+        {
+          "url": "https://www.nvidia.com/en-us/contact/",
+          "title": "Contact Us: Americas Locations & Regional Offices | NVIDIA",
+          "published_on": null,
+          "observed_on": "2026-11-26",
+          "response_sha256": "3c90ba67628fd24dfaffc1e8e4cbcda7454cca0b47bd70be506db10c644e96ed",
+          "content_kind": "raw_http_body",
+          "locator": "Our Locations, more than 50 offices worldwide; NVIDIA Corporate, Santa Clara, California."
+        }
+      ],
+      "wikipedia": {
+        "title": "Nvidia",
+        "article_url": "https://en.wikipedia.org/wiki/Nvidia",
+        "revision_url": "https://en.wikipedia.org/w/index.php?title=Nvidia&oldid=1388103094",
+        "history_url": "https://en.wikipedia.org/w/index.php?title=Nvidia&action=history",
+        "page_id": 39120,
+        "revision_id": 1388103094,
+        "revision_timestamp": "2026-11-26T16:30:59Z",
+        "response_sha256": "79a7f86b76459fb9d03507b999fa000314a822084e686b84fd6135e29ad2b536",
+        "content_kind": "mediawiki_revision_wikitext",
+        "observed_on": "2026-11-26",
+        "description": "Nvidia Corporation (/ɛnˈvɪdiə/ en-VID-ee-ə) is an American multinational technology company headquartered in Santa Clara, California.",
+        "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+        "change_note": "Sentence wording unchanged; links, formatting and citation markers omitted."
+      }
+    },
+    {
+      "entity_id": "org.microsoft",
+      "name": "Microsoft",
+      "group": "AI evaluation & safety",
+      "website": "https://www.microsoft.com/",
+      "current_identity": {
+        "scope": "current_only",
+        "name": "Microsoft",
+        "aliases": [
+          "Microsoft Corporation"
+        ],
+        "website": "https://www.microsoft.com/",
+        "source_indexes": [
+          1,
+          2
+        ]
+      },
+      "offerings": [
+        {
+          "label": "Microsoft Foundry software for model and agent evaluation",
+          "source_indexes": [
+            0
+          ]
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://learn.microsoft.com/en-us/azure/foundry/concepts/evaluation-overview",
+          "title": "Evaluation in Microsoft Foundry - Microsoft Foundry | Microsoft Learn",
+          "published_on": null,
+          "observed_on": "2026-11-26",
+          "response_sha256": "eb8dfe00287e6ecb43ef5a63ec1f7c83212ac044cc70695bb1fdc8741a8bf084",
+          "content_kind": "raw_http_body",
+          "locator": "Evaluation in Microsoft Foundry introduction; Build an evaluation workflow; Choose an evaluation approach and how to run evaluations."
+        },
+        {
+          "url": "https://news.microsoft.com/facts-about-microsoft/",
+          "title": "Facts About Microsoft - Stories",
+          "published_on": null,
+          "observed_on": "2026-11-26",
+          "response_sha256": "81aeabb05e84a8ee693267d945b1175733d45154fd879e96806375c4d86551dc",
+          "content_kind": "raw_http_body",
+          "locator": "Facts About Microsoft introduction; Corporate Address identifies Microsoft Corporation in Redmond, Washington, USA."
+        },
+        {
+          "url": "https://www.microsoft.com/en-us/about/office-locations",
+          "title": "Microsoft Office Locations | About Microsoft",
+          "published_on": null,
+          "observed_on": "2026-11-26",
+          "response_sha256": "a3ea30f650078087069250d3fc68bcdcdfd0a55b4a90314d60b0c079c51faeeb",
+          "content_kind": "raw_http_body",
+          "locator": "Microsoft in the United States; Our headquarters, Redmond, Washington."
+        }
+      ],
+      "wikipedia": {
+        "title": "Microsoft",
+        "article_url": "https://en.wikipedia.org/wiki/Microsoft",
+        "revision_url": "https://en.wikipedia.org/w/index.php?title=Microsoft&oldid=1388014570",
+        "history_url": "https://en.wikipedia.org/w/index.php?title=Microsoft&action=history",
+        "page_id": 19001,
+        "revision_id": 1388014570,
+        "revision_timestamp": "2026-11-26T09:21:01Z",
+        "response_sha256": "3a46740a4c7d291a603977f7e3d05cc994a4d6edf7fe0ae69a5dada55335b79f",
+        "content_kind": "mediawiki_revision_wikitext",
+        "observed_on": "2026-11-26",
+        "description": "Microsoft Corporation is an American multinational technology conglomerate headquartered in Redmond, Washington.",
+        "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+        "change_note": "Sentence wording unchanged; links, formatting and citation markers omitted."
+      }
+    },
+    {
+      "entity_id": "org.amazon",
+      "name": "Amazon",
+      "group": "AI evaluation & safety",
+      "website": "https://www.aboutamazon.com/",
+      "current_identity": {
+        "scope": "current_only",
+        "name": "Amazon",
+        "aliases": [
+          "Amazon.com, Inc."
+        ],
+        "website": "https://www.aboutamazon.com/",
+        "source_indexes": [
+          1,
+          2
+        ]
+      },
+      "offerings": [
+        {
+          "label": "Amazon Bedrock tools for automated model evaluation",
+          "source_indexes": [
+            0
+          ]
+        },
+        {
+          "label": "Amazon Bedrock human evaluation workflows",
+          "source_indexes": [
+            0
+          ]
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/bedrock/evaluations/",
+          "title": "Evaluate Foundation Models - Amazon Bedrock Evaluations - AWS",
+          "published_on": null,
+          "observed_on": "2026-11-26",
+          "response_sha256": "1259d8c75b8c0ccc4d2224992a3eca403030dd3729ae7b2697fb8491ff1b006a",
+          "content_kind": "raw_http_body",
+          "locator": "Evaluation types, Models: LLM-as-a-Judge, Programmatic and Human-based; Evaluate FMs to select the best one for your use case."
+        },
+        {
+          "url": "https://www.aboutamazon.com/what-we-do",
+          "title": "What Amazon does: Shopping, AWS, AI, devices, and more",
+          "published_on": null,
+          "observed_on": "2026-11-26",
+          "response_sha256": "7932adb82b01b11c53037fad20aad905c55fe367dfa4cbde760a5f3cf55bab93",
+          "content_kind": "raw_http_body",
+          "locator": "What We Do, introduction and Amazon Web Services business; footer identifies Amazon.com, Inc. or its affiliates."
+        },
+        {
+          "url": "https://aws.amazon.com/about-aws/",
+          "title": "About AWS",
+          "published_on": null,
+          "observed_on": "2026-11-26",
+          "response_sha256": "b9d1ed04fced060d279103c6609a54fd5541c0d57c9ce31294a46746264e20ea",
+          "content_kind": "raw_http_body",
+          "locator": "About AWS, Overview: AWS describes itself as part of Amazon and offers cloud and AI capabilities to customers."
+        },
+        {
+          "url": "https://www.sec.gov/Archives/edgar/data/1018724/000101872418000005/amzn-20171231x10k.htm",
+          "title": "Amazon.com, Inc. 2017 Form 10-K",
+          "published_on": null,
+          "observed_on": "2026-11-26",
+          "response_sha256": "e36da3bf656bd251792a359810d6aadf55fe4f0f0573a5e7349c48c6c9f1ed6e",
+          "content_kind": "web_tool_text_excerpt",
+          "locator": "Part I, Item 1, Business, printed page 3: completed the initial public offering in May 1997. Historical IPO fact only."
+        },
+        {
+          "url": "https://press.aboutamazon.com/1997/5/amazon-com-inc-announces-initial-public-offering-of-3-000-000-shares-of-common-stock",
+          "title": "Amazon.com, Inc. Announces Initial Public Offering of 3,000,000 Shares of Common Stock",
+          "published_on": null,
+          "observed_on": "2026-11-26",
+          "response_sha256": "a83a477e7f4d8d977ccd1ab6efd582e29fc6ef31fff8d777898e9decb740ad62",
+          "content_kind": "raw_http_body",
+          "locator": "Historical IPO announcement title and dateline. Page date 13 May 1997 and body dateline 14 May 1997 both support the month; no day is asserted."
+        }
+      ],
+      "wikipedia": {
+        "title": "Amazon (company)",
+        "article_url": "https://en.wikipedia.org/wiki/Amazon_%28company%29",
+        "revision_url": "https://en.wikipedia.org/w/index.php?title=Amazon_%28company%29&oldid=1388111682",
+        "history_url": "https://en.wikipedia.org/w/index.php?title=Amazon_%28company%29&action=history",
+        "page_id": 90451,
+        "revision_id": 1388111682,
+        "revision_timestamp": "2026-11-26T17:21:45Z",
+        "response_sha256": "59feb9df87d1beb884b55d1f24ed097bb828ec7a0b2f24acc59b3f316c1b10df",
+        "content_kind": "mediawiki_revision_wikitext",
+        "observed_on": "2026-11-26",
+        "description": "In May 1997, Amazon went public.",
+        "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+        "change_note": "Sentence wording unchanged; links, formatting and citation markers omitted."
+      }
+    },
+    {
+      "entity_id": "org.mphasis",
+      "name": "Mphasis",
+      "group": "AI evaluation & safety",
+      "website": "https://www.mphasis.com/",
+      "current_identity": {
+        "scope": "current_only",
+        "name": "Mphasis",
+        "aliases": [
+          "Mphasis Limited"
+        ],
+        "website": "https://www.mphasis.com/",
+        "source_indexes": [
+          2,
+          3
+        ]
+      },
+      "offerings": [
+        {
+          "label": "LLM evaluation services",
+          "source_indexes": [
+            0
+          ]
+        },
+        {
+          "label": "Synth Studio software for AI model validation",
+          "source_indexes": [
+            1
+          ]
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/marketplace/pp/prodview-h45vgiiejk2xg",
+          "title": "Generative AI Consulting & Assessment | AWS Marketplace",
+          "published_on": null,
+          "observed_on": "2026-11-26",
+          "response_sha256": "689f60dabdb4a1a3f565b4681b80785eff43572acecdb082e42f539a528ba0db",
+          "content_kind": "raw_http_body",
+          "locator": "Sold by Mphasis; Overview, LLM Evaluation as-a-Service; vendor resources and Why Mphasis link Mphasis AI, Synth Studio and official vendor support."
+        },
+        {
+          "url": "https://www.mphasis.com/home/innovation/nextlabs/synth-studio.html",
+          "title": "Synthetic Data Solutions for AI and Machine Learning | Mphasis Synth Studio",
+          "published_on": null,
+          "observed_on": "2026-11-26",
+          "response_sha256": "04aeaa51aeb9fe2ca570fee2b91e84f7b2b5079f4401acaae16dfb6fa6084121",
+          "content_kind": "raw_http_body",
+          "locator": "Synthetic Data for AI and Synthetic Data in Machine Learning FAQs: Synth Studio datasets for AI model validation and model development."
+        },
+        {
+          "url": "https://www.mphasis.com/home/corporate/about-mphasis.html",
+          "title": "Mphasis | About Us",
+          "published_on": null,
+          "observed_on": "2026-11-26",
+          "response_sha256": "69402ba13f2fc55e1c422f06e77a1013d13eb01cb49d3f7c17f76ffde8a6c1c6",
+          "content_kind": "raw_http_body",
+          "locator": "Who We Are; current company overview, industry domains and service offerings; transformation journey."
+        },
+        {
+          "url": "https://www.mphasis.com/home/corporate/mphasis-contact-us.html",
+          "title": "Mphasis | Thanks Contact Us",
+          "published_on": null,
+          "observed_on": "2026-11-26",
+          "response_sha256": "808803dbdfbd2f070cf6b87d5ed00d1f9f3999af0f1004a6ef75c26fc13ede71",
+          "content_kind": "raw_http_body",
+          "locator": "Bangalore-Corporate Office and Bangalore-Registered Office identify Mphasis Limited; worldwide office listings."
+        }
+      ],
+      "wikipedia": {
+        "title": "Mphasis",
+        "article_url": "https://en.wikipedia.org/wiki/Mphasis",
+        "revision_url": "https://en.wikipedia.org/w/index.php?title=Mphasis&oldid=1387928392",
+        "history_url": "https://en.wikipedia.org/w/index.php?title=Mphasis&action=history",
+        "page_id": 11645478,
+        "revision_id": 1387928392,
+        "revision_timestamp": "2026-11-26T01:45:31Z",
+        "response_sha256": "138a358960e3472e623df32fe81540cccd8fc88894f39d19b437738f26718103",
+        "content_kind": "mediawiki_revision_wikitext",
+        "observed_on": "2026-11-26",
+        "description": "Mphasis Limited is an Indian multinational information technology service and consulting company based in Bengaluru.",
+        "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+        "change_note": "Sentence wording unchanged; links, formatting and citation markers omitted."
+      }
+    },
+    {
+      "entity_id": "org.coforge",
+      "name": "Coforge",
+      "group": "AI evaluation & safety",
+      "website": "https://www.coforge.com/",
+      "current_identity": {
+        "scope": "current_only",
+        "name": "Coforge",
+        "aliases": [
+          "Coforge Limited",
+          "NIIT Technologies",
+          "NIIT Technologies Limited"
+        ],
+        "website": "https://www.coforge.com/",
+        "source_indexes": [
+          2,
+          3
+        ]
+      },
+      "offerings": [
+        {
+          "label": "AI model and agent validation services",
+          "source_indexes": [
+            0,
+            1
+          ]
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://www.coforge.com/capabilities/quality-engineering",
+          "title": "AI‑led Quality Engineering and Testing Services | Coforge",
+          "published_on": null,
+          "observed_on": "2026-11-26",
+          "response_sha256": "b3302d9534747322fcbe4bc528c2f40f152e0dcf19fb80e1ca14dd4b28a63cc2",
+          "content_kind": "raw_http_body",
+          "locator": "Greater autonomy requires stronger assurance; Quality Engineering Services; AI-enabled quality, Trusted outcomes."
+        },
+        {
+          "url": "https://www.coforge.com/capabilities/quality-engineering/quality-engineering-services",
+          "title": "Quality Engineering Services with AI‑Led Automation | Coforge",
+          "published_on": null,
+          "observed_on": "2026-11-26",
+          "response_sha256": "6ee8c8e1de58382c46a32057815e32e509d4e7228f7ad35541f37912828cdd0e",
+          "content_kind": "raw_http_body",
+          "locator": "Quality Engineering Services, Services list includes AI Model Validation; client engagement invitation."
+        },
+        {
+          "url": "https://www.coforge.com/who-we-are",
+          "title": "Global AI Engineering Company with Industry Expertise | Coforge",
+          "published_on": null,
+          "observed_on": "2026-11-26",
+          "response_sha256": "9ad996b57c7db5ae4ec3c91b950e83d4ce26d4d0393759f8a022b4b7628bfdae",
+          "content_kind": "raw_http_body",
+          "locator": "Who We Are, global company overview and AI engineering services for clients; footer legal company name."
+        },
+        {
+          "url": "https://investors.coforge.com/hubfs/Press-Release-Intimation-01May-26.pdf",
+          "title": "Coforge Limited stock-exchange intimation with scheme-of-amalgamation court order",
+          "published_on": null,
+          "observed_on": "2026-11-26",
+          "response_sha256": "3e69ee4e1dd31bb532fb8541e2dab984c62db5019463d6d9768af3789c60b2a9",
+          "content_kind": "raw_http_body",
+          "locator": "Scheme-of-amalgamation court order, numbered paragraph 6, printed page 4 of 24 (physical PDF page 7): NIIT Technologies Limited renamed Coforge Limited on 3 August 2020."
+        }
+      ],
+      "wikipedia": {
+        "title": "Coforge",
+        "article_url": "https://en.wikipedia.org/wiki/Coforge",
+        "revision_url": "https://en.wikipedia.org/w/index.php?title=Coforge&oldid=1387990232",
+        "history_url": "https://en.wikipedia.org/w/index.php?title=Coforge&action=history",
+        "page_id": 65603792,
+        "revision_id": 1387990232,
+        "revision_timestamp": "2026-11-26T07:13:13Z",
+        "response_sha256": "41102186d481d93208e7e58c562fc932c6af890561cfd1c2c91dde81be8f780a",
+        "content_kind": "mediawiki_revision_wikitext",
+        "observed_on": "2026-11-26",
+        "description": "In 2020, NIIT Technologies was re-branded as Coforge.",
+        "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+        "change_note": "Sentence wording unchanged; links, formatting and citation markers omitted."
+      }
     }
   ]
 }
