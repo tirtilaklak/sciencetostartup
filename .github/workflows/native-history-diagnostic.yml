@@ -1,0 +1,48 @@
+name: Native history diagnostic
+on:
+  push:
+    branches: [codex/company-history-diagnostic-20261126]
+permissions:
+  contents: read
+jobs:
+  capture:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    container:
+      image: mcr.microsoft.com/playwright:v1.65.0-noble@sha256:f6fe3cf9a493670b9a20f33597a807262abb25c40c31839ba4ac1dbc51fe7366
+      options: --init --ipc=host
+    steps:
+      - uses: actions/checkout@v4
+      - name: Trust the diagnostic checkout
+        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
+      - name: Align temporary container home ownership
+        run: chown --reference=/proc/self "$HOME"
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - uses: actions/checkout@v4
+        with:
+          ref: 000fffba323468a532814fa7c22eb28bd86f2e28
+          path: baseline
+      - name: Capture bounded baseline and candidate history behavior
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p diagnostic-output
+          QA_DIST="$GITHUB_WORKSPACE/dist" python3 scripts/browser_qa_server.py --port 18775 > diagnostic-output/candidate-server.log 2>&1 &
+          history_candidate_pid=$!
+          QA_DIST="$GITHUB_WORKSPACE/baseline/dist" python3 scripts/browser_qa_server.py --port 18776 > diagnostic-output/baseline-server.log 2>&1 &
+          history_baseline_pid=$!
+          trap 'kill "$history_candidate_pid" "$history_baseline_pid" 2>/dev/null || true' EXIT
+          node .github/diagnostics/native-history.cjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: native-history-diagnostic
+          path: diagnostic-output/
+          retention-days: 14
