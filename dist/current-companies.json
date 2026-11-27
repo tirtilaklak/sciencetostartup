@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0.0",
-  "reviewed_on": "2026-11-26",
+  "reviewed_on": "2026-11-27",
   "entries": [
     {
       "entity_id": "org.innodata",
@@ -3197,6 +3197,272 @@
         "content_kind": "mediawiki_revision_wikitext",
         "observed_on": "2026-11-26",
         "description": "In 2020, NIIT Technologies was re-branded as Coforge.",
+        "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+        "change_note": "Sentence wording unchanged; links, formatting and citation markers omitted."
+      }
+    },
+    {
+      "entity_id": "org.infosys",
+      "name": "Infosys",
+      "group": "AI evaluation & safety",
+      "website": "https://www.infosys.com/",
+      "current_identity": {
+        "scope": "current_only",
+        "name": "Infosys",
+        "aliases": [
+          "Infosys Limited",
+          "Infosys Technologies Limited",
+          "Infosys Consultants Private Limited"
+        ],
+        "website": "https://www.infosys.com/",
+        "source_indexes": [
+          2,
+          3
+        ]
+      },
+      "offerings": [
+        {
+          "label": "Model evaluation tools within Infosys AI-first Testing",
+          "source_indexes": [
+            0
+          ]
+        },
+        {
+          "label": "Evaluation frameworks within Infosys Agentic Foundry",
+          "source_indexes": [
+            1
+          ]
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://www.infosys.com/services/quality-engineering/service-offerings/machine-learning-qa.html",
+          "title": "AI in Testing - Offerings | Infosys",
+          "published_on": null,
+          "observed_on": "2026-11-27",
+          "response_sha256": "88c1bebf081b06182974d1c02cc73c222a3ff4dba206242dda0b9e61726efee0",
+          "content_kind": "web_tool_text_excerpt",
+          "locator": "Accelerating Quality Engineering with Infosys AI-first Testing Solutions; How Infosys AI-first Testing helps enterprises: model evaluation tool; Challenges & Solutions, Predict the accuracy of models for better decision-making. Official web-tool text retained; raw HTTP returned 403."
+        },
+        {
+          "url": "https://www.infosys.com/services/data-ai-topaz/offerings/agentic-foundry.html",
+          "title": "Agentic AI Solutions for Enterprise Transformation | Infosys",
+          "published_on": null,
+          "observed_on": "2026-11-27",
+          "response_sha256": "1c9d81a934ccb399c54b75b4befde548f60f75ae59b3cdf757d4d0184d73d0b0",
+          "content_kind": "web_tool_text_excerpt",
+          "locator": "Scalable Agentic AI Solutions for Enterprise Innovation; Horizontal Agents; What differentiates us? Robust and responsible evaluation frameworks. Official web-tool text retained; raw HTTP returned 403."
+        },
+        {
+          "url": "https://www.infosys.com/investors/shareholder-services/faqs.html",
+          "title": "Investor Frequently Asked Questions (FAQs) | Infosys",
+          "published_on": null,
+          "observed_on": "2026-11-27",
+          "response_sha256": "9e11ded677eb85ae33eb3e238f0f0ec237a7cbb448ee9d08398f0a6fdab46263",
+          "content_kind": "web_tool_text_excerpt",
+          "locator": "Investor FAQs, About the company Q1/Q2: Infosys Limited and historical names; Q8/Q9/Q10: international operations, registered office in Bengaluru, official website and CIN. Official web-tool text retained; raw HTTP returned 403."
+        },
+        {
+          "url": "https://www.infosys.com/terms-of-use/",
+          "title": "Terms of Use for a Product, Service or Feature on Websites | Infosys",
+          "published_on": null,
+          "observed_on": "2026-11-27",
+          "response_sha256": "1fb59d5b88ad02b2b183d034d8dc12606a92a2634f0225dd0ebd08aad7898f1b",
+          "content_kind": "web_tool_text_excerpt",
+          "locator": "Terms of Use, introductory bullets: website provided by Infosys Limited, incorporated under the Companies Act of India, with registered office in Bangalore. Official web-tool text retained; raw HTTP returned 403."
+        }
+      ],
+      "wikipedia": {
+        "title": "Infosys",
+        "article_url": "https://en.wikipedia.org/wiki/Infosys",
+        "revision_url": "https://en.wikipedia.org/w/index.php?title=Infosys&oldid=1388011444",
+        "history_url": "https://en.wikipedia.org/w/index.php?title=Infosys&action=history",
+        "page_id": 243401,
+        "revision_id": 1388011444,
+        "revision_timestamp": "2026-11-26T08:57:56Z",
+        "response_sha256": "2a2fb1fc8e5b70082f18461ad9743e5e19ec773ccaa5cd23e4f746c5af62ab9b",
+        "content_kind": "mediawiki_revision_wikitext",
+        "observed_on": "2026-11-27",
+        "description": "Infosys Limited is an Indian multinational technology company that offers information technology, business consulting, and outsourcing services.",
+        "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+        "change_note": "Sentence wording unchanged; links, formatting and citation markers omitted."
+      }
+    },
+    {
+      "entity_id": "org.reply",
+      "name": "Reply",
+      "group": "AI evaluation & safety",
+      "website": "https://www.reply.com/",
+      "current_identity": {
+        "scope": "current_only",
+        "name": "Reply",
+        "aliases": [
+          "Reply S.p.A."
+        ],
+        "website": "https://www.reply.com/",
+        "source_indexes": [
+          2,
+          3,
+          4
+        ]
+      },
+      "offerings": [
+        {
+          "label": "Reply Model Factory for AI model training and evaluation",
+          "source_indexes": [
+            0
+          ]
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://www.reply.com/en/newsroom/news/reply-launches-model-factory-the-production-line-for-creating-industrial-grade-generative-ai-models",
+          "title": "Reply launches Model Factory, the production line for creating industrial-grade generative AI models | Reply",
+          "published_on": "2026-05-14",
+          "observed_on": "2026-11-27",
+          "response_sha256": "42d2eab5fb027e6037aa337461d9cf3129cdafd6ec6a642bb5a5049b7d6b1982",
+          "content_kind": "raw_http_body",
+          "locator": "Reply launches Model Factory, the production line for creating industrial-grade generative AI models, 14 May 2026; enterprise knowledge preparation and controlled training/evaluation lifecycle."
+        },
+        {
+          "url": "https://www.reply.com/en/newsroom/events/arbiter-referee-for-AI-agents",
+          "title": "Open Arena + ARBITER: Choose It, Then Judge It | Reply",
+          "published_on": null,
+          "observed_on": "2026-11-27",
+          "response_sha256": "24408a20611b88cceb392f61c23fa2ec57f34fc5588b9200eb3f687dc9b733ee",
+          "content_kind": "raw_http_body",
+          "locator": "Open Arena + ARBITER: Choose It, Then Judge It; webinar scheduled 19 November 2026. Raw introduction says ahead of public preview; Atena Reply is identified as a Reply Group company. This does not establish general availability of Open Arena or Arbiter."
+        },
+        {
+          "url": "https://www.reply.com/en/company-profile",
+          "title": "Company Profile | Reply",
+          "published_on": null,
+          "observed_on": "2026-11-27",
+          "response_sha256": "a3d5f0238393da00239b00c58f209c788b800a2b9680f02b9fcfb3476e77338d",
+          "content_kind": "raw_http_body",
+          "locator": "We Reply; We are a decentralized network of specialised companies; current Reply group profile and service areas."
+        },
+        {
+          "url": "https://www.reply.com/contents/Reply_Company_Information_en.pdf",
+          "title": "Company Information",
+          "published_on": null,
+          "observed_on": "2026-11-27",
+          "response_sha256": "74b9ef3414426281e3c47aa3427c39e4939c0506c965f09d12e44277351c8cd0",
+          "content_kind": "raw_http_body",
+          "locator": "Company Information, one-page document linked by the current official website: Reply S.p.A.; Corso Francia, 110, Turin, Italy; company register and VAT number. No publication date asserted."
+        },
+        {
+          "url": "https://www.reply.com/it/newsroom/news/reply-inaugura-reply-house-nel-cuore-di-torino-nasce-un-campus-aperto-alla-ricerca-e-all-innovazione",
+          "title": "Reply inaugura Reply House: nel cuore di Torino nasce un campus aperto alla ricerca e all’innovazione | Reply",
+          "published_on": "2026-07-09",
+          "observed_on": "2026-11-27",
+          "response_sha256": "01978f6bc57538180937cbb4094f0c462f32d3555f0030f537f9942ac5f5e325",
+          "content_kind": "raw_http_body",
+          "locator": "Reply inaugura Reply House, 9 July 2026; opening dateline and announcement identify the new group headquarters in Turin. Historical headquarters announcement, independently corroborating the selected company identity."
+        }
+      ],
+      "wikipedia": {
+        "title": "Reply (company)",
+        "article_url": "https://en.wikipedia.org/wiki/Reply_%28company%29",
+        "revision_url": "https://en.wikipedia.org/w/index.php?title=Reply_%28company%29&oldid=1385227785",
+        "history_url": "https://en.wikipedia.org/w/index.php?title=Reply_%28company%29&action=history",
+        "page_id": 52305608,
+        "revision_id": 1385227785,
+        "revision_timestamp": "2026-11-12T11:54:18Z",
+        "response_sha256": "b94dcb33c6c8c93816d62d831b9d35439b1d626fb2c004184ac6989348737f2d",
+        "content_kind": "mediawiki_revision_wikitext",
+        "observed_on": "2026-11-27",
+        "description": "Reply S.p.A. is an Italian information technology consulting, system integration and digital services company headquartered in Turin.",
+        "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+        "change_note": "Sentence wording unchanged; links, formatting and citation markers omitted."
+      }
+    },
+    {
+      "entity_id": "org.fujitsu",
+      "name": "Fujitsu",
+      "group": "AI evaluation & safety",
+      "website": "https://global.fujitsu/en-global/",
+      "current_identity": {
+        "scope": "current_only",
+        "name": "Fujitsu",
+        "aliases": [
+          "Fujitsu Limited"
+        ],
+        "website": "https://global.fujitsu/en-global/",
+        "source_indexes": [
+          2,
+          3,
+          4
+        ]
+      },
+      "offerings": [
+        {
+          "label": "Kozuchi LLM Vulnerability Scanner and Guardrails software",
+          "source_indexes": [
+            0,
+            1
+          ]
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://en-documents.research.global.fujitsu.com/llm-vulnerability-scanner-and-guardrails/",
+          "title": "LLM Vulnerability Scanner and Guardrails",
+          "published_on": null,
+          "observed_on": "2026-11-27",
+          "response_sha256": "e885f6555af678792206a1e69fe39737df54ae4e85a3d65518b2eb4db22f1855",
+          "content_kind": "raw_http_body",
+          "locator": "LLM Vulnerability Scanner and Guardrails; Comprehensive investigation of LLM vulnerabilities; Features of the technology; Contact Us, demonstration or test invitation."
+        },
+        {
+          "url": "https://global.fujitsu/en-global/offering/kozuchi-enterprise-ai-factory",
+          "title": "Fujitsu Kozuchi Enterprise AI Factory | Fujitsu Global",
+          "published_on": null,
+          "observed_on": "2026-11-27",
+          "response_sha256": "eac55615869eb10a05a3f0ceef0aaa923b0ca38302b11b566dfd83b85dd24fd9",
+          "content_kind": "web_tool_text_excerpt",
+          "locator": "Fujitsu Kozuchi Enterprise AI Factory; feature table, Generative AI trust technologies; Recommended information, LLM Vulnerability Scanner & Guardrails; contact form. Official web-tool text retained; raw HTTP returned 429."
+        },
+        {
+          "url": "https://global.fujitsu/en-global/about/corporate/facts",
+          "title": "Fujitsu Facts | Fujitsu Global",
+          "published_on": null,
+          "observed_on": "2026-11-27",
+          "response_sha256": "eae81595d726a5be8ef2a81b69783d39288eff6748d7a5a29abcae86113d3121",
+          "content_kind": "web_tool_text_excerpt",
+          "locator": "Fujitsu Facts; Corporate Headquarters and Overview identify Fujitsu Limited in Kawasaki, Kanagawa, Japan. Official web-tool text retained; raw HTTP returned 429."
+        },
+        {
+          "url": "https://global.fujitsu/en-global/ir/faq",
+          "title": "Frequently Asked Questions | Fujitsu Global",
+          "published_on": null,
+          "observed_on": "2026-11-27",
+          "response_sha256": "003834e25130c4cbf7fde71aac87b9e8906597aa5716c991559fe7d3fd575067",
+          "content_kind": "web_tool_text_excerpt",
+          "locator": "Frequently Asked Questions, Corporate Information: Fujitsu Limited name change in 1967; stock listing and Kanagawa headquarters; Fujitsu Group includes subsidiaries and affiliates. Official web-tool text retained; raw HTTP returned 429."
+        },
+        {
+          "url": "https://global.fujitsu/en-global/about/corporate/history2",
+          "title": "Fujitsu's History (Chronology) (1961 - 1970) | Fujitsu Global",
+          "published_on": null,
+          "observed_on": "2026-11-27",
+          "response_sha256": "f4d243065e7af304ad13fd72eae8d340ae3ed003c6c88d9e255d266a421c32ba",
+          "content_kind": "web_tool_text_excerpt",
+          "locator": "Fujitsu History (1961–1970), November 1962 and June 1967 entries: English name adopted in 1962; Japanese name changed in 1967. This distinction limits the selected Wikipedia historical sentence. Official web-tool text retained."
+        }
+      ],
+      "wikipedia": {
+        "title": "Fujitsu",
+        "article_url": "https://en.wikipedia.org/wiki/Fujitsu",
+        "revision_url": "https://en.wikipedia.org/w/index.php?title=Fujitsu&oldid=1387895709",
+        "history_url": "https://en.wikipedia.org/w/index.php?title=Fujitsu&action=history",
+        "page_id": 58222,
+        "revision_id": 1387895709,
+        "revision_timestamp": "2026-11-25T22:32:10Z",
+        "response_sha256": "ebe0a290f495b45ddae01731c7ca2f5ebd8fd9d8e933e6bb4d7b8bb5f2807bcf",
+        "content_kind": "mediawiki_revision_wikitext",
+        "observed_on": "2026-11-27",
+        "description": "In 1967, the company's name was officially changed to the contraction Fujitsū (富士通).",
         "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
         "change_note": "Sentence wording unchanged; links, formatting and citation markers omitted."
       }

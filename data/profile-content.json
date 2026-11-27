@@ -171,7 +171,44 @@
           ]
         }
       ],
-      "notes": []
+      "notes": [],
+      "current_facts": {
+        "reviewed_on": "2026-11-27",
+        "rows": [
+          {
+            "label": "CDAO agreement (company announcement)",
+            "value": "$100 million to $500 million potential ceiling · announced 6 May 2026",
+            "source_indexes": [
+              0
+            ]
+          },
+          {
+            "label": "Financial scope",
+            "value": "Ceiling; guaranteed purchases, obligated spending and recognized revenue unverified",
+            "source_indexes": [
+              0
+            ]
+          },
+          {
+            "label": "Currency",
+            "value": "Source uses $ without an explicit currency code",
+            "source_indexes": [
+              0
+            ]
+          }
+        ],
+        "sources": [
+          {
+            "url": "https://scale.com/blog/scale-ai-pentagon-cdao-500-million-agreement",
+            "title": "Scale AI announcement of CDAO enterprise agreement expansion",
+            "published_on": "2026-05-06",
+            "observed_on": "2026-11-27",
+            "response_sha256": "58dce9de241621c57fefe612c6a894fe72f341c597b3f679705c3fd237151b65",
+            "content_kind": "raw_http_body",
+            "locator": "Opening announcement and following ceiling qualification; visible publication date: 6 May 2026."
+          }
+        ]
+      }
     },
     {
       "company_id": "surge_ai",
@@ -1110,7 +1147,44 @@
           ]
         }
       ],
-      "notes": []
+      "notes": [],
+      "current_facts": {
+        "reviewed_on": "2026-11-27",
+        "rows": [
+          {
+            "label": "Open Benchmarks Grants commitment",
+            "value": "$30 million · announced 7 Oct 2026 · company-stated plan",
+            "source_indexes": [
+              0
+            ]
+          },
+          {
+            "label": "Commitment scope",
+            "value": "Cash-only amount, spending and disbursement unverified",
+            "source_indexes": [
+              0
+            ]
+          },
+          {
+            "label": "Currency",
+            "value": "Source uses $ without an explicit currency code",
+            "source_indexes": [
+              0
+            ]
+          }
+        ],
+        "sources": [
+          {
+            "url": "https://benchmarks.snorkel.ai/frontier-ai-is-accelerating-open-benchmarks-need-to-keep-up/",
+            "title": "Snorkel AI Open Benchmarks Grants expansion announcement",
+            "published_on": "2026-10-07",
+            "observed_on": "2026-11-27",
+            "response_sha256": "4729e67fe3816aa4c914b82858c5a4a05251c25f2f380a3633c83091497f04ea",
+            "content_kind": "raw_http_body",
+            "locator": "Opening announcement of a $30M commitment; 7 October 2026 publication date. Support types and application details."
+          }
+        ]
+      }
     },
     {
       "company_id": "labelbox",
@@ -1643,7 +1717,37 @@
           ]
         }
       ],
-      "notes": []
+      "notes": [],
+      "current_facts": {
+        "reviewed_on": "2026-11-27",
+        "rows": [
+          {
+            "label": "Cash and cash equivalents",
+            "value": "USD 42,638,000 · 30 Sep 2026 · consolidated group · unaudited",
+            "source_indexes": [
+              0
+            ]
+          },
+          {
+            "label": "Source units",
+            "value": "USD thousands (42,638); point-in-time cash balance",
+            "source_indexes": [
+              0
+            ]
+          }
+        ],
+        "sources": [
+          {
+            "url": "https://yourir.info/resources/396cdf0a32f7cb50/announcements/apx.asx/2A1706837/APX_Q3_FY26_Quarterly_Activity_Report_and_Appendix_4C.pdf",
+            "title": "Appen Q3 FY2026 quarterly activity report and Appendix 4C",
+            "published_on": "2026-10-29",
+            "observed_on": "2026-11-27",
+            "response_sha256": "ac47f92bf13f8af173707ad64593090050d5ce2ae3db5ac4f8ac3735094b402b",
+            "content_kind": "raw_http_body",
+            "locator": "Appendix 4C, PDF page 11: items 4.6 and 5.5, current-quarter USD-thousands column. PDF page 1: 29 October 2026 dateline and unaudited qualification."
+          }
+        ]
+      }
     },
     {
       "company_id": "taskus",
@@ -4717,7 +4821,7 @@
       ],
       "notes": [],
       "current_facts": {
-        "reviewed_on": "2026-11-25",
+        "reviewed_on": "2026-11-27",
         "rows": [
           {
             "label": "Reporting entity",
@@ -4725,7 +4829,8 @@
             "source_indexes": [
               0,
               1
-            ]
+            ],
+            "reviewed_on": "2026-11-25"
           },
           {
             "label": "FY2025 UK subsidiary revenue",
@@ -4733,7 +4838,8 @@
             "source_indexes": [
               0,
               1
-            ]
+            ],
+            "reviewed_on": "2026-11-25"
           },
           {
             "label": "FY2025 subsidiary revenue split",
@@ -4741,7 +4847,8 @@
             "source_indexes": [
               0,
               1
-            ]
+            ],
+            "reviewed_on": "2026-11-25"
           },
           {
             "label": "Parent in FY2025 accounts",
@@ -4749,6 +4856,14 @@
             "source_indexes": [
               0,
               1
+            ],
+            "reviewed_on": "2026-11-25"
+          },
+          {
+            "label": "Task Builder",
+            "value": "Formerly AI Task Builder · app/API availability announced 16 Nov 2026 (company stated)",
+            "source_indexes": [
+              3
             ]
           }
         ],
@@ -4779,6 +4894,15 @@
             "response_sha256": "cd100d639d7abc2ef07bca12a1b405de996b7053780f430c509292dd1fbf7137",
             "content_kind": "raw_http_body",
             "locator": "Filing history, 29 September 2026: full accounts made up to 31 December 2025, with direct PDF and iXBRL links."
+          },
+          {
+            "url": "https://www.prolific.com/resources/evaluate-and-collect-text-images-audio-and-video-with-task-builder",
+            "title": "Prolific Task Builder name and availability announcement",
+            "published_on": "2026-11-16",
+            "observed_on": "2026-11-27",
+            "response_sha256": "a3b72df4c8bded1020b616e6d4e1e45bb2692a35a694cb5fc1f4543e8cca091d",
+            "content_kind": "raw_http_body",
+            "locator": "Introduction; A new name; concluding app and API availability statement. Visible publication date: 16 November 2026."
           }
         ]
       }

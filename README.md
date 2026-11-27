@@ -207,8 +207,8 @@ sanitized public deployment settings; credentials never enter the repository.
 The current `/companies/` directory also reads `data/current-companies.json`.
 This additive registry selects existing research organization profiles and
 source-bound current-only profiles without changing canonical v2.5.0, the
-published research graph or archived packages. Its 35 current additions
-bring the directory to 74 entries; the historical
+published research graph or archived packages. Its 38 current additions
+bring the directory to 77 entries; the historical
 research cohort and financial model coverage remain 39. Current cards and profile
 supplements retain exact Wikipedia sentences, permanent revisions, author-history
 links, CC BY-SA 4.0 attribution, and separately sourced current offering labels.
@@ -218,6 +218,9 @@ primary-source hashes identify the stated HTTP body or saved web-tool excerpt.
 The exported `/current-companies.json` preserves this provenance and licensing.
 Separately dated structured updates cite their own primary sources and do not
 refresh the Wikipedia excerpt or offering observation dates.
+An optional row-level `reviewed_on` preserves an earlier field review when a
+later observation joins the same block. Earlier dates remain visible beside
+those fields; cited evidence cannot be newer than the field review.
 An explicit `current_identity` binds each new current-only profile to its
 official identity sources, names and website. It cannot replace an existing
 profile or research identity. A `website_supplement` can fill a missing official

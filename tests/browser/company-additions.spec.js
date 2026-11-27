@@ -1,6 +1,7 @@
 const { test, expect } = require('@playwright/test');
 const registry = require('../../data/current-companies.json');
 const canonical = require('../../data/canonical.json');
+const profiles = require('../../data/profile-content.json');
 
 function displayDate(value) {
   return new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' }).format(new Date(value + 'T00:00:00Z'));
@@ -27,6 +28,32 @@ async function checkCurrentFacts(container, entry) {
   for (const date of new Set([offeringDates[0], offeringDates[offeringDates.length - 1]])) {
     await expect(container.locator('.company-research-snapshot')).toContainText(displayDate(date));
   }
+}
+
+for (const entry of profiles.entries.filter(entry => entry.current_facts?.rows.some(row => row.reviewed_on && row.reviewed_on !== entry.current_facts.reviewed_on))) {
+  test('company updates retain earlier field review dates: ' + entry.company_id, async ({ page }) => {
+    const facts = entry.current_facts;
+    for (const route of ['/company/' + entry.company_id + '/', '/explore/#company/' + entry.company_id]) {
+      await page.goto(route);
+      const updates = page.locator('.company-current-facts');
+      await expect(updates.locator(':scope > summary')).toHaveText('Updates checked ' + displayDate(facts.reviewed_on));
+      await updates.locator(':scope > summary').click();
+      const rows = updates.locator('dl.current-fact-list > div');
+      await expect(rows).toHaveCount(facts.rows.length);
+      for (const [index, row] of facts.rows.entries()) {
+        const item = rows.nth(index);
+        await expect(item.locator('dt')).toHaveText(row.label);
+        await expect(item.locator('dd')).toContainText(row.value);
+        const date = item.locator('.current-fact-review time');
+        if (row.reviewed_on && row.reviewed_on !== facts.reviewed_on) {
+          await expect(date).toHaveAttribute('datetime', row.reviewed_on);
+          await expect(date).toHaveText(displayDate(row.reviewed_on));
+        } else {
+          await expect(date).toHaveCount(0);
+        }
+      }
+    }
+  });
 }
 
 for (const entry of registry.entries) {

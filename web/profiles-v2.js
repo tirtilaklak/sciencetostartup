@@ -282,7 +282,10 @@ function profileIntroductionHTML(id){
 // Build a pane when it is read; populate another pane before its tab or anchor activates.
 function profileCurrentFacts(id){
  const facts=profileContent(id).current_facts;if(!facts?.rows?.length)return '';
- const rows=facts.rows.map(row=>`<div><dt>${esc(row.label)}</dt><dd>${esc(row.value)} ${row.source_indexes.map(i=>external(facts.sources[i].url,`[${i+1}]`).replace('<a ',`<a aria-label="${attr(facts.sources[i].title+' (opens in a new tab)')}" `)).join(' ')}</dd></div>`).join('');
+ const rows=facts.rows.map(row=>{
+  const earlier=row.reviewed_on&&row.reviewed_on!==facts.reviewed_on?` <small class="current-fact-review">Checked <time datetime="${attr(row.reviewed_on)}">${esc(profileDate(row.reviewed_on))}</time></small>`:'';
+  return `<div><dt>${esc(row.label)}</dt><dd>${esc(row.value)} ${row.source_indexes.map(i=>external(facts.sources[i].url,`[${i+1}]`).replace('<a ',`<a aria-label="${attr(facts.sources[i].title+' (opens in a new tab)')}" `)).join(' ')}${earlier}</dd></div>`;
+ }).join('');
  return `<details class="company-current-facts"><summary>Updates checked ${esc(profileDate(facts.reviewed_on))}</summary><dl class="current-fact-list">${rows}</dl></details>`;
 }
 function profilePaneHTML(id,key){

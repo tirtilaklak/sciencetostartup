@@ -83,7 +83,10 @@ def validate_profile_current_facts(profile_content, data, *, additional_company_
         labels = set()
         for index, row in enumerate(rows):
             where = prefix + ".rows[" + str(index) + "]"
-            require(isinstance(row, dict) and set(row) == {"label", "value", "source_indexes"}, where + " must contain label, value and source_indexes")
+            fields = {"label", "value", "source_indexes"}
+            require(isinstance(row, dict) and fields <= set(row) <= fields | {"reviewed_on"}, where + " must contain label, value and source_indexes, with optional reviewed_on")
+            row_reviewed = day(row.get("reviewed_on", reviewed), where + ".reviewed_on")
+            require(row_reviewed <= reviewed, where + ".reviewed_on is after the block review")
             text(row["label"], where + ".label", 80)
             text(row["value"], where + ".value", 200)
             require(row["label"] not in labels, where + " repeats a label")
@@ -92,4 +95,5 @@ def validate_profile_current_facts(profile_content, data, *, additional_company_
             require(isinstance(references, list) and references, where + ".source_indexes must be non-empty")
             require(all(type(value) is int and 0 <= value < len(sources) for value in references), where + ".source_indexes contains an invalid reference")
             require(len(set(references)) == len(references), where + ".source_indexes repeats a reference")
+            require(all(sources[i]["observed_on"] <= row_reviewed for i in references), where + " source observation is after the row review")
     return profile_content
