@@ -90,6 +90,106 @@ test('About reopens Coverage and limits on cold Back from the company directory'
   await expectReturn(page, source, page.locator('#download-files > summary'), position);
 });
 
+test.describe('About late cold return restoration', () => {
+  test.skip(({ browserName, isMobile }) => browserName !== 'webkit' || !isMobile, 'Exercise the Mobile WebKit return');
+
+  for (const action of ['overwrite', 'Home', 'Tab']) {
+    test(action === 'overwrite' ? 'recovers a delayed scroll and BODY focus reset' : `respects trusted ${action} during recovery`, async ({ page, baseURL }) => {
+      await trackDocument(page, false);
+      await page.addInitScript(action => {
+        if (location.pathname !== '/method/') return;
+        addEventListener('unload', () => {});
+        let signal;
+        let ready;
+        const viewport = link => ({ scroll: scrollY, top: link.getBoundingClientRect().top, focused: document.activeElement === link });
+        const coldSource = () => {
+          const link = document.activeElement;
+          return link?.matches('#coverage-notes a[data-disclosure-return]') &&
+            window.nativeHandoffCached === false &&
+            performance.getEntriesByType('navigation')[0]?.type === 'back_forward' ? link : null;
+        };
+        window.aboutReturnGuardReady = new Promise(resolve => { ready = resolve; });
+        window.aboutReturnGuardCancelled = () => signal?.aborted;
+        const listen = window.addEventListener;
+        window.addEventListener = function (type, callback, options) {
+          const result = Reflect.apply(listen, this, arguments);
+          const link = coldSource();
+          if (this === window && type === 'scroll' && options?.signal && link) {
+            window.addEventListener = listen;
+            signal = options.signal;
+            if (action !== 'overwrite') ready(viewport(link));
+          }
+          return result;
+        };
+        if (action === 'overwrite') {
+          const scroll = window.scrollBy;
+          window.scrollBy = function (...args) {
+            const result = Reflect.apply(scroll, this, args);
+            const link = coldSource();
+            if (!link) return result;
+            window.scrollBy = scroll;
+            const first = viewport(link);
+            ready(first);
+            // Trigger from the existing initial restore, including on the old implementation.
+            window.aboutReturnOverwrite = new Promise(done => setTimeout(() => {
+              const guardActive = signal ? !signal.aborted : null;
+              scrollTo({ top: 0, behavior: 'instant' });
+              link.blur();
+              done({ first, guardActive, overwrite: viewport(link), active: document.activeElement.tagName });
+            }, 25));
+            return result;
+          };
+        }
+        window.aboutReturnUserInput = new Promise(resolve => {
+          addEventListener('keydown', event => {
+            if (event.key !== action || !event.isTrusted || !signal) return;
+            const guardActive = !signal.aborted;
+            if (action === 'Home') {
+              event.preventDefault();
+              scrollTo({ top: 0, behavior: 'instant' });
+            }
+            resolve({ guardActive });
+          }, { capture: true });
+        });
+      }, action);
+      await page.setViewportSize({ width: 390, height: 844 });
+      await routePublishedPages(page, baseURL);
+      const origin = 'https://sciencetostartup.com/method/#about';
+      await page.goto(origin);
+      const coverage = page.locator('#coverage-notes');
+      await coverage.locator('summary').press('Enter');
+      const source = coverage.getByRole('link', { name: 'current company directory' });
+      const position = await activate(source);
+      await expect(page).toHaveURL('https://sciencetostartup.com/companies/');
+      await page.goBack({ waitUntil: 'commit' });
+      const first = await page.evaluate(() => window.aboutReturnGuardReady);
+      expect(first.focused).toBe(true);
+      expect(Math.abs(first.scroll - position.scroll)).toBeLessThan(3);
+      expect(Math.abs(first.top - position.top)).toBeLessThan(3);
+      await expect(page).toHaveURL(origin);
+      await expect(coverage).toHaveAttribute('open', '');
+      if (action === 'overwrite') {
+        const interference = await page.evaluate(() => window.aboutReturnOverwrite);
+        expect(interference.overwrite.scroll).toBe(0);
+        expect(interference.overwrite.focused).toBe(false);
+        expect(interference.active).toBe('BODY');
+        await expectReturn(page, source, page.locator('#download-files > summary'), position);
+      } else {
+        await page.keyboard.press(action);
+        expect(await page.evaluate(async () => ({
+          ...await window.aboutReturnUserInput, cancelled: window.aboutReturnGuardCancelled(),
+        }))).toEqual({ guardActive: true, cancelled: true });
+        const expectedFocus = action === 'Home' ? source : page.locator('#download-files > summary');
+        await expect(expectedFocus).toBeFocused();
+        if (action === 'Home') expect(await page.evaluate(() => scrollY)).toBe(0);
+        await page.evaluate(() => new Promise(resolve => setTimeout(resolve, 300)));
+        await expect(expectedFocus).toBeFocused();
+        if (action === 'Home') expect(await page.evaluate(() => scrollY)).toBe(0);
+      }
+    });
+  }
+});
+
 const companyHandoffs = [
   {
     name: 'Compare Mercor', query: 'Mercor', source: compareResult, following: firstMercorSource,

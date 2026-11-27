@@ -143,8 +143,10 @@
       const role = workRole(link);
       const sourceBookmark = sourcePanel?.contains(link) && location.hash === `#${sourceSummary.id}` ? sourceSummary : null;
       const bookmark = role && location.hash === `#${role.id}` ? role : sourceBookmark;
+      const aboutDisclosure = !role && !bookmark && location.pathname === '/method/' &&
+        location.hash === '#about' && link.closest('#coverage-notes');
       const input = new AbortController();
-      if (role || bookmark) {
+      if (role || bookmark || aboutDisclosure) {
         for (const type of ['keydown', 'pointerdown', 'touchstart', 'wheel']) {
           addEventListener(type, event => { if (event.isTrusted) input.abort(); },
             { capture: true, passive: true, signal: input.signal });
@@ -172,6 +174,34 @@
         const terms = saved.termsOpen && role?.querySelector('.work-terms');
         if (terms) terms.open = true;
         restoreLink();
+        if (aboutDisclosure) {
+          // A cold About return can finish native scroll/focus restoration later.
+          const restoredScroll = scrollY;
+          const recoverAbout = () => {
+            if (input.signal.aborted) return;
+            const current = history.state?.nativeDisclosureReturn || history.state?.nativeCompanyReturn;
+            const active = document.activeElement;
+            if (location.href !== saved.page || current?.page !== saved.page ||
+                current.href !== saved.href || current.index !== saved.index ||
+                !aboutDisclosure.open || !link.isConnected ||
+                (active !== link && active !== document.body)) {
+              input.abort();
+              return;
+            }
+            if (active === link && Math.abs(scrollY - restoredScroll) < 1) return;
+            // Native scroll and focus can settle in separate events within this window.
+            restoreLink();
+          };
+          addEventListener('focusin', event => {
+            if (event.target !== link && event.target !== document.body) input.abort();
+          }, { capture: true, signal: input.signal });
+          addEventListener('focusout', event => {
+            if (event.target === link) requestAnimationFrame(recoverAbout);
+          }, { capture: true, signal: input.signal });
+          addEventListener('scroll', recoverAbout, { passive: true, signal: input.signal });
+          setTimeout(() => input.abort(), 250);
+          return;
+        }
         if (!bookmark) {
           input.abort();
           return;

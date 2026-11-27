@@ -40,6 +40,26 @@ class CurrentCompanyFactsTests(unittest.TestCase):
         with self.assertRaisesRegex(CompanyUpdatesValidationError, "duplicate current facts"):
             validate_profile_current_facts(content, self.data)
 
+    def test_additional_registry_ids_are_explicit_and_canonical_scope_stays_strict(self):
+        content = example()
+        content["entries"][0]["company_id"] = "org.reviewed"
+        original = copy.deepcopy((content, self.data))
+        with self.assertRaisesRegex(CompanyUpdatesValidationError, "known company"):
+            validate_profile_current_facts(content, self.data)
+        self.assertIs(validate_profile_current_facts(content, self.data, additional_company_ids={"org.reviewed"}), content)
+        with self.assertRaisesRegex(CompanyUpdatesValidationError, "known company"):
+            validate_profile_current_facts(content, self.data, additional_company_ids={"org.other"})
+        with self.assertRaisesRegex(CompanyUpdatesValidationError, "validated organization IDs"):
+            validate_profile_current_facts(content, self.data, additional_company_ids={"unreviewed"})
+        self.assertEqual((content, self.data), original)
+
+    def test_explicit_registry_review_ceiling_does_not_refresh_fact_dates(self):
+        content = example()
+        validate_profile_current_facts(content, self.data, reviewed_through="2026-11-16")
+        with self.assertRaisesRegex(CompanyUpdatesValidationError, "after the registry review"):
+            validate_profile_current_facts(content, self.data, reviewed_through="2026-11-15")
+        self.assertEqual(content["entries"][0]["current_facts"]["reviewed_on"], "2026-11-16")
+
     def test_source_dates_are_distinct_and_calendar_valid(self):
         for field, value, message in [
             ("published_on", "2026-11-17", "after observation"),
@@ -82,6 +102,36 @@ class CurrentCompanyFactsTests(unittest.TestCase):
         content["entries"][0]["current_facts"]["sources"][0]["content_kind"] = "web_tool_text_excerpt"
         validate_profile_current_facts(content, self.data)
         self.rejects(lambda entry: entry["current_facts"]["sources"][0].update(content_kind="raw_page_inferred"), "content_kind is unsupported")
+
+    def test_later_update_retains_an_earlier_field_review(self):
+        content = example()
+        facts = content["entries"][0]["current_facts"]
+        original_row = copy.deepcopy(facts["rows"][0])
+        facts["rows"][0]["reviewed_on"] = facts["reviewed_on"]
+        facts["reviewed_on"] = "2026-11-27"
+        newer = copy.deepcopy(facts["sources"][0])
+        newer["observed_on"] = "2026-11-27"
+        facts["sources"].append(newer)
+        facts["rows"].append({"label": "New observation", "value": "Separate field", "source_indexes": [1]})
+        validate_profile_current_facts(content, self.data)
+        self.assertEqual(facts["rows"][0], {**original_row, "reviewed_on": "2026-11-16"})
+        self.assertEqual(facts["sources"][0]["observed_on"], "2026-11-16")
+
+    def test_field_review_cannot_precede_its_evidence_or_follow_its_block(self):
+        self.rejects(lambda entry: entry["current_facts"]["rows"][0].update(reviewed_on="2026-11-15"), "source observation is after the row review")
+        self.rejects(lambda entry: entry["current_facts"]["rows"][0].update(reviewed_on="2026-11-17"), "after the block review")
+        self.rejects(lambda entry: entry["current_facts"]["rows"][0].update(reviewed_on="2026-02-30"), "calendar date")
+
+    def test_native_fact_dates_show_the_retained_field_review(self):
+        from static_pages import current_facts_html
+        entry = example()["entries"][0]
+        entry["current_facts"]["rows"][0]["reviewed_on"] = "2026-11-16"
+        entry["current_facts"]["reviewed_on"] = "2026-11-27"
+        html = current_facts_html(entry)
+        self.assertIn('Updates checked 27 Nov 2026', html)
+        self.assertIn('<time datetime="2026-11-16">16 Nov 2026</time>', html)
+        self.assertIn('31 Jul 2026', html)
+        self.assertNotIn('current-fact-review', current_facts_html(example()["entries"][0]))
 
 
 if __name__ == "__main__":

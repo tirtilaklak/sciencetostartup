@@ -8,11 +8,13 @@ class CompanyUpdatesValidationError(ValueError):
     """A current company fact lacks a valid scope or source receipt."""
 
 
-def validate_profile_current_facts(profile_content, data):
+def validate_profile_current_facts(profile_content, data, *, additional_company_ids=(), reviewed_through=None):
     """Return the supplied profile content after validating optional current_facts.
 
     Profiles without current facts need no current-source receipt. This keeps
     historical profile content independent of current company maintenance.
+    Callers may explicitly admit IDs from an already validated current registry;
+    ordinary profile validation remains restricted to canonical company IDs.
     """
     def require(condition, message):
         if not condition:
@@ -32,7 +34,11 @@ def validate_profile_current_facts(profile_content, data):
         require(not re.search(r"[<>\x00-\x1f\x7f-\x9f\u200e\u200f\u2028\u2029\u202a-\u202e\u2066-\u2069]", value), where + " must be plain text")
 
     require(isinstance(profile_content, dict) and isinstance(profile_content.get("entries"), list), "profiles must contain entries")
-    companies = {row["id"] for row in data.get("companies", [])}
+    additional_company_ids = tuple(additional_company_ids)
+    require(all(isinstance(cid, str) and re.fullmatch(r"org\.[a-z0-9][a-z0-9_.-]*", cid) for cid in additional_company_ids), "additional company IDs must be validated organization IDs")
+    companies = {row["id"] for row in data.get("companies", [])} | set(additional_company_ids)
+    if reviewed_through is not None:
+        day(reviewed_through, "reviewed_through")
     updated = set()
     for entry in profile_content["entries"]:
         require(isinstance(entry, dict), "profile entry must be an object")
@@ -46,6 +52,8 @@ def validate_profile_current_facts(profile_content, data):
         prefix = cid + ".current_facts"
         require(isinstance(facts, dict) and set(facts) == {"reviewed_on", "rows", "sources"}, prefix + " must contain reviewed_on, rows and sources")
         reviewed = day(facts["reviewed_on"], prefix + ".reviewed_on")
+        if reviewed_through is not None:
+            require(reviewed <= reviewed_through, prefix + ".reviewed_on is after the registry review")
         sources = facts["sources"]
         require(isinstance(sources, list) and sources, prefix + ".sources must be non-empty")
         for index, source in enumerate(sources):
@@ -75,7 +83,10 @@ def validate_profile_current_facts(profile_content, data):
         labels = set()
         for index, row in enumerate(rows):
             where = prefix + ".rows[" + str(index) + "]"
-            require(isinstance(row, dict) and set(row) == {"label", "value", "source_indexes"}, where + " must contain label, value and source_indexes")
+            fields = {"label", "value", "source_indexes"}
+            require(isinstance(row, dict) and fields <= set(row) <= fields | {"reviewed_on"}, where + " must contain label, value and source_indexes, with optional reviewed_on")
+            row_reviewed = day(row.get("reviewed_on", reviewed), where + ".reviewed_on")
+            require(row_reviewed <= reviewed, where + ".reviewed_on is after the block review")
             text(row["label"], where + ".label", 80)
             text(row["value"], where + ".value", 200)
             require(row["label"] not in labels, where + " repeats a label")
@@ -84,4 +95,5 @@ def validate_profile_current_facts(profile_content, data):
             require(isinstance(references, list) and references, where + ".source_indexes must be non-empty")
             require(all(type(value) is int and 0 <= value < len(sources) for value in references), where + ".source_indexes contains an invalid reference")
             require(len(set(references)) == len(references), where + ".source_indexes repeats a reference")
+            require(all(sources[i]["observed_on"] <= row_reviewed for i in references), where + " source observation is after the row review")
     return profile_content

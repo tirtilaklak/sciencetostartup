@@ -1815,7 +1815,9 @@ def current_facts_html(profile_entry):
     rows = []
     for row in facts["rows"]:
         links = " ".join(external_link(sources[i]["url"], f"[{i + 1}]", sources[i]["title"]) for i in row["source_indexes"])
-        rows.append(f'<div><dt>{escape(row["label"])}</dt><dd>{escape(row["value"])} {links}</dd></div>')
+        reviewed = row.get("reviewed_on")
+        earlier = f' <small class="current-fact-review">Checked <time datetime="{escape(reviewed)}">{escape(format_date(reviewed))}</time></small>' if reviewed and reviewed != facts["reviewed_on"] else ""
+        rows.append(f'<div><dt>{escape(row["label"])}</dt><dd>{escape(row["value"])} {links}{earlier}</dd></div>')
     return f'<details class="company-current-facts"><summary>Updates checked {escape(format_date(facts["reviewed_on"]))}</summary><dl class="current-fact-list">{"".join(rows)}</dl></details>'
 
 

@@ -104,6 +104,7 @@ main>details.r-company-supplement.company-fold{max-width:960px;margin:0;padding:
 .research-company-dossier .company-fold-body .r-facts{grid-template-columns:110px minmax(0,1fr)}
 .research-company-dossier .company-fold-body :is(h2,h3){padding:0;border:0}
 .research-company-dossier .r-assertion-text{font-family:var(--sans);font-size:15px;line-height:1.7}
+.research-company-dossier .r-record-correction>p>a{display:inline-flex;align-items:center;min-height:44px}
 .research-company-dossier .company-fold-body .r-assertion:first-of-type{padding-top:8px}
 @media(max-width:600px){.research-company-dossier .company-research-snapshot{font-size:13px}.research-company-dossier .company-fold-body .r-facts{grid-template-columns:84px minmax(0,1fr);gap:10px 16px}}
 
